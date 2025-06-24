@@ -9,10 +9,11 @@ export interface TreeNode {
   totalCost: number;
   // Metadados adicionais
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
   responsible?: string;
   status?: 'not-started' | 'in-progress' | 'completed';
+  // Gestão de tempo
+  startDate?: Date;
+  endDate?: Date;
   // Dependências para Gantt
   dependencies?: string[]; // IDs dos nós que devem ser concluídos antes
 }
