@@ -1,0 +1,160 @@
+{
+  "id": "proj-001",
+  "name": "Projeto de Desenvolvimento de Software",
+  "cost": 5000,
+  "level": 1,
+  "description": "Projeto principal de desenvolvimento de uma aplicação web completa",
+  "responsible": "João Silva",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-30",
+  "status": "in-progress",
+  "children": [
+    {
+      "id": "phase-001",
+      "name": "1. Planejamento",
+      "cost": 2000,
+      "level": 2,
+      "description": "Fase de planejamento e análise de requisitos",
+      "responsible": "Maria Santos",
+      "startDate": "2024-01-01",
+      "endDate": "2024-03-30",
+      "status": "completed",
+      "children": [
+        {
+          "id": "task-001",
+          "name": "1.1. Análise de Requisitos",
+          "cost": 3000,
+          "level": 3,
+          "description": "Levantamento detalhado de requisitos funcionais e não funcionais",
+          "responsible": "Ana Costa",
+          "startDate": "2024-01-01",
+          "endDate": "2024-02-15",
+          "status": "completed",
+          "children": []
+        },
+        {
+          "id": "task-002",
+          "name": "1.2. Arquitetura do Sistema",
+          "cost": 2500,
+          "level": 3,
+          "description": "Definição da arquitetura técnica e tecnologias",
+          "responsible": "Carlos Lima",
+          "startDate": "2024-02-01",
+          "endDate": "2024-03-15",
+          "status": "completed",
+          "children": []
+        },
+        {
+          "id": "task-003",
+          "name": "1.3. Prototipagem",
+          "cost": 1800,
+          "level": 3,
+          "description": "Criação de protótipos de interface",
+          "responsible": "Pedro Reis",
+          "startDate": "2024-02-15",
+          "endDate": "2024-03-30",
+          "status": "completed",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "phase-002",
+      "name": "2. Desenvolvimento",
+      "cost": 1500,
+      "level": 2,
+      "description": "Fase de implementação do sistema",
+      "responsible": "João Silva",
+      "startDate": "2024-04-01",
+      "endDate": "2024-10-30",
+      "status": "in-progress",
+      "children": [
+        {
+          "id": "task-004",
+          "name": "2.1. Backend API",
+          "cost": 4000,
+          "level": 3,
+          "description": "Desenvolvimento da API REST",
+          "responsible": "Lucas Ferreira",
+          "startDate": "2024-04-01",
+          "endDate": "2024-07-30",
+          "status": "in-progress",
+          "children": []
+        },
+        {
+          "id": "task-005",
+          "name": "2.2. Frontend Web",
+          "cost": 3500,
+          "level": 3,
+          "description": "Interface web responsiva",
+          "responsible": "Amanda Souza",
+          "startDate": "2024-05-01",
+          "endDate": "2024-08-30",
+          "status": "not-started",
+          "children": []
+        },
+        {
+          "id": "task-006",
+          "name": "2.3. Banco de Dados",
+          "cost": 2800,
+          "level": 3,
+          "description": "Modelagem e implementação do banco",
+          "responsible": "Roberto Alves",
+          "startDate": "2024-04-15",
+          "endDate": "2024-06-30",
+          "status": "in-progress",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "phase-003",
+      "name": "3. Testes",
+      "cost": 1000,
+      "level": 2,
+      "description": "Fase de testes e validação",
+      "responsible": "Maria Santos",
+      "startDate": "2024-09-01",
+      "endDate": "2024-11-30",
+      "status": "not-started",
+      "children": [
+        {
+          "id": "task-007",
+          "name": "3.1. Testes Unitários",
+          "cost": 2000,
+          "level": 3,
+          "description": "Cobertura de testes automatizados",
+          "responsible": "Fernanda Lima",
+          "startDate": "2024-09-01",
+          "endDate": "2024-10-15",
+          "status": "not-started",
+          "children": []
+        },
+        {
+          "id": "task-008",
+          "name": "3.2. Testes de Integração",
+          "cost": 1800,
+          "level": 3,
+          "description": "Testes de integração entre módulos",
+          "responsible": "Bruno Costa",
+          "startDate": "2024-09-15",
+          "endDate": "2024-11-15",
+          "status": "not-started",
+          "children": []
+        },
+        {
+          "id": "task-009",
+          "name": "3.3. Testes de Aceitação",
+          "cost": 2200,
+          "level": 3,
+          "description": "Validação com usuários finais",
+          "responsible": "Carla Mendes",
+          "startDate": "2024-10-01",
+          "endDate": "2024-11-30",
+          "status": "not-started",
+          "children": []
+        }
+      ]
+    }
+  ]
+} 

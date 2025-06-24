@@ -39,9 +39,9 @@ Sistema para criação e gerenciamento de estruturas hierárquicas dinâmicas de
 ### **Fase 3: Exportação e Visualização (Semanas 5-6)**
 - [x] Exportação para Excel com breakdown de custos
 - [x] Exportação para JSON
+- [x] Importação de estruturas existentes (JSON, Excel, CSV)
 - [ ] Visualização Gantt Chart
 - [ ] Exportação para PDF
-- [ ] Importação de estruturas existentes
 
 ### **Fase 4: Backend e Persistência (Semanas 7-8)**
 - [ ] API REST para CRUD de projetos
@@ -83,6 +83,9 @@ npm run build
 - **Dashboard de custos** - Visualização por nível
 - **Exportação Excel** - Com breakdown detalhado
 - **Exportação JSON** - Para backup e integração
+- **Importação inteligente** - Suporte a JSON, Excel (.xlsx/.xls) e CSV
+- **Validação de dados** - Verificação automática na importação
+- **Preview de importação** - Visualização antes de confirmar
 
 ### 🔧 Features Técnicas
 - **TypeScript** - Tipagem forte e autocompletar
@@ -109,6 +112,37 @@ Projeto Principal (Nível 1)
 
 Total Automático: R$ 53.000
 ```
+
+## 📥 Importação de Dados
+
+### Formatos Suportados
+
+1. **JSON** - Estrutura completa com metadados
+2. **Excel (.xlsx/.xls)** - Planilhas hierárquicas
+3. **CSV** - Dados tabulares separados por vírgula
+
+### Colunas Esperadas (Excel/CSV)
+
+| Campo | Obrigatório | Descrição |
+|-------|-------------|-----------|
+| Nome/Name/Atividade | ✅ | Nome da atividade |
+| Nível/Level | ❌ | Nível hierárquico (1, 2 ou 3) |
+| Custo/Cost/Valor | ❌ | Custo da atividade |
+| Descrição/Description | ❌ | Descrição detalhada |
+| Responsável/Responsible | ❌ | Pessoa responsável |
+| Data Início/Start Date | ❌ | Data de início |
+| Data Fim/End Date | ❌ | Data de término |
+
+### Detecção Automática
+
+- **Nível hierárquico**: Por indentação, prefixos (1., 1.1., 1.1.1.) ou coluna explícita
+- **Colunas**: Sistema detecta automaticamente os nomes das colunas
+- **Valores**: Conversão automática de tipos de dados
+
+### Templates Disponíveis
+
+- `/templates/wbs-template.csv` - Exemplo em CSV
+- `/templates/wbs-template.json` - Exemplo em JSON
 
 ## 🎯 Próximos Passos
 
