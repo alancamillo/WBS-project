@@ -1,0 +1,31 @@
+.App {
+  text-align: center;
+}
+
+.tree-node {
+  margin: 8px 0;
+}
+
+.tree-node-level-1 {
+  border-left: 4px solid #1890ff;
+  background-color: #f0f9ff;
+}
+
+.tree-node-level-2 {
+  border-left: 4px solid #52c41a;
+  background-color: #f6ffed;
+}
+
+.tree-node-level-3 {
+  border-left: 4px solid #faad14;
+  background-color: #fffbe6;
+}
+
+.cost-display {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.level-tag {
+  margin-right: 8px;
+} 
