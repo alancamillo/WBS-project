@@ -1,182 +1,179 @@
-# WBS Dynamic Tree - Estrutura Hierárquica de Custos
+# WBS Dynamic Tree: Hierarchical Cost Management Platform
 
-## 📋 Visão Geral
+[![React](https://img.shields.io/badge/React-18+-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Ant Design](https://img.shields.io/badge/Ant%20Design-5+-blue.svg?style=for-the-badge&logo=antdesign)](https://ant.design/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-Sistema para criação e gerenciamento de estruturas hierárquicas dinâmicas de 3 níveis com agregação automática de custos e funcionalidades de exportação.
-
-## 🏗️ Arquitetura Recomendada
-
-### **Stack Tecnológico**
-
-#### Frontend
-- **React 18** + **TypeScript** - Interface reativa e tipagem forte
-- **Ant Design** - Componentes UI profissionais
-- **XLSX.js** - Exportação para Excel
-- **Gantt-Task-React** - Visualização Gantt
-
-#### Backend (Opcional - Fase 2)
-- **Node.js** + **Express** + **TypeScript** ou **Python FastAPI**
-- **PostgreSQL** - Banco com suporte a queries hierárquicas
-- **Prisma** (Node.js) ou **SQLAlchemy** (Python) - ORM
-
-## 🚀 Plano de Implementação
-
-### **Fase 1: Estrutura Base (Semanas 1-2)**
-✅ **Concluído**
-- [x] Configuração do projeto React + TypeScript
-- [x] Definição das interfaces TypeScript
-- [x] Implementação do sistema de agregação automática de custos
-- [x] Componente TreeNode dinâmico e recursivo
-- [x] Interface principal com dashboard de custos
-
-### **Fase 2: Funcionalidades Avançadas (Semanas 3-4)**
-- [ ] Implementação de drag-and-drop para reorganização
-- [ ] Sistema de templates para estruturas comuns
-- [ ] Validações e regras de negócio
-- [ ] Histórico de alterações (undo/redo)
-- [ ] Busca e filtros na estrutura
-
-### **Fase 3: Exportação e Visualização (Semanas 5-6)**
-- [x] Exportação para Excel com breakdown de custos
-- [x] Exportação para JSON
-- [x] Importação de estruturas existentes (JSON, Excel, CSV)
-- [ ] Visualização Gantt Chart
-- [ ] Exportação para PDF
-
-### **Fase 4: Backend e Persistência (Semanas 7-8)**
-- [ ] API REST para CRUD de projetos
-- [ ] Banco de dados PostgreSQL
-- [ ] Sistema de autenticação
-- [ ] Múltiplos projetos por usuário
-- [ ] Compartilhamento e colaboração
-
-### **Fase 5: Otimização e Deploy (Semanas 9-10)**
-- [ ] Otimização de performance para grandes estruturas
-- [ ] Testes automatizados
-- [ ] Deploy na nuvem (Vercel/Netlify + Railway/Heroku)
-- [ ] Documentação completa
-
-## 📦 Instalação e Uso
-
-### Pré-requisitos
-- Node.js 18+ 
-- npm ou yarn
-
-### Instalação
-```bash
-# Instalar dependências
-npm install
-
-# Iniciar em modo desenvolvimento
-npm start
-
-# Build para produção
-npm run build
-```
-
-## 🌟 Funcionalidades Implementadas
-
-### ✅ Core Features
-- **Estrutura hierárquica dinâmica** - 3 níveis configuráveis
-- **Agregação automática de custos** - Cálculo em tempo real
-- **Interface intuitiva** - Edição inline, drag-and-drop visual
-- **Dashboard de custos** - Visualização por nível
-- **Exportação Excel** - Com breakdown detalhado
-- **Exportação JSON** - Para backup e integração
-- **Importação inteligente** - Suporte a JSON, Excel (.xlsx/.xls) e CSV
-- **Validação de dados** - Verificação automática na importação
-- **Preview de importação** - Visualização antes de confirmar
-
-### 🔧 Features Técnicas
-- **TypeScript** - Tipagem forte e autocompletar
-- **Componentes reutilizáveis** - Arquitetura modular
-- **Estado gerenciado** - React hooks e context
-- **Validação de dados** - Consistência e integridade
-- **Responsivo** - Funciona em desktop e mobile
-
-## 📊 Exemplo de Uso
-
-```typescript
-// Estrutura típica de 3 níveis
-Projeto Principal (Nível 1)
-├── Fase 1 - Planejamento (Nível 2)
-│   ├── Análise de Requisitos (Nível 3) - R$ 5.000
-│   └── Documentação (Nível 3) - R$ 3.000
-├── Fase 2 - Desenvolvimento (Nível 2)
-│   ├── Frontend (Nível 3) - R$ 15.000
-│   ├── Backend (Nível 3) - R$ 12.000
-│   └── Banco de Dados (Nível 3) - R$ 8.000
-└── Fase 3 - Testes (Nível 2)
-    ├── Testes Unitários (Nível 3) - R$ 4.000
-    └── Testes de Integração (Nível 3) - R$ 6.000
-
-Total Automático: R$ 53.000
-```
-
-## 📥 Importação de Dados
-
-### Formatos Suportados
-
-1. **JSON** - Estrutura completa com metadados
-2. **Excel (.xlsx/.xls)** - Planilhas hierárquicas
-3. **CSV** - Dados tabulares separados por vírgula
-
-### Colunas Esperadas (Excel/CSV)
-
-| Campo | Obrigatório | Descrição |
-|-------|-------------|-----------|
-| Nome/Name/Atividade | ✅ | Nome da atividade |
-| Nível/Level | ❌ | Nível hierárquico (1, 2 ou 3) |
-| Custo/Cost/Valor | ❌ | Custo da atividade |
-| Descrição/Description | ❌ | Descrição detalhada |
-| Responsável/Responsible | ❌ | Pessoa responsável |
-| Data Início/Start Date | ❌ | Data de início |
-| Data Fim/End Date | ❌ | Data de término |
-
-### Detecção Automática
-
-- **Nível hierárquico**: Por indentação, prefixos (1., 1.1., 1.1.1.) ou coluna explícita
-- **Colunas**: Sistema detecta automaticamente os nomes das colunas
-- **Valores**: Conversão automática de tipos de dados
-
-### Templates Disponíveis
-
-- `/templates/wbs-template.csv` - Exemplo em CSV
-- `/templates/wbs-template.json` - Exemplo em JSON
-
-## 🎯 Próximos Passos
-
-1. **Testar o sistema atual** - Executar `npm start` e testar todas as funcionalidades
-2. **Implementar Gantt Chart** - Usar biblioteca gantt-task-react
-3. **Adicionar persistência** - Backend com banco de dados
-4. **Melhorar UX** - Drag-and-drop, templates, validações
-5. **Deploy** - Publicar versão inicial
-
-## 🔥 Diferenciais da Solução
-
-- **Agregação automática** - Não precisa calcular manualmente
-- **Totalmente dinâmica** - Adicione quantos níveis precisar
-- **Exportação robusta** - Excel com fórmulas e formatação
-- **Interface moderna** - Ant Design com UX profissional
-- **TypeScript** - Código mais confiável e maintível
-- **Extensível** - Fácil adicionar novas funcionalidades
-
-## 🛠️ Aceleradores Utilizados
-
-- **Create React App** - Setup rápido do projeto
-- **Ant Design** - 50+ componentes prontos
-- **XLSX.js** - Exportação Excel sem backend
-- **UUID** - IDs únicos para nós
-- **TypeScript** - Tipagem e IntelliSense
-
-## 📈 Métricas de Sucesso
-
-- **Tempo de desenvolvimento**: 2-3 semanas para MVP
-- **Facilidade de uso**: Interface intuitiva, sem treinamento
-- **Performance**: Suporta 1000+ nós sem travamento
-- **Exportação**: Excel profissional em <5 segundos
-- **Manutenibilidade**: Código TypeScript bem estruturado
+WBS Dynamic Tree is a powerful web application designed to help project managers and teams create, manage, and visualize hierarchical Work Breakdown Structures (WBS) with automatic cost aggregation and advanced export capabilities.
 
 ---
 
-**Desenvolvido com ❤️ usando React + TypeScript + Ant Design** 
+## 🎯 Key Features
+
+- **📊 Dynamic Hierarchical Structure**: Create unlimited 3-level hierarchical structures with parent-child relationships
+- **💰 Automatic Cost Aggregation**: Real-time cost calculation and rollup from child to parent nodes
+- **📤 Multi-format Export**: Export to Excel (.xlsx), JSON, and CSV with professional formatting
+- **📥 Smart Import**: Import existing structures from Excel, CSV, or JSON with automatic column detection
+- **📈 Gantt Visualization**: Timeline view of your project structure with dependencies
+- **🎨 Modern Interface**: Clean, intuitive UI built with Ant Design components
+- **⚡ Real-time Updates**: Instant recalculation of costs and totals as you edit
+- **🔍 Data Validation**: Built-in validation to ensure data consistency and integrity
+
+<img src="screenshots/main-dashboard.png" alt="WBS Dynamic Tree Dashboard" width="100%">
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/wbs-dynamic-tree.git
+
+# Navigate to project directory
+cd wbs-dynamic-tree
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+The application will open at `http://localhost:3000`
+
+## 📚 Usage
+
+### Creating a Project Structure
+
+1. **Add Root Level Items**: Start by creating your main project phases or categories
+2. **Build Hierarchy**: Add sub-items under each main category
+3. **Add Details**: Include costs, descriptions, and responsible parties
+4. **Automatic Calculation**: Watch as costs automatically roll up to parent levels
+
+<img src="screenshots/tree-editing.png" alt="Creating and editing tree structure" width="100%">
+
+### Example Structure
+
+```
+Software Development Project
+├── 📋 Planning Phase                    ($8,000)
+│   ├── Requirements Analysis           ($5,000)
+│   └── Technical Documentation         ($3,000)
+├── 💻 Development Phase                 ($35,000)
+│   ├── Frontend Development            ($15,000)
+│   ├── Backend Development             ($12,000)
+│   └── Database Design                 ($8,000)
+└── 🧪 Testing Phase                     ($10,000)
+    ├── Unit Testing                    ($4,000)
+    └── Integration Testing             ($6,000)
+
+Total Project Cost: $53,000 (auto-calculated)
+```
+
+### Importing Data
+
+WBS Dynamic Tree supports multiple import formats:
+
+**Excel/CSV Import**
+- Automatic column detection for Name, Level, Cost, Description
+- Hierarchical structure recognition through indentation or numbering
+- Data validation and preview before import confirmation
+
+<img src="screenshots/import-process.png" alt="Import data from Excel or CSV" width="100%">
+
+<img src="screenshots/import-process-data.png" alt="Import data from Excel or CSV" width="100%">
+
+**JSON Import**
+- Complete structure import with all metadata
+- Preserves all custom fields and relationships
+- Perfect for backing up and restoring projects
+
+### Exporting Your Work
+
+**Excel Export**: Professional spreadsheets with:
+- Hierarchical formatting and indentation
+- Cost breakdown and summary tables
+- Formulas for automatic calculations
+- Custom styling and colors
+
+**JSON Export**: Complete data export for:
+- System integration and API usage
+- Backup and version control
+- Data migration between environments
+
+### Gantt Chart Visualization
+
+View your project structure as a timeline with:
+- Task dependencies and relationships
+- Duration and milestone tracking
+- Critical path visualization
+- Resource allocation overview
+
+<img src="screenshots/gantt-chart.png" alt="Gantt chart visualization" width="100%">
+
+## 🏗️ Architecture
+
+### Technology Stack
+
+- **Frontend**: React 18 + TypeScript for type-safe, modern UI
+- **UI Components**: Ant Design for professional, accessible interface
+- **Data Processing**: XLSX.js for Excel manipulation without backend
+- **Visualization**: Gantt-Task-React for project timeline views
+- **State Management**: React Context and Hooks for efficient data flow
+
+### Project Structure
+
+```
+src/
+├── components/           # Reusable UI components
+│   ├── TreeView.tsx     # Main tree display component
+│   ├── TreeNode.tsx     # Individual node component
+│   ├── GanttChart.tsx   # Timeline visualization
+│   └── ImportWBS.tsx    # Data import interface
+├── services/            # Business logic and utilities
+│   ├── exportService.ts # Export functionality
+│   ├── importService.ts # Import processing
+│   └── ganttService.ts  # Gantt chart data processing
+├── types/               # TypeScript type definitions
+├── utils/               # Helper functions
+└── data/                # Sample data and templates
+```
+
+## 📊 Performance & Scalability
+
+- **Handles 1000+ nodes** without performance degradation
+- **Real-time calculations** with optimized algorithms
+- **Memory efficient** tree traversal and updates
+- **Responsive design** works on desktop, tablet, and mobile
+
+## 🤝 Contributing
+
+We welcome contributions to WBS Dynamic Tree! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### Getting Started
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Documentation**: Check our [Wiki](https://github.com/your-username/wbs-dynamic-tree/wiki) for detailed guides
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/your-username/wbs-dynamic-tree/issues)
+- **Discussions**: Join the community in [GitHub Discussions](https://github.com/your-username/wbs-dynamic-tree/discussions)
+
+---
+
+**Built with ❤️ using React, TypeScript, and Ant Design** 
