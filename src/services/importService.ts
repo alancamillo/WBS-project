@@ -220,6 +220,11 @@ export class ImportService {
         });
       }
 
+      const startDate = this.parseDate(row[columnMappings.startDate]);
+      const endDate = this.parseDate(row[columnMappings.endDate]);
+      const duration = this.parseDuration(row[columnMappings.duration]);
+      const dependencies = this.parseDependencies(row[columnMappings.dependencies]);
+
       const node: TreeNode = {
         id: uuidv4(),
         name: name.trim(),
@@ -229,8 +234,10 @@ export class ImportService {
         totalCost: 0,
         description: row[columnMappings.description] ? String(row[columnMappings.description]).trim() : undefined,
         responsible: row[columnMappings.responsible] ? String(row[columnMappings.responsible]).trim() : undefined,
-        startDate: this.parseDate(row[columnMappings.startDate]),
-        endDate: this.parseDate(row[columnMappings.endDate])
+        startDate,
+        endDate,
+        durationDays: duration,
+        dependencies: dependencies.length > 0 ? dependencies : undefined
       };
 
       nodesByLevel[node.level].push({ node, originalIndex: index });
@@ -295,6 +302,14 @@ export class ImportService {
       /^(data.?fim|end.?date|fim|end|finish)$/i.test(key.trim())
     );
 
+    mappings.duration = keys.find(key => 
+      /^(duração|duration|dias|days|tempo)$/i.test(key.trim())
+    );
+
+    mappings.dependencies = keys.find(key => 
+      /^(dependências|dependencies|deps|predecessor)$/i.test(key.trim())
+    );
+
     return mappings;
   }
 
@@ -352,6 +367,51 @@ export class ImportService {
     
     const date = new Date(value);
     return isNaN(date.getTime()) ? undefined : date;
+  }
+
+  /**
+   * Parseia duração em dias
+   */
+  private static parseDuration(value: any): number {
+    if (!value) return 0;
+    if (typeof value === 'number') return Math.max(0, value);
+    
+    const cleanValue = String(value).trim().toLowerCase();
+    
+    // Tenta extrair número do valor
+    const numMatch = cleanValue.match(/(\d+(?:\.\d+)?)/);
+    if (!numMatch) return 0;
+    
+    const num = parseFloat(numMatch[1]);
+    
+    // Detecta unidades e converte para dias
+    if (cleanValue.includes('semana') || cleanValue.includes('week')) {
+      return num * 7;
+    } else if (cleanValue.includes('mês') || cleanValue.includes('month')) {
+      return num * 30;
+    } else if (cleanValue.includes('ano') || cleanValue.includes('year')) {
+      return num * 365;
+    }
+    
+    // Default: assume dias
+    return Math.max(0, num);
+  }
+
+  /**
+   * Parseia dependências (lista de IDs ou nomes separados por vírgula/ponto-e-vírgula)
+   */
+  private static parseDependencies(value: any): string[] {
+    if (!value) return [];
+    if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+    
+    const cleanValue = String(value).trim();
+    if (!cleanValue) return [];
+    
+    // Separa por vírgula, ponto-e-vírgula ou quebra de linha
+    return cleanValue
+      .split(/[,;\n|]/)
+      .map(dep => dep.trim())
+      .filter(Boolean);
   }
 
   /**

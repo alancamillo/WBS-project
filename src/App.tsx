@@ -182,6 +182,8 @@ function App() {
               node={rootNode}
               onUpdate={handleRootUpdate}
               onDelete={() => {}} // Root não pode ser deletado
+              rootNode={rootNode}
+              onTreeUpdate={handleRootUpdate}
             />
           ) : viewMode === 'flow' ? (
             <FlowTreeView rootNode={rootNode} />

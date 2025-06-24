@@ -58,8 +58,10 @@ export class ExportService {
           Descrição: currentNode.description || '',
           'Data Início': currentNode.startDate ? currentNode.startDate.toLocaleDateString() : '',
           'Data Fim': currentNode.endDate ? currentNode.endDate.toLocaleDateString() : '',
+          'Duração (dias)': currentNode.durationDays || '',
           Responsável: currentNode.responsible || '',
-          Status: currentNode.status || ''
+          Status: currentNode.status || '',
+          Dependências: currentNode.dependencies ? currentNode.dependencies.join(', ') : ''
         });
       }
 
