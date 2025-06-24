@@ -7,6 +7,8 @@
   "responsible": "João Silva",
   "startDate": "2024-01-01",
   "endDate": "2024-12-30",
+  "durationDays": 364,
+  "dependencies": [],
   "status": "in-progress",
   "children": [
     {
@@ -18,6 +20,8 @@
       "responsible": "Maria Santos",
       "startDate": "2024-01-01",
       "endDate": "2024-03-30",
+      "durationDays": 89,
+      "dependencies": [],
       "status": "completed",
       "children": [
         {
@@ -29,6 +33,8 @@
           "responsible": "Ana Costa",
           "startDate": "2024-01-01",
           "endDate": "2024-02-15",
+          "durationDays": 45,
+          "dependencies": [],
           "status": "completed",
           "children": []
         },
@@ -41,6 +47,8 @@
           "responsible": "Carlos Lima",
           "startDate": "2024-02-01",
           "endDate": "2024-03-15",
+          "durationDays": 43,
+          "dependencies": ["task-001"],
           "status": "completed",
           "children": []
         },
@@ -53,6 +61,8 @@
           "responsible": "Pedro Reis",
           "startDate": "2024-02-15",
           "endDate": "2024-03-30",
+          "durationDays": 44,
+          "dependencies": ["task-002"],
           "status": "completed",
           "children": []
         }
@@ -67,6 +77,8 @@
       "responsible": "João Silva",
       "startDate": "2024-04-01",
       "endDate": "2024-10-30",
+      "durationDays": 212,
+      "dependencies": ["phase-001"],
       "status": "in-progress",
       "children": [
         {
@@ -78,6 +90,8 @@
           "responsible": "Lucas Ferreira",
           "startDate": "2024-04-01",
           "endDate": "2024-07-30",
+          "durationDays": 120,
+          "dependencies": ["task-002"],
           "status": "in-progress",
           "children": []
         },
@@ -90,6 +104,8 @@
           "responsible": "Amanda Souza",
           "startDate": "2024-05-01",
           "endDate": "2024-08-30",
+          "durationDays": 121,
+          "dependencies": ["task-004"],
           "status": "not-started",
           "children": []
         },
@@ -102,6 +118,8 @@
           "responsible": "Roberto Alves",
           "startDate": "2024-04-15",
           "endDate": "2024-06-30",
+          "durationDays": 76,
+          "dependencies": ["task-002"],
           "status": "in-progress",
           "children": []
         }
@@ -116,6 +134,8 @@
       "responsible": "Maria Santos",
       "startDate": "2024-09-01",
       "endDate": "2024-11-30",
+      "durationDays": 91,
+      "dependencies": ["phase-002"],
       "status": "not-started",
       "children": [
         {
@@ -127,6 +147,8 @@
           "responsible": "Fernanda Lima",
           "startDate": "2024-09-01",
           "endDate": "2024-10-15",
+          "durationDays": 44,
+          "dependencies": ["task-004"],
           "status": "not-started",
           "children": []
         },
@@ -139,6 +161,8 @@
           "responsible": "Bruno Costa",
           "startDate": "2024-09-15",
           "endDate": "2024-11-15",
+          "durationDays": 61,
+          "dependencies": ["task-005", "task-006"],
           "status": "not-started",
           "children": []
         },
@@ -151,6 +175,8 @@
           "responsible": "Carla Mendes",
           "startDate": "2024-10-01",
           "endDate": "2024-11-30",
+          "durationDays": 60,
+          "dependencies": ["task-007", "task-008"],
           "status": "not-started",
           "children": []
         }

@@ -9,10 +9,14 @@ export interface TreeNode {
   totalCost: number;
   // Metadados adicionais
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
   responsible?: string;
   status?: 'not-started' | 'in-progress' | 'completed';
+  // Gestão de tempo
+  startDate?: Date;
+  endDate?: Date;
+  durationDays?: number; // Duração em dias
+  // Dependências
+  dependencies?: string[]; // IDs dos nós que devem ser concluídos antes desta atividade
 }
 
 export interface Project {
