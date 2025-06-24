@@ -14,6 +14,7 @@ export interface TreeNode {
   // Gestão de tempo
   startDate?: Date;
   endDate?: Date;
+  durationDays?: number;
   // Dependências para Gantt
   dependencies?: string[]; // IDs dos nós que devem ser concluídos antes
 }
