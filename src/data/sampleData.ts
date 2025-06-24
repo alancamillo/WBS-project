@@ -9,6 +9,11 @@ export const createSampleProject = (): TreeNode => {
     name: 'Project Management',
     cost: 5000,
     level: 1,
+    startDate: new Date('2024-01-01'),
+    endDate: new Date('2024-12-31'),
+    status: 'in-progress',
+    responsible: 'Gerente de Projeto',
+    description: 'Projeto principal de desenvolvimento e gestão',
     children: [
       {
         id: uuidv4(),
@@ -16,6 +21,11 @@ export const createSampleProject = (): TreeNode => {
         cost: 2000,
         level: 2,
         parentId: projectId,
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-03-31'),
+        status: 'completed',
+        responsible: 'Analista de Sistemas',
+        description: 'Fase de planejamento e design do projeto',
         children: [
           {
             id: uuidv4(),
@@ -23,6 +33,11 @@ export const createSampleProject = (): TreeNode => {
             cost: 3000,
             level: 3,
             parentId: uuidv4(),
+            startDate: new Date('2024-01-01'),
+            endDate: new Date('2024-01-15'),
+            status: 'completed',
+            responsible: 'Analista de Negócios',
+            description: 'Definição do escopo detalhado do projeto',
             children: [],
             totalCost: 3000
           },
@@ -32,6 +47,11 @@ export const createSampleProject = (): TreeNode => {
             cost: 2500,
             level: 3,
             parentId: uuidv4(),
+            startDate: new Date('2024-01-16'),
+            endDate: new Date('2024-02-15'),
+            status: 'completed',
+            responsible: 'Product Owner',
+            description: 'Identificação e documentação dos entregáveis',
             children: [],
             totalCost: 2500
           },
@@ -41,6 +61,11 @@ export const createSampleProject = (): TreeNode => {
             cost: 1800,
             level: 3,
             parentId: uuidv4(),
+            startDate: new Date('2024-02-16'),
+            endDate: new Date('2024-03-15'),
+            status: 'completed',
+            responsible: 'Arquiteto de Soluções',
+            description: 'Decomposição das atividades em tarefas menores',
             children: [],
             totalCost: 1800
           },
@@ -80,6 +105,11 @@ export const createSampleProject = (): TreeNode => {
         cost: 1500,
         level: 2,
         parentId: projectId,
+        startDate: new Date('2024-04-01'),
+        endDate: new Date('2024-09-30'),
+        status: 'in-progress',
+        responsible: 'Gerente de Desenvolvimento',
+        description: 'Fase de execução e desenvolvimento do projeto',
         children: [
           {
             id: uuidv4(),

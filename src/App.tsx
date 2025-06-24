@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined } from '@ant-design/icons';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
 import ImportWBS from './components/ImportWBS';
+import GanttChart from './components/GanttChart';
 import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
@@ -25,7 +26,7 @@ function App() {
     totalCost: 0
   }));
 
-  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
 
   // Recalcula custos automaticamente quando a estrutura muda
@@ -159,6 +160,13 @@ function App() {
                 >
                   Diagrama
                 </Button>
+                <Button
+                  icon={<BarChartOutlined />}
+                  onClick={() => setViewMode('gantt')}
+                  type={viewMode === 'gantt' ? 'primary' : 'default'}
+                >
+                  Gantt
+                </Button>
               </Button.Group>
               
               <Button
@@ -185,6 +193,8 @@ function App() {
             />
           ) : viewMode === 'flow' ? (
             <FlowTreeView rootNode={rootNode} />
+          ) : viewMode === 'gantt' ? (
+            <GanttChart rootNode={rootNode} />
           ) : (
             <TreeView rootNode={rootNode} />
           )}
