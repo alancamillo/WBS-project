@@ -13,8 +13,7 @@ import {
   Col,
   List,
   Tag,
-  Progress,
-  Descriptions
+  Progress
 } from 'antd';
 import {
   UploadOutlined,
@@ -22,8 +21,7 @@ import {
   FileTextOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  WarningOutlined,
-  InfoCircleOutlined
+  WarningOutlined
 } from '@ant-design/icons';
 import { ImportService, ImportResult, ImportValidationError } from '../services/importService';
 import { TreeNode } from '../types';
