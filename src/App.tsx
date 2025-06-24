@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined } from '@ant-design/icons';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
+import ImportWBS from './components/ImportWBS';
 import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
@@ -25,6 +26,7 @@ function App() {
   }));
 
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow'>('list');
+  const [importModalVisible, setImportModalVisible] = useState(false);
 
   // Recalcula custos automaticamente quando a estrutura muda
   useEffect(() => {
@@ -54,6 +56,11 @@ function App() {
   const handleLoadSampleData = () => {
     const sampleProject = createSampleProject();
     setRootNode(sampleProject);
+  };
+
+  const handleImportWBS = (importedNode: TreeNode) => {
+    setRootNode(importedNode);
+    setImportModalVisible(false);
   };
 
   const costBreakdown = CostCalculator.getCostBreakdown(rootNode);
@@ -128,6 +135,15 @@ function App() {
               >
                 Carregar Exemplo
               </Button>
+              
+              <Button
+                icon={<UploadOutlined />}
+                onClick={() => setImportModalVisible(true)}
+                type="default"
+              >
+                Importar WBS
+              </Button>
+              
               <Button.Group>
                 <Button
                   icon={<UnorderedListOutlined />}
@@ -144,6 +160,7 @@ function App() {
                   Diagrama
                 </Button>
               </Button.Group>
+              
               <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
@@ -172,6 +189,12 @@ function App() {
             <TreeView rootNode={rootNode} />
           )}
         </Card>
+
+        <ImportWBS
+          visible={importModalVisible}
+          onClose={() => setImportModalVisible(false)}
+          onImport={handleImportWBS}
+        />
       </Content>
     </Layout>
   );

@@ -1,0 +1,22 @@
+{
+  "id": "test-001",
+  "name": "Projeto Teste",
+  "cost": 1000,
+  "level": 1,
+  "children": [
+    {
+      "id": "task-001",
+      "name": "Tarefa 1",
+      "cost": 500,
+      "level": 2,
+      "children": []
+    },
+    {
+      "id": "task-002", 
+      "name": "Tarefa 2",
+      "cost": 300,
+      "level": 2,
+      "children": []
+    }
+  ]
+} 
