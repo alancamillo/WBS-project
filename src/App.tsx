@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined } from '@ant-design/icons';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
 import ImportWBS from './components/ImportWBS';
 import GanttChart from './components/GanttChart';
 import TableView from './components/TableView';
+import BudgetAllocationView from './components/BudgetAllocationView';
 import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
@@ -27,7 +28,7 @@ function App() {
     totalCost: 0
   }));
 
-  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
 
   // Recalcula custos, datas e durações automaticamente quando a estrutura muda
@@ -176,6 +177,13 @@ function App() {
                 >
                   Gantt
                 </Button>
+                <Button
+                  icon={<PieChartOutlined />}
+                  onClick={() => setViewMode('budget')}
+                  type={viewMode === 'budget' ? 'primary' : 'default'}
+                >
+                  Budget
+                </Button>
               </Button.Group>
               
               <Button
@@ -203,6 +211,8 @@ function App() {
             />
           ) : viewMode === 'table' ? (
             <TableView rootNode={rootNode} />
+          ) : viewMode === 'budget' ? (
+            <BudgetAllocationView rootNode={rootNode} />
           ) : viewMode === 'flow' ? (
             <FlowTreeView rootNode={rootNode} />
           ) : viewMode === 'gantt' ? (
