@@ -70,4 +70,56 @@ export interface GanttDependency {
   from: string;
   to: string;
   type: 'finish-to-start' | 'start-to-start' | 'finish-to-finish' | 'start-to-finish';
+}
+
+// Tipos para Gestão de Riscos
+export interface Risk {
+  id: string;
+  title: string;
+  description: string;
+  category: 'technical' | 'financial' | 'operational' | 'external' | 'strategic';
+  probability: 'very-low' | 'low' | 'medium' | 'high' | 'very-high';
+  impact: 'very-low' | 'low' | 'medium' | 'high' | 'very-high';
+  riskScore: number; // Calculado automaticamente (probability * impact)
+  status: 'identified' | 'assessed' | 'mitigated' | 'closed';
+  owner: string;
+  createdAt: Date;
+  updatedAt: Date;
+  dueDate?: Date;
+  mitigationPlan?: string;
+  contingencyPlan?: string;
+  actualCost?: number;
+  estimatedCost?: number;
+  // Vinculação com WBS
+  associatedNodeIds?: string[]; // IDs dos nós da WBS relacionados
+}
+
+export interface RiskMatrix {
+  probability: number;
+  impact: number;
+  level: 'low' | 'medium' | 'high' | 'critical';
+  color: string;
+}
+
+export interface RiskMetrics {
+  totalRisks: number;
+  risksByStatus: Record<Risk['status'], number>;
+  risksByCategory: Record<Risk['category'], number>;
+  averageRiskScore: number;
+  lowRisks: number;
+  mediumRisks: number;
+  highRisks: number;
+  criticalRisks: number;
+  catastrophicRisks: number;
+  overdueRisks: number;
+  soonDueRisks: number;
+}
+
+export interface RiskFilterOptions {
+  status?: Risk['status'][];
+  category?: Risk['category'][];
+  probability?: Risk['probability'][];
+  impact?: Risk['impact'][];
+  owner?: string;
+  associatedNodeId?: string;
 } 
