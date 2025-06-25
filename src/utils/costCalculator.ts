@@ -1,4 +1,5 @@
 import { TreeNode } from '../types';
+import { DateCalculator } from './dateCalculator';
 
 export class CostCalculator {
   /**
@@ -25,9 +26,16 @@ export class CostCalculator {
     const updateNode = (node: TreeNode): TreeNode => {
       const updatedChildren = node.children.map(child => updateNode(child));
       
+      // Calcula duração automaticamente se não estiver definida
+      let updatedDurationDays = node.durationDays;
+      if (!updatedDurationDays && node.startDate && node.endDate) {
+        updatedDurationDays = DateCalculator.calculateDurationDays(node.startDate, node.endDate);
+      }
+      
       return {
         ...node,
         children: updatedChildren,
+        durationDays: updatedDurationDays,
         totalCost: this.calculateTotalCost({
           ...node,
           children: updatedChildren
@@ -75,5 +83,32 @@ export class CostCalculator {
       level3: level3Cost,
       total: level1Cost + level2Cost + level3Cost
     };
+  }
+
+  /**
+   * Processa completamente um nó da árvore, calculando custos, datas e durações
+   */
+  static processCompleteNode(rootNode: TreeNode): TreeNode {
+    // Primeiro, atualiza custos e durações
+    let processedNode = this.updateAllTotalCosts(rootNode);
+    
+    // Depois, calcula datas agregadas para nós pais
+    const updateDatesRecursively = (node: TreeNode): TreeNode => {
+      const updatedChildren = node.children.map(child => updateDatesRecursively(child));
+      
+      let updatedNode = {
+        ...node,
+        children: updatedChildren
+      };
+      
+      // Se é um nó pai com filhos, calcula datas agregadas
+      if (updatedChildren.length > 0) {
+        updatedNode = DateCalculator.calculateAggregatedDates(updatedNode);
+      }
+      
+      return updatedNode;
+    };
+    
+    return updateDatesRecursively(processedNode);
   }
 } 

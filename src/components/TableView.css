@@ -1,0 +1,254 @@
+/* Estilos para TableView */
+.table-view-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-view-container .ant-table {
+  font-size: 12px;
+}
+
+.table-view-container .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.table-view-container .ant-table-tbody > tr > td {
+  padding: 6px 12px;
+  vertical-align: middle;
+}
+
+/* Estilos para diferentes níveis de linha */
+.table-row-level-1 {
+  background-color: #f0f8ff !important;
+  font-weight: bold;
+}
+
+.table-row-level-1:hover {
+  background-color: #e6f1ff !important;
+}
+
+.table-row-level-2 {
+  background-color: #f6ffed !important;
+}
+
+.table-row-level-2:hover {
+  background-color: #edffd6 !important;
+}
+
+.table-row-level-3 {
+  background-color: #fffbe6 !important;
+}
+
+.table-row-level-3:hover {
+  background-color: #fff5cc !important;
+}
+
+/* Estilos para indicação de hierarquia */
+.hierarchy-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.hierarchy-indent {
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+}
+
+/* Estilos para tags de status */
+.status-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Estilos para valores monetários */
+.cost-value {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.cost-own {
+  color: #1890ff;
+}
+
+.cost-total {
+  color: #52c41a;
+}
+
+/* Estilos para datas */
+.date-value {
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* Estilos para progresso */
+.progress-container {
+  width: 100%;
+  padding: 0 4px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .table-view-container .ant-table {
+    font-size: 11px;
+  }
+  
+  .table-view-container .ant-table-thead > tr > th {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .table-view-container .ant-table-tbody > tr > td {
+    padding: 4px 8px;
+  }
+}
+
+/* Estilos para tooltip */
+.table-tooltip {
+  max-width: 300px;
+}
+
+/* Estilos para ações */
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.action-buttons .ant-btn {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para filtros e busca */
+.table-header-actions {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.table-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #666;
+  font-size: 13px;
+}
+
+.table-stats .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-stats .stat-value {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Animações */
+.table-view-container .ant-table-tbody > tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Customização da paginação */
+.table-view-container .ant-pagination {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.table-view-container .ant-pagination .ant-pagination-options {
+  margin-right: 16px;
+}
+
+/* Estilos para scroll horizontal */
+.table-view-container .ant-table-body {
+  overflow-x: auto;
+}
+
+/* Estilos para seleção de linhas */
+.table-view-container .ant-table-row-selected {
+  background-color: #e6f7ff !important;
+}
+
+.table-view-container .ant-table-row-selected:hover {
+  background-color: #d4edda !important;
+}
+
+/* Estilos para coluna de dependências */
+.dependencies-container {
+  max-width: 180px;
+}
+
+.dependency-tag {
+  margin-bottom: 2px;
+  font-size: 11px;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.dependency-name {
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dependencies-count {
+  font-size: 10px;
+  color: #666;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.no-dependencies {
+  color: #999;
+  font-style: italic;
+}
+
+/* Estilos para tags de dependências por tipo */
+.dependency-tag.ant-tag {
+  border-radius: 12px;
+  padding: 1px 6px;
+  line-height: 16px;
+  margin: 1px 2px 1px 0;
+}
+
+.dependency-tag.ant-tag-purple {
+  background-color: #f9f0ff;
+  border-color: #d3adf7;
+  color: #722ed1;
+}
+
+/* Responsividade para dependências */
+@media (max-width: 768px) {
+  .dependencies-container {
+    max-width: 120px;
+  }
+  
+  .dependency-name {
+    max-width: 80px;
+  }
+  
+  .dependency-tag {
+    font-size: 10px;
+  }
+} 

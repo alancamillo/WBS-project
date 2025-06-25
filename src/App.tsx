@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
 import ImportWBS from './components/ImportWBS';
 import GanttChart from './components/GanttChart';
+import TableView from './components/TableView';
 import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
@@ -26,14 +27,15 @@ function App() {
     totalCost: 0
   }));
 
-  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
 
-  // Recalcula custos automaticamente quando a estrutura muda
+  // Recalcula custos, datas e durações automaticamente quando a estrutura muda
   useEffect(() => {
-    const updatedRoot = CostCalculator.updateAllTotalCosts(rootNode);
-    if (updatedRoot.totalCost !== rootNode.totalCost) {
-      setRootNode(updatedRoot);
+    const processedRoot = CostCalculator.processCompleteNode(rootNode);
+    if (processedRoot.totalCost !== rootNode.totalCost || 
+        JSON.stringify(processedRoot) !== JSON.stringify(rootNode)) {
+      setRootNode(processedRoot);
     }
   }, [rootNode]);
 
@@ -154,6 +156,13 @@ function App() {
                   Lista
                 </Button>
                 <Button
+                  icon={<TableOutlined />}
+                  onClick={() => setViewMode('table')}
+                  type={viewMode === 'table' ? 'primary' : 'default'}
+                >
+                  Tabela
+                </Button>
+                <Button
                   icon={<ApartmentOutlined />}
                   onClick={() => setViewMode('flow')}
                   type={viewMode === 'flow' ? 'primary' : 'default'}
@@ -192,6 +201,8 @@ function App() {
               onDelete={() => {}} // Root não pode ser deletado
               rootNode={rootNode} // Passando rootNode para acesso às dependências
             />
+          ) : viewMode === 'table' ? (
+            <TableView rootNode={rootNode} />
           ) : viewMode === 'flow' ? (
             <FlowTreeView rootNode={rootNode} />
           ) : viewMode === 'gantt' ? (
