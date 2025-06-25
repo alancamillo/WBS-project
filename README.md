@@ -5,20 +5,37 @@
 [![Ant Design](https://img.shields.io/badge/Ant%20Design-5+-blue.svg?style=for-the-badge&logo=antdesign)](https://ant.design/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-WBS Dynamic Tree is a powerful web application designed to help project managers and teams create, manage, and visualize hierarchical Work Breakdown Structures (WBS) with automatic cost aggregation and advanced export capabilities.
+WBS Dynamic Tree is a powerful web application designed to help project managers and teams create, manage, and visualize hierarchical Work Breakdown Structures (WBS) with automatic cost aggregation, advanced export capabilities, and comprehensive budget analysis tools.
 
 ---
 
 ## 🎯 Key Features
 
+### Core Functionality
 - **📊 Dynamic Hierarchical Structure**: Create unlimited 3-level hierarchical structures with parent-child relationships
 - **💰 Automatic Cost Aggregation**: Real-time cost calculation and rollup from child to parent nodes
 - **📤 Multi-format Export**: Export to Excel (.xlsx), JSON, and CSV with professional formatting
 - **📥 Smart Import**: Import existing structures from Excel, CSV, or JSON with automatic column detection
-- **📈 Gantt Visualization**: Timeline view of your project structure with dependencies
-- **🎨 Modern Interface**: Clean, intuitive UI built with Ant Design components
+
+### Advanced Visualizations
+- **📈 Gantt Chart**: Timeline view of your project structure with dependencies and critical path
+- **🌲 Tree View**: Interactive hierarchical display with expand/collapse functionality
+- **🌊 Flow Tree**: Visual flow representation of project structure
+- **📋 Table View**: Comprehensive tabular display with hierarchical indicators and phase collapsing
+- **💹 Budget Allocation**: Advanced budget analysis with temporal distribution and interactive charts
+
+### Budget Analysis & Reporting
+- **📊 Temporal Budget Distribution**: Analyze budget allocation across different time periods (monthly, quarterly, yearly)
+- **📈 Interactive Charts**: Sand charts and cumulative budget visualization with series toggle
+- **🎯 Multi-level Analysis**: View costs by project level or individual phases
+- **📅 Date Range Filtering**: Focus analysis on specific time periods
+- **💼 Executive Dashboard**: Key metrics and budget variance analysis
+
+### Modern Interface
+- **🎨 Clean UI**: Intuitive interface built with Ant Design components
 - **⚡ Real-time Updates**: Instant recalculation of costs and totals as you edit
 - **🔍 Data Validation**: Built-in validation to ensure data consistency and integrity
+- **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 
 <img src="screenshots/main-dashboard.png" alt="WBS Dynamic Tree Dashboard" width="100%">
 
@@ -53,25 +70,64 @@ The application will open at `http://localhost:3000`
 
 1. **Add Root Level Items**: Start by creating your main project phases or categories
 2. **Build Hierarchy**: Add sub-items under each main category
-3. **Add Details**: Include costs, descriptions, and responsible parties
+3. **Add Details**: Include costs, descriptions, responsible parties, and dates
 4. **Automatic Calculation**: Watch as costs automatically roll up to parent levels
 
 <img src="screenshots/tree-editing.png" alt="Creating and editing tree structure" width="100%">
 
+### Multiple View Options
+
+#### 🌲 Tree View
+- Interactive hierarchical display
+- Expand/collapse functionality
+- Real-time editing capabilities
+- Visual hierarchy indicators
+
+#### 🌊 Flow Tree View  
+- Visual flow representation
+- Connection lines between nodes
+- Ideal for process visualization
+- Clean, modern layout
+
+#### 📋 Table View
+- Comprehensive tabular display
+- Hierarchical indentation with level indicators
+- **Phase Collapsing**: Collapse/expand phases (level 2) for better overview
+- Sortable columns with dependencies resolution
+- Pagination and search capabilities
+- Color-coded by hierarchy level
+
+#### 📈 Gantt Chart
+- Timeline visualization with dependencies
+- Duration and milestone tracking
+- Critical path analysis
+- Resource allocation overview
+
+#### 💹 Budget Allocation Analysis
+- **Temporal Analysis**: View budget distribution across time periods
+- **Interactive Charts**: 
+  - Sand chart showing budget allocation over time
+  - Cumulative budget progression
+  - Series visibility toggle for focused analysis
+- **Flexible Grouping**: Switch between level-based and phase-based analysis
+- **Executive Dashboard**: Key metrics including total budget, planned spend, and variance
+- **Time Period Options**: Monthly, quarterly, and yearly analysis
+- **Date Range Filtering**: Focus on specific project periods
+
 ### Example Structure
 
 ```
-Software Development Project
-├── 📋 Planning Phase                    ($8,000)
-│   ├── Requirements Analysis           ($5,000)
-│   └── Technical Documentation         ($3,000)
-├── 💻 Development Phase                 ($35,000)
-│   ├── Frontend Development            ($15,000)
-│   ├── Backend Development             ($12,000)
-│   └── Database Design                 ($8,000)
-└── 🧪 Testing Phase                     ($10,000)
-    ├── Unit Testing                    ($4,000)
-    └── Integration Testing             ($6,000)
+Software Development Project                 ($53,000)
+├── 📋 Planning Phase                        ($8,000)
+│   ├── Requirements Analysis               ($5,000)
+│   └── Technical Documentation             ($3,000)
+├── 💻 Development Phase                     ($35,000)
+│   ├── Frontend Development                ($15,000)
+│   ├── Backend Development                 ($12,000)
+│   └── Database Design                     ($8,000)
+└── 🧪 Testing Phase                         ($10,000)
+    ├── Unit Testing                        ($4,000)
+    └── Integration Testing                 ($6,000)
 
 Total Project Cost: $53,000 (auto-calculated)
 ```
@@ -81,9 +137,10 @@ Total Project Cost: $53,000 (auto-calculated)
 WBS Dynamic Tree supports multiple import formats:
 
 **Excel/CSV Import**
-- Automatic column detection for Name, Level, Cost, Description
+- Automatic column detection for Name, Level, Cost, Description, Dates
 - Hierarchical structure recognition through indentation or numbering
 - Data validation and preview before import confirmation
+- Support for dependencies and responsible parties
 
 <img src="screenshots/import-process.png" alt="Import data from Excel or CSV" width="100%">
 
@@ -101,19 +158,31 @@ WBS Dynamic Tree supports multiple import formats:
 - Cost breakdown and summary tables
 - Formulas for automatic calculations
 - Custom styling and colors
+- Date and dependency information
 
 **JSON Export**: Complete data export for:
 - System integration and API usage
 - Backup and version control
 - Data migration between environments
 
-### Gantt Chart Visualization
+### Budget Analysis Features
 
-View your project structure as a timeline with:
-- Task dependencies and relationships
-- Duration and milestone tracking
-- Critical path visualization
-- Resource allocation overview
+**Temporal Distribution**
+- Analyze how budget is distributed across project timeline
+- Proportional allocation based on task duration and dates
+- Support for overlapping tasks and phases
+
+**Interactive Visualizations**
+- Click legend items to show/hide specific series
+- Switch between grouped (by level) and separated (by phase) views
+- Hover tooltips with detailed cost information
+- Zoom and pan capabilities for detailed analysis
+
+**Executive Reporting**
+- Budget variance analysis
+- Planned vs actual cost tracking
+- Key performance indicators
+- Export charts and data for presentations
 
 <img src="screenshots/gantt-chart.png" alt="Gantt chart visualization" width="100%">
 
@@ -124,26 +193,51 @@ View your project structure as a timeline with:
 - **Frontend**: React 18 + TypeScript for type-safe, modern UI
 - **UI Components**: Ant Design for professional, accessible interface
 - **Data Processing**: XLSX.js for Excel manipulation without backend
-- **Visualization**: Gantt-Task-React for project timeline views
+- **Visualization**: 
+  - Gantt-Task-React for project timeline views
+  - Recharts for advanced budget analysis charts
+- **Date Handling**: date-fns for robust date calculations and formatting
 - **State Management**: React Context and Hooks for efficient data flow
 
 ### Project Structure
 
 ```
 src/
-├── components/           # Reusable UI components
-│   ├── TreeView.tsx     # Main tree display component
-│   ├── TreeNode.tsx     # Individual node component
-│   ├── GanttChart.tsx   # Timeline visualization
-│   └── ImportWBS.tsx    # Data import interface
-├── services/            # Business logic and utilities
-│   ├── exportService.ts # Export functionality
-│   ├── importService.ts # Import processing
-│   └── ganttService.ts  # Gantt chart data processing
-├── types/               # TypeScript type definitions
-├── utils/               # Helper functions
-└── data/                # Sample data and templates
+├── components/                    # Reusable UI components
+│   ├── TreeView.tsx              # Main tree display component
+│   ├── TreeNode.tsx              # Individual node component
+│   ├── TableView.tsx             # Tabular view with hierarchy
+│   ├── FlowTreeView.tsx          # Flow-based tree visualization
+│   ├── GanttChart.tsx            # Timeline visualization
+│   ├── BudgetAllocationView.tsx  # Budget analysis dashboard
+│   └── ImportWBS.tsx             # Data import interface
+├── services/                      # Business logic and utilities
+│   ├── exportService.ts          # Export functionality
+│   ├── importService.ts          # Import processing
+│   └── ganttService.ts           # Gantt chart data processing
+├── types/                         # TypeScript type definitions
+├── utils/                         # Helper functions
+│   ├── costCalculator.ts         # Cost aggregation logic
+│   └── dateCalculator.ts         # Date and duration calculations
+└── data/                          # Sample data and templates
 ```
+
+### Key Algorithms
+
+**Cost Aggregation**
+- Bottom-up cost calculation with real-time updates
+- Handles complex hierarchies with multiple levels
+- Automatic recalculation on data changes
+
+**Temporal Budget Distribution**
+- Proportional cost allocation based on task duration
+- Intersection calculation for overlapping periods
+- Support for different time granularities
+
+**Hierarchical Data Management**
+- Efficient tree traversal and manipulation
+- Parent-child relationship maintenance
+- Level-based processing and filtering
 
 ## 📊 Performance & Scalability
 
@@ -151,6 +245,27 @@ src/
 - **Real-time calculations** with optimized algorithms
 - **Memory efficient** tree traversal and updates
 - **Responsive design** works on desktop, tablet, and mobile
+- **Chart optimization** with series visibility controls for large datasets
+- **Lazy loading** for improved initial load times
+
+## 🎨 UI/UX Features
+
+### Visual Hierarchy
+- Color-coded levels (blue for projects, green for phases, yellow for activities)
+- Consistent iconography across all views
+- Indentation and visual cues for hierarchy understanding
+
+### Interactive Elements
+- Collapsible sections in table view
+- Drag-and-drop functionality (planned)
+- Context menus for quick actions
+- Keyboard shortcuts for power users
+
+### Accessibility
+- Screen reader compatible
+- Keyboard navigation support
+- High contrast mode compatibility
+- WCAG 2.1 compliance
 
 ## 🤝 Contributing
 
@@ -164,6 +279,14 @@ We welcome contributions to WBS Dynamic Tree! Whether you're fixing bugs, adding
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Maintain test coverage above 80%
+- Use Ant Design components when possible
+- Follow the existing code style and conventions
+- Update documentation for new features
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -176,4 +299,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ using React, TypeScript, and Ant Design** 
+**Built with ❤️ using React, TypeScript, Ant Design, and Recharts** 
