@@ -144,6 +144,12 @@
   gap: 16px;
 }
 
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .table-stats {
   display: flex;
   align-items: center;
@@ -251,4 +257,57 @@
   .dependency-tag {
     font-size: 10px;
   }
+}
+
+/* Estilos para controles de colapso */
+.collapse-button {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 4px !important;
+  min-width: auto !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.collapse-button:hover {
+  background-color: #f0f0f0 !important;
+  border-radius: 4px !important;
+}
+
+.collapsed-phase-indicator {
+  margin-left: 8px;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
+  color: #d48806;
+}
+
+/* Estilos para fases colapsadas */
+.table-view-container .ant-table-tbody .table-row-level-2.collapsed {
+  background-color: #fff7e6 !important;
+  border-left: 3px solid #faad14 !important;
+}
+
+.table-view-container .ant-table-tbody .table-row-level-2.collapsed:hover {
+  background-color: #fff2e0 !important;
+}
+
+/* Estilos para o botão de controle global */
+.table-controls .ant-btn {
+  border-radius: 6px;
+  font-size: 12px;
+  height: 28px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-controls .ant-btn:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
 } 

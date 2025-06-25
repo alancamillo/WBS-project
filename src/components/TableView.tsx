@@ -9,7 +9,11 @@ import {
   FolderOutlined,
   FileOutlined,
   UserOutlined,
-  CalendarOutlined 
+  CalendarOutlined,
+  DownOutlined,
+  RightOutlined,
+  ExpandOutlined,
+  CompressOutlined
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -29,6 +33,7 @@ const TableView: React.FC<TableViewProps> = ({
   rootNode
 }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
+  const [collapsedPhases, setCollapsedPhases] = useState<Set<string>>(new Set());
 
   // Função para encontrar um nó por ID na árvore
   const findNodeById = (node: TreeNode, id: string): TreeNode | null => {
@@ -58,7 +63,46 @@ const TableView: React.FC<TableViewProps> = ({
     });
   };
 
-  // Função para "achatar" a árvore em uma lista linear
+  // Função para encontrar a fase (nível 2) pai de um nó
+  const findParentPhase = (nodeId: string): TreeNode | null => {
+    const findPhaseRecursive = (node: TreeNode, targetId: string): TreeNode | null => {
+      // Se é uma fase (nível 2) e tem o nó como filho direto ou indireto
+      if (node.level === 2) {
+        const hasTargetAsChild = (parent: TreeNode): boolean => {
+          return parent.children.some(child => 
+            child.id === targetId || hasTargetAsChild(child)
+          );
+        };
+        
+        if (hasTargetAsChild(node)) {
+          return node;
+        }
+      }
+      
+      // Continua procurando nos filhos
+      for (const child of node.children) {
+        const result = findPhaseRecursive(child, targetId);
+        if (result) return result;
+      }
+      
+      return null;
+    };
+    
+    return findPhaseRecursive(rootNode, nodeId);
+  };
+
+  // Função para contar itens dentro de uma fase
+  const countItemsInPhase = (phaseNode: TreeNode): number => {
+    let count = 0;
+    const countRecursive = (node: TreeNode) => {
+      count++;
+      node.children.forEach(child => countRecursive(child));
+    };
+    phaseNode.children.forEach(child => countRecursive(child));
+    return count;
+  };
+
+  // Função para "achatar" a árvore em uma lista linear com controle de colapso
   const flattenTree = (node: TreeNode, depth = 0, path = ''): FlattenedNode[] => {
     const currentPath = path ? `${path} > ${node.name}` : node.name;
     
@@ -79,6 +123,12 @@ const TableView: React.FC<TableViewProps> = ({
 
     let result = [flattenedNode];
     
+    // Se é uma fase (nível 2) e está colapsada, não inclui os filhos
+    if (node.level === 2 && collapsedPhases.has(node.id)) {
+      return result;
+    }
+    
+    // Para outros nós, ou fases expandidas, inclui os filhos
     if (node.children.length > 0) {
       for (const child of node.children) {
         result = result.concat(flattenTree(child, depth + 1, currentPath));
@@ -88,7 +138,42 @@ const TableView: React.FC<TableViewProps> = ({
     return result;
   };
 
-  const flattenedData = useMemo(() => flattenTree(rootNode), [rootNode]);
+  // Função para alternar o estado de colapso de uma fase
+  const togglePhaseCollapse = (phaseId: string) => {
+    setCollapsedPhases(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(phaseId)) {
+        newSet.delete(phaseId);
+      } else {
+        newSet.add(phaseId);
+      }
+      return newSet;
+    });
+  };
+
+  // Função para expandir/colapsar todas as fases
+  const toggleAllPhases = () => {
+    const allPhases: string[] = [];
+    
+    const findAllPhases = (node: TreeNode) => {
+      if (node.level === 2) {
+        allPhases.push(node.id);
+      }
+      node.children.forEach(child => findAllPhases(child));
+    };
+    
+    findAllPhases(rootNode);
+    
+    if (collapsedPhases.size === 0) {
+      // Se nenhuma fase está colapsada, colapsa todas
+      setCollapsedPhases(new Set(allPhases));
+    } else {
+      // Se algumas estão colapsadas, expande todas
+      setCollapsedPhases(new Set());
+    }
+  };
+
+  const flattenedData = useMemo(() => flattenTree(rootNode), [rootNode, collapsedPhases]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -152,18 +237,39 @@ const TableView: React.FC<TableViewProps> = ({
       title: 'Estrutura',
       dataIndex: 'name',
       key: 'name',
-      width: 300,
+      width: 350,
       render: (text: string, record: FlattenedNode) => (
         <div style={{ paddingLeft: record.depth * 20 }}>
           <Space>
+            {/* Controle de colapso para fases (nível 2) */}
+            {record.level === 2 && record.hasChildren ? (
+              <Button
+                type="text"
+                size="small"
+                icon={collapsedPhases.has(record.id) ? <RightOutlined /> : <DownOutlined />}
+                onClick={() => togglePhaseCollapse(record.id)}
+                className="collapse-button"
+              />
+            ) : (
+              <span style={{ width: 20, display: 'inline-block' }} />
+            )}
+            
             {record.hasChildren ? (
               <FolderOutlined style={{ color: getLevelColor(record.level) }} />
             ) : (
               <FileOutlined style={{ color: getLevelColor(record.level) }} />
             )}
+            
             <Text strong={record.level === 1} style={{ fontSize: record.level === 1 ? '14px' : '12px' }}>
               {text}
             </Text>
+            
+            {/* Contador de itens para fases colapsadas */}
+            {record.level === 2 && collapsedPhases.has(record.id) && (
+              <Tag color="orange" style={{ marginLeft: 8, fontSize: '10px' }}>
+                {countItemsInPhase(record)} itens
+              </Tag>
+            )}
           </Space>
         </div>
       ),
@@ -365,6 +471,17 @@ const TableView: React.FC<TableViewProps> = ({
             </Text>
           </div>
         </div>
+        
+        <div className="table-controls">
+          <Button
+            type="default"
+            size="small"
+            icon={collapsedPhases.size > 0 ? <ExpandOutlined /> : <CompressOutlined />}
+            onClick={toggleAllPhases}
+          >
+            {collapsedPhases.size > 0 ? 'Expandir Todas' : 'Colapsar Fases'}
+          </Button>
+        </div>
       </div>
       
       <Table<FlattenedNode>
@@ -381,7 +498,13 @@ const TableView: React.FC<TableViewProps> = ({
         scroll={{ x: 1500, y: 600 }}
         size="small"
         bordered
-        rowClassName={(record) => `table-row-level-${record.level}`}
+        rowClassName={(record) => {
+          let className = `table-row-level-${record.level}`;
+          if (record.level === 2 && collapsedPhases.has(record.id)) {
+            className += ' collapsed';
+          }
+          return className;
+        }}
         expandable={{
           expandedRowKeys,
           onExpandedRowsChange: (keys: readonly Key[]) => setExpandedRowKeys([...keys]),
