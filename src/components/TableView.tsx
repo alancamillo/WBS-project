@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Table, Tag, Button, Space, Typography, Tooltip, Progress } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import { Key } from 'antd/es/table/interface';
@@ -63,33 +63,7 @@ const TableView: React.FC<TableViewProps> = ({
     });
   };
 
-  // Função para encontrar a fase (nível 2) pai de um nó
-  const findParentPhase = (nodeId: string): TreeNode | null => {
-    const findPhaseRecursive = (node: TreeNode, targetId: string): TreeNode | null => {
-      // Se é uma fase (nível 2) e tem o nó como filho direto ou indireto
-      if (node.level === 2) {
-        const hasTargetAsChild = (parent: TreeNode): boolean => {
-          return parent.children.some(child => 
-            child.id === targetId || hasTargetAsChild(child)
-          );
-        };
-        
-        if (hasTargetAsChild(node)) {
-          return node;
-        }
-      }
-      
-      // Continua procurando nos filhos
-      for (const child of node.children) {
-        const result = findPhaseRecursive(child, targetId);
-        if (result) return result;
-      }
-      
-      return null;
-    };
-    
-    return findPhaseRecursive(rootNode, nodeId);
-  };
+
 
   // Função para contar itens dentro de uma fase
   const countItemsInPhase = (phaseNode: TreeNode): number => {
@@ -103,7 +77,7 @@ const TableView: React.FC<TableViewProps> = ({
   };
 
   // Função para "achatar" a árvore em uma lista linear com controle de colapso
-  const flattenTree = (node: TreeNode, depth = 0, path = ''): FlattenedNode[] => {
+  const flattenTree = useCallback((node: TreeNode, depth = 0, path = ''): FlattenedNode[] => {
     const currentPath = path ? `${path} > ${node.name}` : node.name;
     
     // Calcula duração automaticamente se não estiver definida mas tiver datas
@@ -136,7 +110,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
 
     return result;
-  };
+  }, [collapsedPhases]);
 
   // Função para alternar o estado de colapso de uma fase
   const togglePhaseCollapse = (phaseId: string) => {
@@ -173,7 +147,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
   };
 
-  const flattenedData = useMemo(() => flattenTree(rootNode), [rootNode, collapsedPhases]);
+  const flattenedData = useMemo(() => flattenTree(rootNode), [rootNode, flattenTree]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -221,6 +195,46 @@ const TableView: React.FC<TableViewProps> = ({
       case 'not-started': return 'Não Iniciado';
       default: return 'Indefinido';
     }
+  };
+
+  // Função para calcular o percentual de conclusão baseado nas atividades filhas
+  const calculateProgressPercentage = (node: TreeNode): number => {
+    // Se não tem filhos, usa o status próprio
+    if (node.children.length === 0) {
+      switch (node.status) {
+        case 'completed': return 100;
+        case 'in-progress': return 50;
+        case 'not-started': return 0;
+        default: return 0;
+      }
+    }
+    
+    // Se tem filhos, calcula baseado nas atividades filhas
+    let totalChildren = 0;
+    let completedWeight = 0;
+    
+    const countChildrenRecursive = (childNode: TreeNode) => {
+      if (childNode.children.length === 0) {
+        // É uma folha (atividade final)
+        totalChildren++;
+        if (childNode.status === 'completed') {
+          completedWeight++;
+        } else if (childNode.status === 'in-progress') {
+          completedWeight += 0.5;
+        }
+      } else {
+        // Tem filhos, continua recursivamente
+        childNode.children.forEach(grandChild => countChildrenRecursive(grandChild));
+      }
+    };
+    
+    node.children.forEach(child => countChildrenRecursive(child));
+    
+    if (totalChildren === 0) {
+      return 0;
+    }
+    
+    return Math.round((completedWeight / totalChildren) * 100);
   };
 
   const getProgressValue = (status?: string) => {
@@ -313,13 +327,78 @@ const TableView: React.FC<TableViewProps> = ({
       dataIndex: 'status',
       key: 'progress',
       width: 120,
-      render: (status?: string) => (
-        <Progress 
-          percent={getProgressValue(status)} 
-          size="small" 
-          strokeColor={getStatusColor(status)}
-        />
-      ),
+      render: (status?: string, record?: FlattenedNode) => {
+        // Para nós que têm filhos, calcula o percentual baseado nas atividades filhas
+        let percentage: number;
+        let strokeColor: string;
+        
+        if (record && record.hasChildren) {
+          // Encontra o nó original na árvore para calcular o progresso
+          const originalNode = findNodeById(rootNode, record.id);
+          if (originalNode) {
+            percentage = calculateProgressPercentage(originalNode);
+            // Define a cor baseada no percentual calculado
+            if (percentage === 100) {
+              strokeColor = 'green';
+            } else if (percentage > 0) {
+              strokeColor = 'blue';
+            } else {
+              strokeColor = 'default';
+            }
+          } else {
+            percentage = getProgressValue(status);
+            strokeColor = getStatusColor(status);
+          }
+        } else {
+          // Para folhas (atividades finais), usa o status próprio
+          percentage = getProgressValue(status);
+          strokeColor = getStatusColor(status);
+        }
+        
+        // Gera tooltip com informações detalhadas
+        let tooltipTitle = '';
+        if (record && record.hasChildren) {
+          const originalNode = findNodeById(rootNode, record.id);
+          if (originalNode) {
+            let totalActivities = 0;
+            let completedActivities = 0;
+            let inProgressActivities = 0;
+            
+            const countActivities = (node: TreeNode) => {
+              if (node.children.length === 0) {
+                totalActivities++;
+                if (node.status === 'completed') {
+                  completedActivities++;
+                } else if (node.status === 'in-progress') {
+                  inProgressActivities++;
+                }
+              } else {
+                node.children.forEach(child => countActivities(child));
+              }
+            };
+            
+            originalNode.children.forEach(child => countActivities(child));
+            
+            tooltipTitle = `Progresso baseado em atividades filhas:\n` +
+                          `• Concluídas: ${completedActivities}\n` +
+                          `• Em progresso: ${inProgressActivities}\n` +
+                          `• Total: ${totalActivities}\n` +
+                          `• Percentual: ${percentage}%`;
+          }
+        } else {
+          tooltipTitle = `Status próprio: ${getStatusText(status)}`;
+        }
+        
+        return (
+          <Tooltip title={tooltipTitle}>
+            <Progress 
+              percent={percentage} 
+              size="small" 
+              strokeColor={strokeColor}
+            />
+          </Tooltip>
+        );
+      },
     },
     {
       title: 'Custo Próprio',
@@ -387,7 +466,6 @@ const TableView: React.FC<TableViewProps> = ({
         }
         
         if (finalDays) {
-          const formatted = DateCalculator.formatDuration(finalDays);
           return (
             <Tooltip title={`${finalDays} dias corridos`}>
               <Tag color="blue" style={{ cursor: 'help' }}>
