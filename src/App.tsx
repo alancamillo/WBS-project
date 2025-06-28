@@ -16,6 +16,7 @@ import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
 import { createSampleProject } from './data/sampleData';
+import { useCurrencySettings } from './hooks/useCurrencySettings';
 import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 
@@ -27,6 +28,7 @@ const WBS_STORAGE_KEY = 'wbs-project-structure';
 
 function App() {
   const { t } = useTranslation();
+  const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   
   // Função para carregar estrutura WBS do localStorage
   const loadWBSFromStorage = (): TreeNode => {
@@ -239,8 +241,7 @@ function App() {
               <Statistic
                 title={`💰 ${t('statistics.totalCost')}`}
                 value={costBreakdown.total}
-                prefix="R$"
-                precision={2}
+                formatter={(value) => formatCurrency(value as number)}
                 valueStyle={{ color: '#1890ff' }}
               />
             </Card>

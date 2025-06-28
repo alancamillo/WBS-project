@@ -5,6 +5,7 @@ import {
   Modal,
   Form,
   Input,
+  InputNumber,
   Select,
   DatePicker,
   Row,
@@ -37,6 +38,7 @@ import {
   InfoCircleOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { Risk, RiskMetrics, RiskFilterOptions, TreeNode } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
@@ -59,6 +61,7 @@ const RISKS_STORAGE_KEY = 'wbs-project-risks';
 
 const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
   const { t } = useTranslation();
+  const { getCurrencySymbol } = useCurrencySettings();
 
   // Função para carregar riscos do localStorage
   const loadRisksFromStorage = (): Risk[] => {
@@ -1040,10 +1043,13 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
                 name="estimatedCost"
                 label={t('riskManagement.form.estimatedCost')}
               >
-                <Input 
-                  type="number" 
+                <InputNumber
+                  style={{ width: '100%' }}
                   placeholder={t('riskManagement.form.estimatedCostPlaceholder')}
-                  addonBefore="R$"
+                  addonBefore={getCurrencySymbol()}
+                  min={0}
+                  step={0.01}
+                  precision={2}
                 />
               </Form.Item>
             </Col>
@@ -1052,10 +1058,13 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
                 name="actualCost"
                 label={t('riskManagement.form.actualCost')}
               >
-                <Input 
-                  type="number" 
+                <InputNumber
+                  style={{ width: '100%' }}
                   placeholder={t('riskManagement.form.actualCostPlaceholder')}
-                  addonBefore="R$"
+                  addonBefore={getCurrencySymbol()}
+                  min={0}
+                  step={0.01}
+                  precision={2}
                 />
               </Form.Item>
             </Col>
