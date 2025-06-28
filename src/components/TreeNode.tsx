@@ -36,7 +36,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   rootNode 
 }) => {
   const { t } = useTranslation();
-  const { formatCurrency } = useCurrencySettings();
+  const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(node.name);
   const [editedCost, setEditedCost] = useState(node.cost);
@@ -152,12 +152,12 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   // Validação para data de início editada
   const editedDateValidation = useMemo(() => {
     return validateDependencyDates(editedStartDate, editedEndDate, editedDependencies);
-  }, [editedStartDate, editedEndDate, editedDependencies, rootNode]);
+  }, [editedStartDate, editedEndDate, editedDependencies, rootNode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Validação para dados atuais do nó
   const currentDateValidation = useMemo(() => {
     return validateDependencyDates(node.startDate, node.endDate, node.dependencies || []);
-  }, [node.startDate, node.endDate, node.dependencies, rootNode]);
+  }, [node.startDate, node.endDate, node.dependencies, rootNode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Função para coletar todas as tarefas da árvore (exceto a atual)
   const getAllAvailableTasks = useMemo(() => {
@@ -181,7 +181,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     
     traverse(rootNode);
     return tasks;
-  }, [rootNode, node]);
+  }, [rootNode, node]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Obtém nomes das tarefas dependentes
   const getDependencyNames = (dependencyIds: string[]): string[] => {
@@ -406,16 +406,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     return new Date(date).toLocaleDateString('pt-BR');
   };
 
-  // Verifica se a data de fim é herdada dos filhos
-  const isEndDateInherited = (nodeToCheck: TreeNodeType): boolean => {
-    if (nodeToCheck.children.length === 0) return false;
-    
-    const inheritedEndDate = calculateInheritedEndDate(nodeToCheck);
-    if (!inheritedEndDate || !nodeToCheck.endDate) return false;
-    
-    // Compara as datas (considera herdada se são iguais)
-    return Math.abs(inheritedEndDate.getTime() - nodeToCheck.endDate.getTime()) < 1000; // 1 segundo de tolerância
-  };
+
 
   // Obtém informações sobre a herança da data de fim
   const getEndDateInheritanceInfo = (nodeToCheck: TreeNodeType): { isInherited: boolean; sourceChild?: string } => {
@@ -655,8 +646,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 <InputNumber
                   value={editedCost}
                   onChange={(value) => setEditedCost(value || 0)}
-                  formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value!.replace(/R\$\s?|(,*)/g, ''))}
+                  addonBefore={getCurrencySymbol()}
+                  min={0}
+                  step={0.01}
+                  precision={2}
                   style={{ width: '100%' }}
                 />
               </div>
