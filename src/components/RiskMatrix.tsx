@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { Risk } from '../types';
 import './RiskMatrix.css';
 
@@ -10,6 +11,8 @@ interface RiskMatrixProps {
 }
 
 const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
+  const { t } = useTranslation();
+
   // Função para obter cor baseada no score específico (1-12)
   const getMatrixColor = (score: number): string => {
     // Cores específicas para cada score
@@ -96,21 +99,34 @@ const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
     matrix.push(row);
   }
 
-  const probabilityLabels = ['Muito Alta (5)', 'Alta (4)', 'Média (3)', 'Baixa (2)', 'Muito Baixa (1)'];
-  const impactLabels = ['Muito Baixo (1)', 'Baixo (2)', 'Médio (3)', 'Alto (4)', 'Muito Alto (5)'];
+  const probabilityLabels = [
+    t('riskMatrix.probabilityLabels.veryHigh'),
+    t('riskMatrix.probabilityLabels.high'),
+    t('riskMatrix.probabilityLabels.medium'),
+    t('riskMatrix.probabilityLabels.low'),
+    t('riskMatrix.probabilityLabels.veryLow')
+  ];
+
+  const impactLabels = [
+    t('riskMatrix.impactLabels.veryLow'),
+    t('riskMatrix.impactLabels.low'),
+    t('riskMatrix.impactLabels.medium'),
+    t('riskMatrix.impactLabels.high'),
+    t('riskMatrix.impactLabels.veryHigh')
+  ];
 
   return (
     <div className="risk-matrix-wrapper">
       <div className="matrix-title-container">
         <Title level={4} style={{ textAlign: 'center', marginBottom: 24 }}>
-          Matriz de Risco - Cronograma do Projeto
+          {t('riskMatrix.title')}
         </Title>
       </div>
       
       <div className="matrix-with-labels">
         {/* Label vertical da Probabilidade */}
         <div className="probability-axis">
-          <div className="axis-title vertical">Probabilidade</div>
+          <div className="axis-title vertical">{t('riskMatrix.probability')}</div>
         </div>
 
         {/* Matriz principal */}
@@ -139,7 +155,7 @@ const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
                   key={impIndex}
                   className="data-cell"
                   style={{ backgroundColor: cell.color }}
-                  title={`Score: ${cell.score} | Riscos: ${cell.riskCount}`}
+                  title={`${t('riskMatrix.tooltip.score')} ${cell.score} | ${t('riskMatrix.tooltip.risks')} ${cell.riskCount}`}
                 >
                   <div 
                     className="score-number" 
@@ -159,7 +175,7 @@ const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
 
       {/* Label horizontal do Impacto */}
       <div className="impact-axis">
-        <div className="axis-title horizontal">Impacto</div>
+        <div className="axis-title horizontal">{t('riskMatrix.impact')}</div>
       </div>
 
       {/* Legenda */}
@@ -167,41 +183,41 @@ const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
         <div className="legend-row">
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#4682A9' }}></div>
-            <span>Score 1</span>
+            <span>{t('riskMatrix.legend.score')} 1</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#749BC2' }}></div>
-            <span>Score 2</span>
+            <span>{t('riskMatrix.legend.score')} 2</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#91C8E4' }}></div>
-            <span>Score 3</span>
+            <span>{t('riskMatrix.legend.score')} 3</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#06923E' }}></div>
-            <span>Score 4</span>
+            <span>{t('riskMatrix.legend.score')} 4</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#A7C1A8' }}></div>
-            <span>Score 5</span>
+            <span>{t('riskMatrix.legend.score')} 5</span>
           </div>
         </div>
         <div className="legend-row">
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#FFB200' }}></div>
-            <span>Score 6-7</span>
+            <span>{t('riskMatrix.legend.scoreRange', { range: '6-7' })}</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#C83F12' }}></div>
-            <span>Score 8-9</span>
+            <span>{t('riskMatrix.legend.scoreRange', { range: '8-9' })}</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#8A0000' }}></div>
-            <span>Score 10</span>
+            <span>{t('riskMatrix.legend.score')} 10</span>
           </div>
           <div className="legend-item">
             <div className="legend-color" style={{ backgroundColor: '#3B060A' }}></div>
-            <span>Score 11-12</span>
+            <span>{t('riskMatrix.legend.scoreRange', { range: '11-12' })}</span>
           </div>
         </div>
       </div>

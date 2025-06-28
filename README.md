@@ -3,6 +3,9 @@
 [![React](https://img.shields.io/badge/React-18+-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Ant Design](https://img.shields.io/badge/Ant%20Design-5+-blue.svg?style=for-the-badge&logo=antdesign)](https://ant.design/)
+[![i18next](https://img.shields.io/badge/i18next-Multi--language-green.svg?style=for-the-badge&logo=i18next)](https://www.i18next.com/)
+[![Languages](https://img.shields.io/badge/Languages-4%20Supported-orange.svg?style=for-the-badge)]()
+[![Currencies](https://img.shields.io/badge/Currencies-6%20Supported-purple.svg?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 WBS Dynamic Tree is a powerful web application designed to help project managers and teams create, manage, and visualize hierarchical Work Breakdown Structures (WBS) with automatic cost aggregation, advanced export capabilities, and comprehensive budget analysis tools.
@@ -36,6 +39,23 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **⚡ Real-time Updates**: Instant recalculation of costs and totals as you edit
 - **🔍 Data Validation**: Built-in validation to ensure data consistency and integrity
 - **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+
+### Internationalization & Currency Support
+- **🌍 Multi-language Support**: Full internationalization with 4 supported languages:
+  - **🇧🇷 Portuguese (Português)** - Complete localization for Brazilian users
+  - **🇺🇸 English** - Native English interface and content
+  - **🇪🇸 Spanish (Español)** - Full Spanish translation and localization
+  - **🇨🇳 Chinese (中文)** - Comprehensive Chinese language support
+- **💱 Independent Currency System**: Currency selection independent of interface language
+- **💰 Multi-currency Support**: 6 major currencies with proper localization:
+  - **Brazilian Real (BRL)** - R$ with Brazilian formatting
+  - **US Dollar (USD)** - $ with American formatting
+  - **Euro (EUR)** - € with European formatting
+  - **Chinese Yuan (CNY)** - ¥ with Chinese formatting
+  - **British Pound (GBP)** - £ with British formatting
+  - **Japanese Yen (JPY)** - ¥ with Japanese formatting
+- **🔄 Persistent Settings**: Language and currency preferences automatically saved and restored
+- **📊 Localized Data**: Numbers, dates, and currencies formatted according to selected locale
 
 <img src="screenshots/main-dashboard.png" alt="WBS Dynamic Tree Dashboard" width="100%">
 
@@ -165,6 +185,36 @@ WBS Dynamic Tree supports multiple import formats:
 - Backup and version control
 - Data migration between environments
 
+### Language and Currency Settings
+
+**Changing Interface Language**
+- Access the Settings panel (⚙️ icon in the top navigation)
+- Select your preferred language from the dropdown:
+  - Portuguese (Português) - for Brazilian users
+  - English - for international users
+  - Spanish (Español) - for Spanish-speaking users
+  - Chinese (中文) - for Chinese users
+- The interface will immediately update to your selected language
+- Language preference is automatically saved and restored
+
+**Currency Configuration**
+- Currency settings are independent of language selection
+- Configure your preferred currency in the Settings panel:
+  - Brazilian Real (R$) - for Brazilian projects
+  - US Dollar ($) - for American projects
+  - Euro (€) - for European projects
+  - Chinese Yuan (¥) - for Chinese projects
+  - British Pound (£) - for UK projects
+  - Japanese Yen (¥) - for Japanese projects
+- All cost calculations, charts, and exports will use your selected currency
+- Currency preference is automatically saved and restored
+
+**Localized Formatting**
+- Numbers and dates are formatted according to your language preference
+- Currency symbols and formatting follow international standards
+- Month names and date formats adapt to your selected language
+- Chart tooltips and labels are fully localized
+
 ### Budget Analysis Features
 
 **Temporal Distribution**
@@ -192,6 +242,7 @@ WBS Dynamic Tree supports multiple import formats:
 
 - **Frontend**: React 18 + TypeScript for type-safe, modern UI
 - **UI Components**: Ant Design for professional, accessible interface
+- **Internationalization**: i18next + react-i18next for multi-language support
 - **Data Processing**: XLSX.js for Excel manipulation without backend
 - **Visualization**: 
   - Gantt-Task-React for project timeline views

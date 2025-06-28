@@ -11,6 +11,8 @@ import ReactFlow, {
   Handle,
   Position,
 } from 'reactflow';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import dagre from 'dagre';
 import 'reactflow/dist/style.css';
 import { TreeNode } from '../types';
@@ -28,12 +30,8 @@ interface CustomNodeData {
 }
 
 const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+  const { t } = useTranslation();
+  const { formatCurrency } = useCurrencySettings();
 
   const getLevelColor = (level: number) => {
     switch (level) {
@@ -46,10 +44,10 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
 
   const getLevelLabel = (level: number) => {
     switch (level) {
-      case 1: return 'Projeto';
-      case 2: return 'Fase';
-      case 3: return 'Atividade';
-      default: return 'Item';
+      case 1: return t('flowTree.project');
+      case 2: return t('flowTree.phase');
+      case 3: return t('flowTree.activity');
+      default: return t('flowTree.item');
     }
   };
 
@@ -114,7 +112,7 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
             fontWeight: 'bold'
           }}
         >
-          Nível {data.level}
+          {t('flowTree.level')} {data.level}
         </span>
       </div>
       
@@ -130,10 +128,10 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
       </div>
       
       <div style={{ fontSize: '10px', color: '#666' }}>
-        <div>Custo Próprio: <strong style={{ color: colors.text }}>{formatCurrency(data.cost)}</strong></div>
-        <div>Custo Total: <strong style={{ color: '#52c41a' }}>{formatCurrency(data.totalCost)}</strong></div>
+        <div>{t('flowTree.ownCost')} <strong style={{ color: colors.text }}>{formatCurrency(data.cost)}</strong></div>
+        <div>{t('flowTree.totalCostLabel')} <strong style={{ color: '#52c41a' }}>{formatCurrency(data.totalCost)}</strong></div>
         {data.childrenCount > 0 && (
-          <div>Subitens: <strong>{data.childrenCount}</strong></div>
+          <div>{t('flowTree.subitems')} <strong>{data.childrenCount}</strong></div>
         )}
       </div>
     </div>

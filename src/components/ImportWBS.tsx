@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Modal,
   Upload,
@@ -23,6 +23,8 @@ import {
   ExclamationCircleOutlined,
   WarningOutlined
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { ImportService, ImportResult, ImportValidationError } from '../services/importService';
 import { TreeNode } from '../types';
 
@@ -36,6 +38,8 @@ interface ImportWBSProps {
 }
 
 const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => {
+  const { t } = useTranslation();
+  const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<'upload' | 'preview' | 'complete'>('upload');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
@@ -56,7 +60,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
       setImportResult({
         success: false,
         errors: [{
-          message: `Erro inesperado: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+          message: `${t('importWBS.unexpectedError')} ${error instanceof Error ? error.message : t('messages.error.networkError')}`,
           severity: 'error'
         }],
         warnings: []
@@ -85,9 +89,9 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
 
   const renderUploadStep = () => (
     <div>
-      <Title level={4}>Importar Estrutura WBS</Title>
+      <Title level={4}>{t('importWBS.title')}</Title>
       <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
-        Selecione um arquivo para importar sua estrutura de trabalho. Formatos suportados: JSON, Excel (.xlsx/.xls), CSV
+        {t('importWBS.description')}
       </Text>
 
       <Dragger
@@ -104,10 +108,10 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
           <UploadOutlined />
         </p>
         <p className="ant-upload-text">
-          Clique ou arraste um arquivo para esta área
+          {t('importWBS.dragDropText')}
         </p>
         <p className="ant-upload-hint">
-          Suporte para JSON, Excel (.xlsx/.xls) e CSV
+          {t('importWBS.supportedFormats')}
         </p>
       </Dragger>
 
@@ -115,13 +119,13 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
         <div style={{ textAlign: 'center', marginTop: 16 }}>
           <Progress type="circle" percent={50} status="active" />
           <br />
-          <Text>Processando arquivo...</Text>
+          <Text>{t('importWBS.processing')}</Text>
         </div>
       )}
 
       {importResult && !importResult.success && (
         <Alert
-          message="Erro na Importação"
+          message={t('importWBS.importError')}
           description={
             <List
               size="small"
@@ -129,7 +133,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
               renderItem={(error: ImportValidationError) => (
                 <List.Item>
                   <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginRight: 8 }} />
-                  {error.line && `Linha ${error.line}: `}
+                  {error.line && `${t('importWBS.line')} ${error.line}: `}
                   {error.message}
                 </List.Item>
               )}
@@ -140,27 +144,27 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
         />
       )}
 
-      <Card title="Formatos Suportados" style={{ marginTop: 24 }}>
+      <Card title={t('importWBS.supportedFormatsTitle')} style={{ marginTop: 24 }}>
         <Row gutter={16}>
           <Col span={8}>
             <Card size="small">
               <FileTextOutlined style={{ fontSize: 24, color: '#1890ff' }} />
               <Title level={5}>JSON</Title>
-              <Text type="secondary">Estrutura WBS completa com metadados</Text>
+              <Text type="secondary">{t('importWBS.jsonDescription')}</Text>
             </Card>
           </Col>
           <Col span={8}>
             <Card size="small">
               <FileExcelOutlined style={{ fontSize: 24, color: '#52c41a' }} />
               <Title level={5}>Excel</Title>
-              <Text type="secondary">Planilhas .xlsx/.xls com hierarquia</Text>
+              <Text type="secondary">{t('importWBS.excelDescription')}</Text>
             </Card>
           </Col>
           <Col span={8}>
             <Card size="small">
               <FileTextOutlined style={{ fontSize: 24, color: '#faad14' }} />
               <Title level={5}>CSV</Title>
-              <Text type="secondary">Dados tabulares separados por vírgula</Text>
+              <Text type="secondary">{t('importWBS.csvDescription')}</Text>
             </Card>
           </Col>
         </Row>
@@ -206,40 +210,40 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
 
     const columns = [
       {
-        title: 'Nome',
+        title: t('importWBS.columns.name'),
         dataIndex: 'name',
         key: 'name',
         width: '30%',
       },
       {
-        title: 'Nível',
+        title: t('importWBS.columns.level'),
         dataIndex: 'level',
         key: 'level',
         width: '8%',
         render: (level: number) => <Tag color={level === 1 ? 'blue' : level === 2 ? 'green' : 'orange'}>{level}</Tag>
       },
       {
-        title: 'Custo Próprio',
+        title: t('importWBS.columns.ownCost'),
         dataIndex: 'cost',
         key: 'cost',
         width: '12%',
-        render: (cost: number) => `R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+        render: (cost: number) => formatCurrency(cost)
       },
       {
-        title: 'Custo Total',
+        title: t('importWBS.columns.totalCost'),
         dataIndex: 'totalCost',
         key: 'totalCost',
         width: '12%',
-        render: (cost: number) => `R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+        render: (cost: number) => formatCurrency(cost)
       },
       {
-        title: 'Filhos',
+        title: t('importWBS.columns.children'),
         dataIndex: 'childrenCount',
         key: 'childrenCount',
         width: '8%',
       },
       {
-        title: 'Responsável',
+        title: t('importWBS.columns.responsible'),
         dataIndex: 'responsible',
         key: 'responsible',
         width: '15%',
@@ -248,31 +252,31 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
 
     return (
       <div>
-        <Title level={4}>Preview da Importação</Title>
+        <Title level={4}>{t('importWBS.previewTitle')}</Title>
         <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
-          Arquivo: <strong>{selectedFile?.name}</strong>
+          {t('importWBS.file')} <strong>{selectedFile?.name}</strong>
         </Text>
 
         {/* Summary Cards */}
         <Row gutter={16} style={{ marginBottom: 24 }}>
           <Col span={6}>
             <Card size="small">
-              <Statistic title="Total de Nós" value={summary?.totalNodes} />
+              <Statistic title={t('importWBS.totalNodes')} value={summary?.totalNodes} />
             </Card>
           </Col>
           <Col span={6}>
             <Card size="small">
-              <Statistic title="Nível 1" value={summary?.level1Nodes} />
+              <Statistic title={t('importWBS.level1')} value={summary?.level1Nodes} />
             </Card>
           </Col>
           <Col span={6}>
             <Card size="small">
-              <Statistic title="Nível 2" value={summary?.level2Nodes} />
+              <Statistic title={t('importWBS.level2')} value={summary?.level2Nodes} />
             </Card>
           </Col>
           <Col span={6}>
             <Card size="small">
-              <Statistic title="Nível 3" value={summary?.level3Nodes} />
+              <Statistic title={t('importWBS.level3')} value={summary?.level3Nodes} />
             </Card>
           </Col>
         </Row>
@@ -281,9 +285,9 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
           <Col span={12}>
             <Card size="small">
               <Statistic
-                title="Custo Total"
+                title={t('importWBS.totalCost')}
                 value={summary?.totalCost}
-                prefix="R$"
+                prefix={getCurrencySymbol()}
                 precision={2}
                 valueStyle={{ color: '#1890ff' }}
               />
@@ -292,8 +296,8 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
           <Col span={12}>
             <Card size="small">
               <Statistic
-                title="Status"
-                value="Pronto para Importar"
+                title={t('importWBS.status')}
+                value={t('importWBS.readyToImport')}
                 valueStyle={{ color: '#52c41a' }}
                 prefix={<CheckCircleOutlined />}
               />
@@ -304,7 +308,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
         {/* Warnings */}
         {warnings.length > 0 && (
           <Alert
-            message={`${warnings.length} Aviso(s) Encontrado(s)`}
+            message={`${warnings.length} ${t('importWBS.warningsFound')}`}
             description={
               <List
                 size="small"
@@ -312,7 +316,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
                 renderItem={(warning: ImportValidationError) => (
                   <List.Item>
                     <WarningOutlined style={{ color: '#faad14', marginRight: 8 }} />
-                    {warning.line && `Linha ${warning.line}: `}
+                    {warning.line && `${t('importWBS.line')} ${warning.line}: `}
                     {warning.message}
                   </List.Item>
                 )}
@@ -325,7 +329,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
         )}
 
         {/* Structure Preview Table */}
-        <Card title="Estrutura Importada" style={{ marginBottom: 16 }}>
+        <Card title={t('importWBS.importedStructure')} style={{ marginBottom: 16 }}>
           {Array.isArray(tableData) && tableData.length > 0 ? (
             <Table
               columns={columns}
@@ -337,17 +341,17 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
             />
           ) : (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <Text type="secondary">Nenhum dado para exibir</Text>
+              <Text type="secondary">{t('importWBS.noDataToDisplay')}</Text>
             </div>
           )}
         </Card>
 
         <Space>
           <Button onClick={() => setCurrentStep('upload')}>
-            Voltar
+            {t('importWBS.back')}
           </Button>
           <Button type="primary" onClick={handleConfirmImport}>
-            Confirmar Importação
+            {t('importWBS.confirmImport')}
           </Button>
         </Space>
       </div>
@@ -357,9 +361,9 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
   const renderCompleteStep = () => (
     <div style={{ textAlign: 'center', padding: '40px 0' }}>
       <CheckCircleOutlined style={{ fontSize: 72, color: '#52c41a', marginBottom: 24 }} />
-      <Title level={3}>Importação Concluída!</Title>
+      <Title level={3}>{t('importWBS.importCompleted')}</Title>
       <Text type="secondary">
-        Sua estrutura WBS foi importada com sucesso.
+        {t('importWBS.importSuccess')}
       </Text>
       <div style={{ marginTop: 32 }}>
         <Progress percent={100} status="success" />
@@ -369,7 +373,7 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
 
   return (
     <Modal
-      title="Importar WBS"
+      title={t('importWBS.modalTitle')}
       visible={visible}
       onCancel={handleClose}
       footer={null}

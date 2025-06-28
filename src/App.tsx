@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Badge, message, Popconfirm } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
@@ -9,6 +10,8 @@ import GanttChart from './components/GanttChart';
 import TableView from './components/TableView';
 import BudgetAllocationView from './components/BudgetAllocationView';
 import RiskManagement from './components/RiskManagement';
+import LanguageSelector from './components/LanguageSelector';
+import SettingsModal from './components/SettingsModal';
 import { TreeNode, ExportOptions } from './types/index';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
@@ -23,6 +26,8 @@ const { Title } = Typography;
 const WBS_STORAGE_KEY = 'wbs-project-structure';
 
 function App() {
+  const { t } = useTranslation();
+  
   // Função para carregar estrutura WBS do localStorage
   const loadWBSFromStorage = (): TreeNode => {
     try {
@@ -43,18 +48,18 @@ function App() {
         return convertDates(parsedWBS);
       }
     } catch (error) {
-      console.error('Erro ao carregar estrutura WBS do localStorage:', error);
-    }
-    
-    // Retorna estrutura padrão se não houver dados salvos
-    return {
-      id: uuidv4(),
-      name: 'Projeto Principal',
-      cost: 0,
-      level: 1,
-      children: [],
-      totalCost: 0
-    };
+              console.error(t('messages.error.loadFailed'), error);
+      }
+      
+      // Retorna estrutura padrão se não houver dados salvos
+      return {
+        id: uuidv4(),
+        name: t('wbs.project'),
+        cost: 0,
+        level: 1,
+        children: [],
+        totalCost: 0
+      };
   };
 
   // Função para salvar estrutura WBS no localStorage
@@ -62,13 +67,13 @@ function App() {
     try {
       localStorage.setItem(WBS_STORAGE_KEY, JSON.stringify(wbs));
     } catch (error) {
-      console.error('Erro ao salvar estrutura WBS no localStorage:', error);
+      console.error(t('messages.error.saveFailed'), error);
       
       // Verificar se é erro de quota excedida
       if (error instanceof DOMException && error.code === 22) {
-        message.error('Armazenamento local cheio! A estrutura WBS pode não ter sido salva.');
+        message.error(t('messages.error.storageQuotaExceeded'));
       } else {
-        message.warning('Não foi possível salvar a estrutura WBS automaticamente.');
+        message.warning(t('messages.error.autoSaveFailed'));
       }
     }
   };
@@ -77,6 +82,7 @@ function App() {
 
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
   // Salvar no localStorage sempre que a estrutura WBS mudar
   useEffect(() => {
@@ -123,31 +129,31 @@ function App() {
     
     if (hasExistingData) {
       Modal.confirm({
-        title: 'Carregar Dados de Exemplo',
+        title: t('modals.loadSampleData.title'),
         content: (
           <div>
-            <p>Você já possui uma estrutura WBS com {existingNodes} nó(s).</p>
-            <p>Carregar o exemplo irá substituir a estrutura atual.</p>
-            <p>Deseja continuar?</p>
+            <p>{t('modals.loadSampleData.content', { count: existingNodes })}</p>
+            <p>{t('modals.loadSampleData.warning')}</p>
+            <p>{t('modals.loadSampleData.question')}</p>
           </div>
         ),
-        okText: 'Sim, substituir',
-        cancelText: 'Cancelar',
+        okText: t('modals.loadSampleData.replaceButton'),
+        cancelText: t('buttons.cancel'),
         onOk: () => {
           setRootNode(sampleProject);
-          message.success('Dados de exemplo carregados com sucesso!');
+          message.success(t('messages.success.sampleDataLoaded'));
         },
       });
     } else {
       setRootNode(sampleProject);
-      message.success('Dados de exemplo carregados com sucesso!');
+      message.success(t('messages.success.sampleDataLoaded'));
     }
   };
 
   const handleClearWBS = () => {
     const emptyProject: TreeNode = {
       id: uuidv4(),
-      name: 'Projeto Principal',
+      name: t('wbs.project'),
       cost: 0,
       level: 1,
       children: [],
@@ -156,13 +162,13 @@ function App() {
     
     setRootNode(emptyProject);
     localStorage.removeItem(WBS_STORAGE_KEY);
-    message.success('Estrutura WBS limpa com sucesso!');
+    message.success(t('messages.success.wbsCleared'));
   };
 
   const handleImportWBS = (importedNode: TreeNode) => {
     setRootNode(importedNode);
     setImportModalVisible(false);
-    message.success('Estrutura WBS importada e salva automaticamente!');
+    message.success(t('messages.success.wbsImported'));
   };
 
   const costBreakdown = CostCalculator.getCostBreakdown(rootNode);
@@ -206,11 +212,23 @@ function App() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ backgroundColor: '#001529', padding: '0 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <ProjectOutlined style={{ fontSize: '24px', color: 'white', marginRight: '12px' }} />
-          <Title level={3} style={{ color: 'white', margin: 0 }}>
-            WBS - Work Breakdown Structure
-          </Title>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <ProjectOutlined style={{ fontSize: '24px', color: 'white', marginRight: '12px' }} />
+            <Title level={3} style={{ color: 'white', margin: 0 }}>
+              {t('app.title')}
+            </Title>
+          </div>
+          <Space>
+            <LanguageSelector size="small" />
+            <Button
+              type="text"
+              icon={<SettingOutlined />}
+              onClick={() => setSettingsModalVisible(true)}
+              style={{ color: 'white' }}
+              title={t('settings.title')}
+            />
+          </Space>
         </div>
       </Header>
 
@@ -219,7 +237,7 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="💰 Custo Total"
+                title={`💰 ${t('statistics.totalCost')}`}
                 value={costBreakdown.total}
                 prefix="R$"
                 precision={2}
@@ -230,7 +248,7 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="📊 Total de Nós"
+                title={`📊 ${t('statistics.totalNodes')}`}
                 value={wbsStats.totalNodes}
                 suffix={wbsStats.hasData ? '(Salvos)' : ''}
                 valueStyle={{ color: wbsStats.hasData ? '#52c41a' : '#999' }}
@@ -240,7 +258,7 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="🎯 Fases (Nível 2)"
+                title={`🎯 ${t('statistics.phases')} (${t('wbs.phase')})`}
                 value={wbsStats.phases}
                 prefix="📁"
                 valueStyle={{ color: '#52c41a' }}
@@ -250,7 +268,7 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="⚡ Atividades (Nível 3)"
+                title={`⚡ ${t('statistics.activities')} (${t('wbs.activity')})`}
                 value={wbsStats.activities}
                 prefix="📝"
                 valueStyle={{ color: '#faad14' }}
@@ -262,12 +280,12 @@ function App() {
         <Card
           title={
             <Space>
-              <span>Estrutura do Projeto</span>
+              <span>{t('wbs.project')} - {t('app.subtitle')}</span>
               {wbsStats.hasData && (
                 <Badge 
                   count={wbsStats.totalNodes} 
                   style={{ backgroundColor: '#1890ff' }}
-                  title={`${wbsStats.totalNodes} nó(s) na estrutura WBS (${wbsStats.phases} fases, ${wbsStats.activities} atividades)`}
+                  title={`${wbsStats.totalNodes} nó(s) na estrutura WBS (${wbsStats.phases} ${t('statistics.phases').toLowerCase()}, ${wbsStats.activities} ${t('statistics.activities').toLowerCase()})`}
                 />
               )}
             </Space>
@@ -279,15 +297,15 @@ function App() {
                 onClick={handleLoadSampleData}
                 type="dashed"
               >
-                Carregar Exemplo
+                {t('buttons.loadSampleData')}
               </Button>
               
               <Popconfirm
-                title="Limpar Estrutura WBS"
-                description="Esta ação irá remover toda a estrutura do projeto. Tem certeza?"
+                title={t('modals.clearWBS.title')}
+                description={t('modals.clearWBS.question')}
                 onConfirm={handleClearWBS}
-                okText="Sim, limpar"
-                cancelText="Cancelar"
+                okText={t('buttons.yes')}
+                cancelText={t('buttons.cancel')}
                 okButtonProps={{ danger: true }}
               >
                 <Button
@@ -296,7 +314,7 @@ function App() {
                   icon={<DeleteOutlined />}
                   disabled={rootNode.children.length === 0}
                 >
-                  Limpar WBS
+                  {t('buttons.clearWBS')}
                 </Button>
               </Popconfirm>
               
@@ -305,7 +323,7 @@ function App() {
                 onClick={() => setImportModalVisible(true)}
                 type="default"
               >
-                Importar WBS
+                {t('buttons.importExcel')}
               </Button>
               
               <Button.Group>
@@ -314,42 +332,42 @@ function App() {
                   onClick={() => setViewMode('list')}
                   type={viewMode === 'list' ? 'primary' : 'default'}
                 >
-                  Lista
+                  {t('navigation.list')}
                 </Button>
                 <Button
                   icon={<TableOutlined />}
                   onClick={() => setViewMode('table')}
                   type={viewMode === 'table' ? 'primary' : 'default'}
                 >
-                  Tabela
+                  {t('navigation.table')}
                 </Button>
                 <Button
                   icon={<ApartmentOutlined />}
                   onClick={() => setViewMode('flow')}
                   type={viewMode === 'flow' ? 'primary' : 'default'}
                 >
-                  Diagrama
+                  {t('navigation.flow')}
                 </Button>
                 <Button
                   icon={<BarChartOutlined />}
                   onClick={() => setViewMode('gantt')}
                   type={viewMode === 'gantt' ? 'primary' : 'default'}
                 >
-                  Gantt
+                  {t('navigation.gantt')}
                 </Button>
                 <Button
                   icon={<PieChartOutlined />}
                   onClick={() => setViewMode('budget')}
                   type={viewMode === 'budget' ? 'primary' : 'default'}
                 >
-                  Budget
+                  {t('navigation.budget')}
                 </Button>
                 <Button
                   icon={<ExclamationCircleOutlined />}
                   onClick={() => setViewMode('risks')}
                   type={viewMode === 'risks' ? 'primary' : 'default'}
                 >
-                  Riscos
+                  {t('navigation.risks')}
                 </Button>
               </Button.Group>
               
@@ -358,13 +376,13 @@ function App() {
                 icon={<FileExcelOutlined />}
                 onClick={handleExportExcel}
               >
-                Exportar Excel
+                {t('buttons.export')} Excel
               </Button>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={handleExportJSON}
               >
-                Exportar JSON
+                {t('buttons.export')} JSON
               </Button>
             </Space>
           }
@@ -374,7 +392,7 @@ function App() {
             <div style={{ marginBottom: 16, padding: 16, background: '#f6ffed', borderRadius: 6, border: '1px solid #b7eb8f' }}>
               <Space direction="vertical" size="small">
                 <div style={{ fontWeight: 'bold', color: '#389e0d' }}>
-                  💾 Armazenamento Automático Ativado
+                  💾 {t('settings.autoSave')} Ativado
                 </div>
                 <div style={{ color: '#666', fontSize: 14 }}>
                   Sua estrutura WBS é automaticamente salva no navegador. Todas as modificações, 
@@ -411,6 +429,11 @@ function App() {
           visible={importModalVisible}
           onClose={() => setImportModalVisible(false)}
           onImport={handleImportWBS}
+        />
+
+        <SettingsModal
+          visible={settingsModalVisible}
+          onClose={() => setSettingsModalVisible(false)}
         />
       </Content>
     </Layout>

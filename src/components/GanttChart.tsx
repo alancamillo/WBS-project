@@ -14,6 +14,8 @@ import {
   Alert,
   Tooltip
 } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { 
   BarChartOutlined, 
   DownloadOutlined, 
@@ -42,6 +44,19 @@ const GanttChart: React.FC<GanttChartProps> = ({
   onTaskChange, 
   onTaskDelete 
 }) => {
+  const { t, i18n } = useTranslation();
+  const { formatCurrency } = useCurrencySettings();
+
+  // Função para obter locale do Gantt
+  const getGanttLocale = () => {
+    switch (i18n.language) {
+      case 'en': return 'en-US';
+      case 'es': return 'es-ES';
+      case 'zh': return 'zh-CN';
+      default: return 'pt-BR';
+    }
+  };
+
   const [viewOptions, setViewOptions] = useState<GanttViewOptions>({
     showLevels: [1, 2, 3],
     showCriticalPath: true,
@@ -133,7 +148,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
         <Col>
           <Title level={2} style={{ margin: 0 }}>
             <BarChartOutlined style={{ marginRight: '8px' }} />
-            Gantt Chart - {rootNode.name}
+            {t('gantt.title')} - {rootNode.name}
           </Title>
         </Col>
         <Col>
@@ -143,13 +158,13 @@ const GanttChart: React.FC<GanttChartProps> = ({
               icon={<DownloadOutlined />}
               onClick={() => handleExportGantt('json')}
             >
-              Exportar JSON
+              {t('gantt.exportJson')}
             </Button>
             <Button 
               icon={<DownloadOutlined />}
               onClick={() => handleExportGantt('csv')}
             >
-              Exportar CSV
+              {t('gantt.exportCsv')}
             </Button>
           </Space>
         </Col>
@@ -160,7 +175,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Total de Tarefas"
+              title={t('gantt.totalTasks')}
               value={projectAnalysis.summary.totalTasks}
               prefix={<ClockCircleOutlined />}
             />
@@ -169,7 +184,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Taxa de Conclusão"
+              title={t('gantt.completionRate')}
               value={projectAnalysis.summary.completionRate}
               precision={1}
               suffix="%"
@@ -180,22 +195,17 @@ const GanttChart: React.FC<GanttChartProps> = ({
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Custo Total"
+              title={t('gantt.totalCost')}
               value={projectAnalysis.summary.totalCost}
               prefix={<DollarCircleOutlined />}
-              formatter={(value) => 
-                new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL'
-                }).format(value as number)
-              }
+              formatter={(value) => formatCurrency(value as number)}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Duração (dias)"
+              title={t('gantt.durationDays')}
               value={projectAnalysis.summary.totalDurationDays}
               prefix={<CalendarOutlined />}
             />
@@ -205,26 +215,26 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
       {/* Controles de visualização */}
       <Card style={{ marginBottom: '24px' }}>
-        <Title level={4}>Configurações de Visualização</Title>
+        <Title level={4}>{t('gantt.viewSettings')}</Title>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Text strong>Níveis para Exibir:</Text>
+              <Text strong>{t('gantt.levelsToShow')}</Text>
               <Select
                 mode="multiple"
                 style={{ width: '100%' }}
-                placeholder="Selecione os níveis"
+                placeholder={t('gantt.selectLevels')}
                 value={viewOptions.showLevels}
                 onChange={handleLevelChange}
               >
                 <Option value={1}>
-                  <Tag color={getLevelColor(1)}>Nível 1 - Projeto</Tag>
+                  <Tag color={getLevelColor(1)}>{t('gantt.level1Project')}</Tag>
                 </Option>
                 <Option value={2}>
-                  <Tag color={getLevelColor(2)}>Nível 2 - Fase</Tag>
+                  <Tag color={getLevelColor(2)}>{t('gantt.level2Phase')}</Tag>
                 </Option>
                 <Option value={3}>
-                  <Tag color={getLevelColor(3)}>Nível 3 - Atividade</Tag>
+                  <Tag color={getLevelColor(3)}>{t('gantt.level3Activity')}</Tag>
                 </Option>
               </Select>
             </Space>
@@ -232,7 +242,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
           
           <Col xs={24} sm={12} md={8}>
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Text strong>Modo de Visualização:</Text>
+              <Text strong>{t('gantt.viewMode')}</Text>
               <Select
                 style={{ width: '100%' }}
                 value={selectedView}
@@ -241,43 +251,43 @@ const GanttChart: React.FC<GanttChartProps> = ({
                   handleViewOptionsChange('viewMode', value);
                 }}
               >
-                <Option value={ViewMode.QuarterDay}>Quarto de Dia</Option>
-                <Option value={ViewMode.HalfDay}>Meio Dia</Option>
-                <Option value={ViewMode.Day}>Dia</Option>
-                <Option value={ViewMode.Week}>Semana</Option>
-                <Option value={ViewMode.Month}>Mês</Option>
+                <Option value={ViewMode.QuarterDay}>{t('gantt.quarterDay')}</Option>
+                <Option value={ViewMode.HalfDay}>{t('gantt.halfDay')}</Option>
+                <Option value={ViewMode.Day}>{t('gantt.day')}</Option>
+                <Option value={ViewMode.Week}>{t('gantt.week')}</Option>
+                <Option value={ViewMode.Month}>{t('gantt.month')}</Option>
               </Select>
             </Space>
           </Col>
 
           <Col xs={24} sm={12} md={8}>
             <Space direction="vertical">
-              <Text strong>Opções Avançadas:</Text>
+              <Text strong>{t('gantt.advancedOptions')}</Text>
               <Space direction="vertical">
-                <Tooltip title="Destacar tarefas no caminho crítico do projeto">
+                <Tooltip title={t('gantt.criticalPathTooltip')}>
                   <Switch
                     checked={viewOptions.showCriticalPath}
                     onChange={(checked) => handleViewOptionsChange('showCriticalPath', checked)}
-                    checkedChildren="Caminho Crítico"
-                    unCheckedChildren="Caminho Crítico"
+                    checkedChildren={t('gantt.criticalPath')}
+                    unCheckedChildren={t('gantt.criticalPath')}
                   />
                 </Tooltip>
                 
-                <Tooltip title="Agrupar tarefas por nível hierárquico">
+                <Tooltip title={t('gantt.groupByLevelTooltip')}>
                   <Switch
                     checked={viewOptions.groupByLevel}
                     onChange={(checked) => handleViewOptionsChange('groupByLevel', checked)}
-                    checkedChildren="Agrupar por Nível"
-                    unCheckedChildren="Agrupar por Nível"
+                    checkedChildren={t('gantt.groupByLevel')}
+                    unCheckedChildren={t('gantt.groupByLevel')}
                   />
                 </Tooltip>
                 
-                <Tooltip title="Exibir informações de custo nas tarefas">
+                <Tooltip title={t('gantt.showCostsTooltip')}>
                   <Switch
                     checked={viewOptions.showCosts}
                     onChange={(checked) => handleViewOptionsChange('showCosts', checked)}
-                    checkedChildren="Mostrar Custos"
-                    unCheckedChildren="Mostrar Custos"
+                    checkedChildren={t('gantt.showCosts')}
+                    unCheckedChildren={t('gantt.showCosts')}
                   />
                 </Tooltip>
               </Space>
@@ -292,7 +302,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
           type="warning"
           showIcon
           style={{ marginBottom: '24px' }}
-          message="Recomendações do Sistema"
+          message={t('gantt.systemRecommendations')}
           description={
             <ul style={{ marginBottom: 0 }}>
               {projectAnalysis.recommendations.map((rec: string, index: number) => (
@@ -308,10 +318,10 @@ const GanttChart: React.FC<GanttChartProps> = ({
         <Card style={{ marginBottom: '24px' }}>
           <Title level={4}>
             <InfoCircleOutlined style={{ marginRight: '8px', color: '#ff4d4f' }} />
-            Caminho Crítico
+            {t('gantt.criticalPath')}
           </Title>
           <Text type="secondary">
-            Tarefas que, se atrasadas, impactarão diretamente o prazo final do projeto:
+            {t('gantt.criticalPathDescription')}
           </Text>
           <Divider />
           <Row gutter={[8, 8]}>
@@ -333,7 +343,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
             <Gantt
               tasks={tasks}
               viewMode={selectedView}
-              locale="pt-BR"
+              locale={getGanttLocale()}
               listCellWidth="200px"
               columnWidth={65}
               onDateChange={onTaskChange}
@@ -363,18 +373,15 @@ const GanttChart: React.FC<GanttChartProps> = ({
                     {task.name}
                   </div>
                   <div style={{ fontSize: '12px', color: '#666' }}>
-                    <div>Início: {task.start.toLocaleDateString('pt-BR')}</div>
-                    <div>Fim: {task.end.toLocaleDateString('pt-BR')}</div>
-                    <div>Progresso: {task.progress}%</div>
+                    <div>{t('gantt.startDate')} {task.start.toLocaleDateString(getGanttLocale())}</div>
+                    <div>{t('gantt.endDate')} {task.end.toLocaleDateString(getGanttLocale())}</div>
+                    <div>{t('gantt.progress')} {task.progress}%</div>
                     {ganttTasks.find(t => t.id === task.id)?.responsible && (
-                      <div>Responsável: {ganttTasks.find(t => t.id === task.id)?.responsible}</div>
+                      <div>{t('gantt.responsible')} {ganttTasks.find(t => t.id === task.id)?.responsible}</div>
                     )}
                     {viewOptions.showCosts && (
                       <div>
-                        Custo: {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL'
-                        }).format(ganttTasks.find(t => t.id === task.id)?.cost || 0)}
+                        {t('gantt.cost')} {formatCurrency(ganttTasks.find(t => t.id === task.id)?.cost || 0)}
                       </div>
                     )}
                   </div>
@@ -391,7 +398,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
             }}>
               <Space direction="vertical" align="center">
                 <BarChartOutlined style={{ fontSize: '48px' }} />
-                <Text type="secondary">Nenhuma tarefa encontrada para os níveis selecionados</Text>
+                <Text type="secondary">{t('gantt.noTasksFound')}</Text>
               </Space>
             </div>
           )}

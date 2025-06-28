@@ -2,6 +2,8 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Table, Tag, Button, Space, Typography, Tooltip, Progress } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import { Key } from 'antd/es/table/interface';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { TreeNode } from '../types';
 import { DateCalculator } from '../utils/dateCalculator';
 import './TableView.css';
@@ -32,8 +34,26 @@ interface FlattenedNode extends TreeNode {
 const TableView: React.FC<TableViewProps> = ({ 
   rootNode
 }) => {
+  const { t, i18n } = useTranslation();
+  const { formatCurrency } = useCurrencySettings();
   const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
   const [collapsedPhases, setCollapsedPhases] = useState<Set<string>>(new Set());
+
+  // Função para formatação de data baseada no idioma
+  const formatDate = useCallback((date?: Date): string => {
+    if (!date) return '-';
+    
+    const localeConfig = {
+      pt: 'pt-BR',
+      en: 'en-US',
+      es: 'es-ES',
+      zh: 'zh-CN'
+    };
+
+    const locale = localeConfig[i18n.language as keyof typeof localeConfig] || localeConfig.pt;
+    
+    return new Intl.DateTimeFormat(locale).format(date);
+  }, [i18n.language]);
 
   // Função para encontrar um nó por ID na árvore
   const findNodeById = (node: TreeNode, id: string): TreeNode | null => {
@@ -62,8 +82,6 @@ const TableView: React.FC<TableViewProps> = ({
       return depNode ? depNode.name : `ID: ${depId}`;
     });
   };
-
-
 
   // Função para contar itens dentro de uma fase
   const countItemsInPhase = (phaseNode: TreeNode): number => {
@@ -149,18 +167,6 @@ const TableView: React.FC<TableViewProps> = ({
 
   const flattenedData = useMemo(() => flattenTree(rootNode), [rootNode, flattenTree]);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return '-';
-    return new Intl.DateTimeFormat('pt-BR').format(date);
-  };
-
   const getLevelColor = (level: number) => {
     switch (level) {
       case 1: return '#1890ff';
@@ -172,10 +178,10 @@ const TableView: React.FC<TableViewProps> = ({
 
   const getLevelLabel = (level: number) => {
     switch (level) {
-      case 1: return 'Projeto';
-      case 2: return 'Fase';
-      case 3: return 'Atividade';
-      default: return 'Item';
+      case 1: return t('tableView.levels.project');
+      case 2: return t('tableView.levels.phase');
+      case 3: return t('tableView.levels.activity');
+      default: return t('tableView.levels.item');
     }
   };
 
@@ -190,10 +196,10 @@ const TableView: React.FC<TableViewProps> = ({
 
   const getStatusText = (status?: string) => {
     switch (status) {
-      case 'completed': return 'Concluído';
-      case 'in-progress': return 'Em Progresso';
-      case 'not-started': return 'Não Iniciado';
-      default: return 'Indefinido';
+      case 'completed': return t('tableView.status.completed');
+      case 'in-progress': return t('tableView.status.inProgress');
+      case 'not-started': return t('tableView.status.notStarted');
+      default: return t('tableView.status.undefined');
     }
   };
 
@@ -248,7 +254,7 @@ const TableView: React.FC<TableViewProps> = ({
 
   const columns: ColumnType<FlattenedNode>[] = [
     {
-      title: 'Estrutura',
+      title: t('tableView.columns.structure'),
       dataIndex: 'name',
       key: 'name',
       width: 350,
@@ -281,7 +287,7 @@ const TableView: React.FC<TableViewProps> = ({
             {/* Contador de itens para fases colapsadas */}
             {record.level === 2 && collapsedPhases.has(record.id) && (
               <Tag color="orange" style={{ marginLeft: 8, fontSize: '10px' }}>
-                {countItemsInPhase(record)} itens
+                {t('tableView.stats.itemsCount', { count: countItemsInPhase(record) })}
               </Tag>
             )}
           </Space>
@@ -289,7 +295,7 @@ const TableView: React.FC<TableViewProps> = ({
       ),
     },
     {
-      title: 'Nível',
+      title: t('tableView.columns.level'),
       dataIndex: 'level',
       key: 'level',
       width: 80,
@@ -300,7 +306,7 @@ const TableView: React.FC<TableViewProps> = ({
       ),
     },
     {
-      title: 'Responsável',
+      title: t('tableView.columns.responsible'),
       dataIndex: 'responsible',
       key: 'responsible',
       width: 150,
@@ -312,7 +318,7 @@ const TableView: React.FC<TableViewProps> = ({
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: 'Status',
+      title: t('tableView.columns.status'),
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -323,7 +329,7 @@ const TableView: React.FC<TableViewProps> = ({
       ),
     },
     {
-      title: 'Progresso',
+      title: t('tableView.columns.progress'),
       dataIndex: 'status',
       key: 'progress',
       width: 120,
@@ -379,14 +385,14 @@ const TableView: React.FC<TableViewProps> = ({
             
             originalNode.children.forEach(child => countActivities(child));
             
-            tooltipTitle = `Progresso baseado em atividades filhas:\n` +
-                          `• Concluídas: ${completedActivities}\n` +
-                          `• Em progresso: ${inProgressActivities}\n` +
-                          `• Total: ${totalActivities}\n` +
-                          `• Percentual: ${percentage}%`;
+            tooltipTitle = `${t('tableView.tooltips.progressBasedOnChildren')}\n` +
+                          `• ${t('tableView.tooltips.completed', { count: completedActivities })}\n` +
+                          `• ${t('tableView.tooltips.inProgress', { count: inProgressActivities })}\n` +
+                          `• ${t('tableView.tooltips.total', { count: totalActivities })}\n` +
+                          `• ${t('tableView.tooltips.percentage', { percent: percentage })}`;
           }
         } else {
-          tooltipTitle = `Status próprio: ${getStatusText(status)}`;
+          tooltipTitle = t('tableView.tooltips.ownStatus', { status: getStatusText(status) });
         }
         
         return (
@@ -401,7 +407,7 @@ const TableView: React.FC<TableViewProps> = ({
       },
     },
     {
-      title: 'Custo Próprio',
+      title: t('tableView.columns.ownCost'),
       dataIndex: 'cost',
       key: 'cost',
       width: 120,
@@ -413,7 +419,7 @@ const TableView: React.FC<TableViewProps> = ({
       ),
     },
     {
-      title: 'Custo Total',
+      title: t('tableView.columns.totalCost'),
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: 120,
@@ -425,7 +431,7 @@ const TableView: React.FC<TableViewProps> = ({
       ),
     },
     {
-      title: 'Data Início',
+      title: t('tableView.columns.startDate'),
       dataIndex: 'startDate',
       key: 'startDate',
       width: 110,
@@ -439,7 +445,7 @@ const TableView: React.FC<TableViewProps> = ({
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: 'Data Fim',
+      title: t('tableView.columns.endDate'),
       dataIndex: 'endDate',
       key: 'endDate',
       width: 110,
@@ -453,7 +459,7 @@ const TableView: React.FC<TableViewProps> = ({
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: 'Duração',
+      title: t('tableView.columns.duration'),
       dataIndex: 'durationDays',
       key: 'durationDays',
       width: 120,
@@ -467,7 +473,7 @@ const TableView: React.FC<TableViewProps> = ({
         
         if (finalDays) {
           return (
-            <Tooltip title={`${finalDays} dias corridos`}>
+            <Tooltip title={t('tableView.tooltips.workingDays', { days: finalDays })}>
               <Tag color="blue" style={{ cursor: 'help' }}>
                 {finalDays}d
               </Tag>
@@ -479,7 +485,7 @@ const TableView: React.FC<TableViewProps> = ({
       },
     },
     {
-      title: 'Descrição',
+      title: t('tableView.columns.description'),
       dataIndex: 'description',
       key: 'description',
       width: 200,
@@ -495,7 +501,7 @@ const TableView: React.FC<TableViewProps> = ({
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: 'Dependências',
+      title: t('tableView.columns.dependencies'),
       dataIndex: 'dependencies',
       key: 'dependencies',
       width: 200,
@@ -503,7 +509,7 @@ const TableView: React.FC<TableViewProps> = ({
         const dependencyNames = resolveDependencies(dependencies);
         
         if (dependencyNames.length === 0) {
-          return <Text type="secondary" className="no-dependencies">Nenhuma</Text>;
+          return <Text type="secondary" className="no-dependencies">{t('tableView.dependencies.none')}</Text>;
         }
         
         return (
@@ -514,7 +520,7 @@ const TableView: React.FC<TableViewProps> = ({
                 color="purple" 
                 className="dependency-tag"
               >
-                <Tooltip title={`Depende de: ${depName}`}>
+                <Tooltip title={t('tableView.tooltips.dependsOn', { name: depName })}>
                   <span className="dependency-name">
                     {depName}
                   </span>
@@ -523,7 +529,10 @@ const TableView: React.FC<TableViewProps> = ({
             ))}
             {dependencyNames.length > 0 && (
               <div className="dependencies-count">
-                {dependencyNames.length} dependência{dependencyNames.length > 1 ? 's' : ''}
+                {dependencyNames.length === 1 
+                  ? t('tableView.dependencies.single', { count: dependencyNames.length })
+                  : t('tableView.dependencies.multiple', { count: dependencyNames.length })
+                }
               </div>
             )}
           </div>
@@ -538,12 +547,12 @@ const TableView: React.FC<TableViewProps> = ({
         <div className="table-stats">
           <div className="stat-item">
             <Text type="secondary">
-              Total de itens: <span className="stat-value">{flattenedData.length}</span>
+              {t('tableView.stats.totalItems')} <span className="stat-value">{flattenedData.length}</span>
             </Text>
           </div>
           <div className="stat-item">
             <Text type="secondary">
-              Custo total do projeto: <span className="stat-value cost-total">
+              {t('tableView.stats.totalProjectCost')} <span className="stat-value cost-total">
                 {formatCurrency(rootNode.totalCost)}
               </span>
             </Text>
@@ -557,7 +566,7 @@ const TableView: React.FC<TableViewProps> = ({
             icon={collapsedPhases.size > 0 ? <ExpandOutlined /> : <CompressOutlined />}
             onClick={toggleAllPhases}
           >
-            {collapsedPhases.size > 0 ? 'Expandir Todas' : 'Colapsar Fases'}
+            {collapsedPhases.size > 0 ? t('tableView.controls.expandAll') : t('tableView.controls.collapsePhases')}
           </Button>
         </div>
       </div>
@@ -569,7 +578,7 @@ const TableView: React.FC<TableViewProps> = ({
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) => 
-            `${range[0]}-${range[1]} de ${total} itens`,
+            `${range[0]}-${range[1]} ${t('tableView.pagination.of')} ${total} ${t('tableView.pagination.items')}`,
           pageSizeOptions: ['10', '25', '50', '100'],
           defaultPageSize: 25,
         }}
