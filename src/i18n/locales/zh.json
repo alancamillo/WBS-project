@@ -1,0 +1,241 @@
+{
+  "app": {
+    "title": "WBS管理系统",
+    "subtitle": "工作分解结构"
+  },
+  "navigation": {
+    "list": "列表",
+    "tree": "树形",
+    "flow": "流程",
+    "gantt": "甘特图",
+    "table": "表格",
+    "budget": "预算",
+    "risks": "风险"
+  },
+  "buttons": {
+    "export": "导出",
+    "importExcel": "导入Excel",
+    "loadSampleData": "加载示例",
+    "clearWBS": "清空WBS",
+    "download": "下载",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "add": "添加",
+    "close": "关闭",
+    "yes": "是",
+    "no": "否",
+    "ok": "确定"
+  },
+  "statistics": {
+    "totalCost": "总成本",
+    "totalNodes": "总节点数",
+    "phases": "阶段",
+    "activities": "活动",
+    "leafNodes": "叶节点",
+    "completedTasks": "已完成任务",
+    "pendingTasks": "待完成任务",
+    "progress": "进度"
+  },
+  "wbs": {
+    "project": "项目",
+    "phase": "阶段",
+    "activity": "活动",
+    "task": "任务",
+    "name": "名称",
+    "cost": "成本",
+    "duration": "持续时间",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "progress": "进度",
+    "status": "状态",
+    "description": "描述",
+    "resources": "资源",
+    "responsible": "负责人",
+    "priority": "优先级",
+    "budget": "预算",
+    "actualCost": "实际成本",
+    "estimatedCost": "预估成本",
+    "totalCost": "总成本"
+  },
+  "status": {
+    "notStarted": "未开始",
+    "inProgress": "进行中",
+    "completed": "已完成",
+    "onHold": "暂停",
+    "cancelled": "已取消"
+  },
+  "priority": {
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "critical": "紧急"
+  },
+  "modals": {
+    "loadSampleData": {
+      "title": "加载示例数据",
+      "content": "您已经有一个包含{{count}}个节点的WBS结构。",
+      "warning": "加载示例将替换当前结构。",
+      "question": "您要继续吗？",
+      "replaceButton": "是，替换"
+    },
+    "clearWBS": {
+      "title": "清空WBS结构",
+      "content": "此操作将删除整个当前WBS结构。",
+      "warning": "此操作无法撤销。",
+      "question": "您确定要继续吗？"
+    },
+    "deleteNode": {
+      "title": "删除节点",
+      "content": "此操作将删除节点'{{name}}'及其所有子节点。",
+      "warning": "此操作无法撤销。",
+      "question": "您确定要删除吗？"
+    },
+    "importWBS": {
+      "title": "导入WBS结构",
+      "selectFile": "选择Excel文件(.xlsx)",
+      "dragAndDrop": "将文件拖放到这里或点击选择",
+      "supportedFormats": "支持的格式：.xlsx, .xls"
+    }
+  },
+  "messages": {
+    "success": {
+      "wbsImported": "WBS结构已导入并自动保存！",
+      "wbsCleared": "WBS结构清空成功！",
+      "sampleDataLoaded": "示例数据加载成功！",
+      "nodeAdded": "节点添加成功！",
+      "nodeUpdated": "节点更新成功！",
+      "nodeDeleted": "节点删除成功！",
+      "exportComplete": "导出完成！",
+      "dataSaved": "数据保存成功！",
+      "settingsUpdated": "设置更新成功！"
+    },
+    "error": {
+      "loadFailed": "从localStorage加载WBS结构时出错：",
+      "saveFailed": "保存WBS结构到localStorage时出错：",
+      "storageQuotaExceeded": "本地存储已满！WBS结构可能未保存。",
+      "autoSaveFailed": "无法自动保存WBS结构。",
+      "importFailed": "导入文件时出错：",
+      "exportFailed": "导出数据时出错：",
+      "invalidFile": "无效文件或不支持的格式。",
+      "networkError": "网络错误。请检查您的连接。"
+    },
+    "warning": {
+      "unsavedChanges": "您有未保存的更改。",
+      "confirmLeave": "您确定要在不保存的情况下离开吗？"
+    }
+  },
+  "forms": {
+    "placeholders": {
+      "nodeName": "输入节点名称",
+      "nodeDescription": "输入节点描述",
+      "nodeCost": "输入预估成本",
+      "nodeProgress": "输入进度(%)",
+      "nodeResponsible": "输入负责人",
+      "searchNodes": "搜索节点...",
+      "filterByStatus": "按状态筛选",
+      "filterByPriority": "按优先级筛选"
+    },
+    "labels": {
+      "required": "必填",
+      "optional": "可选",
+      "currency": "¥",
+      "percentage": "%",
+      "days": "天",
+      "hours": "小时"
+    },
+    "validation": {
+      "required": "此字段为必填项",
+      "minLength": "最少{{min}}个字符",
+      "maxLength": "最多{{max}}个字符",
+      "invalidNumber": "无效数字",
+      "invalidDate": "无效日期",
+      "invalidEmail": "无效邮箱",
+      "invalidUrl": "无效URL"
+    }
+  },
+  "charts": {
+    "costBreakdown": "成本分解",
+    "progressOverview": "进度概览",
+    "budgetAnalysis": "预算分析",
+    "timelineView": "时间轴视图",
+    "riskMatrix": "风险矩阵"
+  },
+  "risks": {
+    "title": "风险管理",
+    "riskName": "风险名称",
+    "riskDescription": "风险描述",
+    "probability": "概率",
+    "impact": "影响",
+    "mitigation": "缓解措施",
+    "contingency": "应急计划",
+    "owner": "负责人",
+    "category": "类别",
+    "status": "状态",
+    "identificationDate": "识别日期",
+    "reviewDate": "审查日期",
+    "categories": {
+      "technical": "技术",
+      "financial": "财务",
+      "operational": "运营",
+      "strategic": "战略",
+      "external": "外部"
+    }
+  },
+  "export": {
+    "title": "导出数据",
+    "format": "格式",
+    "options": "选项",
+    "includeMetadata": "包含元数据",
+    "includeCostBreakdown": "包含成本分解",
+    "includeGantt": "包含甘特图计划",
+    "includeRisks": "包含风险",
+    "fileName": "文件名",
+    "exportButton": "导出数据"
+  },
+  "language": {
+    "title": "语言",
+    "select": "选择语言",
+    "current": "当前语言",
+    "detected": "检测到的语言",
+    "supportedLanguages": "支持的语言",
+    "languages": {
+      "pt": "Português",
+      "en": "English",
+      "es": "Español",
+      "zh": "中文"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "general": "常规",
+    "display": "显示",
+    "dataAndStorage": "数据和存储",
+    "language": "语言",
+    "theme": "主题",
+    "autoSave": "自动保存",
+    "currency": "货币",
+    "dateFormat": "日期格式",
+    "timeFormat": "时间格式",
+    "autoDetect": "自动检测",
+    "resetToAutoDetect": "使用浏览器语言",
+    "persistence": "自动持久化",
+    "persistenceDescription": "您的语言偏好会自动保存在浏览器中，并在会话之间保持。",
+    "enabled": "启用",
+    "disabled": "禁用",
+    "autoSaveDescription": "所有更改都会自动保存到本地存储。",
+    "lightTheme": "浅色主题",
+    "darkTheme": "深色主题",
+    "themeDescription": "视觉定制将在未来版本中实现。"
+  },
+  "help": {
+    "title": "帮助",
+    "documentation": "文档",
+    "shortcuts": "键盘快捷键",
+    "about": "关于",
+    "version": "版本",
+    "support": "支持"
+  }
+} 

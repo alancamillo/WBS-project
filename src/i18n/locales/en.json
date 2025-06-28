@@ -1,0 +1,241 @@
+{
+  "app": {
+    "title": "WBS Management System",
+    "subtitle": "Work Breakdown Structure"
+  },
+  "navigation": {
+    "list": "List",
+    "tree": "Tree",
+    "flow": "Flow",
+    "gantt": "Gantt",
+    "table": "Table",
+    "budget": "Budget",
+    "risks": "Risks"
+  },
+  "buttons": {
+    "export": "Export",
+    "importExcel": "Import Excel",
+    "loadSampleData": "Load Sample",
+    "clearWBS": "Clear WBS",
+    "download": "Download",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "statistics": {
+    "totalCost": "Total Cost",
+    "totalNodes": "Total Nodes",
+    "phases": "Phases",
+    "activities": "Activities",
+    "leafNodes": "Leaf Nodes",
+    "completedTasks": "Completed Tasks",
+    "pendingTasks": "Pending Tasks",
+    "progress": "Progress"
+  },
+  "wbs": {
+    "project": "Project",
+    "phase": "Phase",
+    "activity": "Activity",
+    "task": "Task",
+    "name": "Name",
+    "cost": "Cost",
+    "duration": "Duration",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "progress": "Progress",
+    "status": "Status",
+    "description": "Description",
+    "resources": "Resources",
+    "responsible": "Responsible",
+    "priority": "Priority",
+    "budget": "Budget",
+    "actualCost": "Actual Cost",
+    "estimatedCost": "Estimated Cost",
+    "totalCost": "Total Cost"
+  },
+  "status": {
+    "notStarted": "Not Started",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "onHold": "On Hold",
+    "cancelled": "Cancelled"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "modals": {
+    "loadSampleData": {
+      "title": "Load Sample Data",
+      "content": "You already have a WBS structure with {{count}} node(s).",
+      "warning": "Loading the sample will replace the current structure.",
+      "question": "Do you want to continue?",
+      "replaceButton": "Yes, replace"
+    },
+    "clearWBS": {
+      "title": "Clear WBS Structure",
+      "content": "This action will remove the entire current WBS structure.",
+      "warning": "This action cannot be undone.",
+      "question": "Are you sure you want to continue?"
+    },
+    "deleteNode": {
+      "title": "Delete Node",
+      "content": "This action will remove the node '{{name}}' and all its children.",
+      "warning": "This action cannot be undone.",
+      "question": "Are you sure you want to delete?"
+    },
+    "importWBS": {
+      "title": "Import WBS Structure",
+      "selectFile": "Select an Excel file (.xlsx)",
+      "dragAndDrop": "Drag and drop the file here or click to select",
+      "supportedFormats": "Supported formats: .xlsx, .xls"
+    }
+  },
+  "messages": {
+    "success": {
+      "wbsImported": "WBS structure imported and saved automatically!",
+      "wbsCleared": "WBS structure cleared successfully!",
+      "sampleDataLoaded": "Sample data loaded successfully!",
+      "nodeAdded": "Node added successfully!",
+      "nodeUpdated": "Node updated successfully!",
+      "nodeDeleted": "Node deleted successfully!",
+      "exportComplete": "Export completed successfully!",
+      "dataSaved": "Data saved successfully!",
+      "settingsUpdated": "Settings updated successfully!"
+    },
+    "error": {
+      "loadFailed": "Error loading WBS structure from localStorage:",
+      "saveFailed": "Error saving WBS structure to localStorage:",
+      "storageQuotaExceeded": "Local storage full! The WBS structure might not have been saved.",
+      "autoSaveFailed": "Could not save the WBS structure automatically.",
+      "importFailed": "Error importing file:",
+      "exportFailed": "Error exporting data:",
+      "invalidFile": "Invalid file or unsupported format.",
+      "networkError": "Network error. Check your connection."
+    },
+    "warning": {
+      "unsavedChanges": "You have unsaved changes.",
+      "confirmLeave": "Are you sure you want to leave without saving?"
+    }
+  },
+  "forms": {
+    "placeholders": {
+      "nodeName": "Enter node name",
+      "nodeDescription": "Enter node description",
+      "nodeCost": "Enter estimated cost",
+      "nodeProgress": "Enter progress (%)",
+      "nodeResponsible": "Enter responsible person",
+      "searchNodes": "Search nodes...",
+      "filterByStatus": "Filter by status",
+      "filterByPriority": "Filter by priority"
+    },
+    "labels": {
+      "required": "Required",
+      "optional": "Optional",
+      "currency": "$",
+      "percentage": "%",
+      "days": "days",
+      "hours": "hours"
+    },
+    "validation": {
+      "required": "This field is required",
+      "minLength": "Minimum {{min}} characters",
+      "maxLength": "Maximum {{max}} characters",
+      "invalidNumber": "Invalid number",
+      "invalidDate": "Invalid date",
+      "invalidEmail": "Invalid email",
+      "invalidUrl": "Invalid URL"
+    }
+  },
+  "charts": {
+    "costBreakdown": "Cost Breakdown",
+    "progressOverview": "Progress Overview",
+    "budgetAnalysis": "Budget Analysis",
+    "timelineView": "Timeline View",
+    "riskMatrix": "Risk Matrix"
+  },
+  "risks": {
+    "title": "Risk Management",
+    "riskName": "Risk Name",
+    "riskDescription": "Risk Description",
+    "probability": "Probability",
+    "impact": "Impact",
+    "mitigation": "Mitigation",
+    "contingency": "Contingency",
+    "owner": "Owner",
+    "category": "Category",
+    "status": "Status",
+    "identificationDate": "Identification Date",
+    "reviewDate": "Review Date",
+    "categories": {
+      "technical": "Technical",
+      "financial": "Financial",
+      "operational": "Operational",
+      "strategic": "Strategic",
+      "external": "External"
+    }
+  },
+  "export": {
+    "title": "Export Data",
+    "format": "Format",
+    "options": "Options",
+    "includeMetadata": "Include Metadata",
+    "includeCostBreakdown": "Include Cost Breakdown",
+    "includeGantt": "Include Gantt Schedule",
+    "includeRisks": "Include Risks",
+    "fileName": "File Name",
+    "exportButton": "Export Data"
+  },
+  "language": {
+    "title": "Language",
+    "select": "Select Language",
+    "current": "Current Language",
+    "detected": "Detected Language",
+    "supportedLanguages": "Supported Languages",
+    "languages": {
+      "pt": "Português",
+      "en": "English",
+      "es": "Español",
+      "zh": "中文"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "display": "Display",
+    "dataAndStorage": "Data and Storage",
+    "language": "Language",
+    "theme": "Theme",
+    "autoSave": "Auto Save",
+    "currency": "Currency",
+    "dateFormat": "Date Format",
+    "timeFormat": "Time Format",
+    "autoDetect": "Auto Detection",
+    "resetToAutoDetect": "Use Browser Language",
+    "persistence": "Auto Persistence",
+    "persistenceDescription": "Your language preferences are automatically saved in the browser and will persist between sessions.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "autoSaveDescription": "All changes are automatically saved to local storage.",
+    "lightTheme": "Light Theme",
+    "darkTheme": "Dark Theme",
+    "themeDescription": "Visual customization will be implemented in a future version."
+  },
+  "help": {
+    "title": "Help",
+    "documentation": "Documentation",
+    "shortcuts": "Keyboard Shortcuts",
+    "about": "About",
+    "version": "Version",
+    "support": "Support"
+  }
+} 

@@ -1,0 +1,241 @@
+{
+  "app": {
+    "title": "Sistema de Gestão WBS",
+    "subtitle": "Estrutura Analítica do Projeto"
+  },
+  "navigation": {
+    "list": "Lista",
+    "tree": "Árvore",
+    "flow": "Fluxo",
+    "gantt": "Gantt",
+    "table": "Tabela",
+    "budget": "Orçamento",
+    "risks": "Riscos"
+  },
+  "buttons": {
+    "export": "Exportar",
+    "importExcel": "Importar Excel",
+    "loadSampleData": "Carregar Exemplo",
+    "clearWBS": "Limpar WBS",
+    "download": "Baixar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "add": "Adicionar",
+    "close": "Fechar",
+    "yes": "Sim",
+    "no": "Não",
+    "ok": "OK"
+  },
+  "statistics": {
+    "totalCost": "Custo Total",
+    "totalNodes": "Total de Nós",
+    "phases": "Fases",
+    "activities": "Atividades",
+    "leafNodes": "Nós Folha",
+    "completedTasks": "Tarefas Concluídas",
+    "pendingTasks": "Tarefas Pendentes",
+    "progress": "Progresso"
+  },
+  "wbs": {
+    "project": "Projeto",
+    "phase": "Fase",
+    "activity": "Atividade",
+    "task": "Tarefa",
+    "name": "Nome",
+    "cost": "Custo",
+    "duration": "Duração",
+    "startDate": "Data de Início",
+    "endDate": "Data de Fim",
+    "progress": "Progresso",
+    "status": "Status",
+    "description": "Descrição",
+    "resources": "Recursos",
+    "responsible": "Responsável",
+    "priority": "Prioridade",
+    "budget": "Orçamento",
+    "actualCost": "Custo Real",
+    "estimatedCost": "Custo Estimado",
+    "totalCost": "Custo Total"
+  },
+  "status": {
+    "notStarted": "Não Iniciado",
+    "inProgress": "Em Andamento",
+    "completed": "Concluído",
+    "onHold": "Em Espera",
+    "cancelled": "Cancelado"
+  },
+  "priority": {
+    "low": "Baixa",
+    "medium": "Média",
+    "high": "Alta",
+    "critical": "Crítica"
+  },
+  "modals": {
+    "loadSampleData": {
+      "title": "Carregar Dados de Exemplo",
+      "content": "Você já possui uma estrutura WBS com {{count}} nó(s).",
+      "warning": "Carregar o exemplo irá substituir a estrutura atual.",
+      "question": "Deseja continuar?",
+      "replaceButton": "Sim, substituir"
+    },
+    "clearWBS": {
+      "title": "Limpar Estrutura WBS",
+      "content": "Esta ação irá remover toda a estrutura WBS atual.",
+      "warning": "Esta ação não pode ser desfeita.",
+      "question": "Tem certeza de que deseja continuar?"
+    },
+    "deleteNode": {
+      "title": "Excluir Nó",
+      "content": "Esta ação irá remover o nó '{{name}}' e todos os seus filhos.",
+      "warning": "Esta ação não pode ser desfeita.",
+      "question": "Tem certeza de que deseja excluir?"
+    },
+    "importWBS": {
+      "title": "Importar Estrutura WBS",
+      "selectFile": "Selecione um arquivo Excel (.xlsx)",
+      "dragAndDrop": "Arraste e solte o arquivo aqui ou clique para selecionar",
+      "supportedFormats": "Formatos suportados: .xlsx, .xls"
+    }
+  },
+  "messages": {
+    "success": {
+      "wbsImported": "Estrutura WBS importada e salva automaticamente!",
+      "wbsCleared": "Estrutura WBS limpa com sucesso!",
+      "sampleDataLoaded": "Dados de exemplo carregados com sucesso!",
+      "nodeAdded": "Nó adicionado com sucesso!",
+      "nodeUpdated": "Nó atualizado com sucesso!",
+      "nodeDeleted": "Nó excluído com sucesso!",
+      "exportComplete": "Exportação concluída com sucesso!",
+      "dataSaved": "Dados salvos com sucesso!",
+      "settingsUpdated": "Configurações atualizadas com sucesso!"
+    },
+    "error": {
+      "loadFailed": "Erro ao carregar estrutura WBS do localStorage:",
+      "saveFailed": "Erro ao salvar estrutura WBS no localStorage:",
+      "storageQuotaExceeded": "Armazenamento local cheio! A estrutura WBS pode não ter sido salva.",
+      "autoSaveFailed": "Não foi possível salvar a estrutura WBS automaticamente.",
+      "importFailed": "Erro ao importar arquivo:",
+      "exportFailed": "Erro ao exportar dados:",
+      "invalidFile": "Arquivo inválido ou formato não suportado.",
+      "networkError": "Erro de rede. Verifique sua conexão."
+    },
+    "warning": {
+      "unsavedChanges": "Você tem alterações não salvas.",
+      "confirmLeave": "Tem certeza de que deseja sair sem salvar?"
+    }
+  },
+  "forms": {
+    "placeholders": {
+      "nodeName": "Digite o nome do nó",
+      "nodeDescription": "Digite a descrição do nó",
+      "nodeCost": "Digite o custo estimado",
+      "nodeProgress": "Digite o progresso (%)",
+      "nodeResponsible": "Digite o responsável",
+      "searchNodes": "Pesquisar nós...",
+      "filterByStatus": "Filtrar por status",
+      "filterByPriority": "Filtrar por prioridade"
+    },
+    "labels": {
+      "required": "Obrigatório",
+      "optional": "Opcional",
+      "currency": "R$",
+      "percentage": "%",
+      "days": "dias",
+      "hours": "horas"
+    },
+    "validation": {
+      "required": "Este campo é obrigatório",
+      "minLength": "Mínimo de {{min}} caracteres",
+      "maxLength": "Máximo de {{max}} caracteres",
+      "invalidNumber": "Número inválido",
+      "invalidDate": "Data inválida",
+      "invalidEmail": "Email inválido",
+      "invalidUrl": "URL inválida"
+    }
+  },
+  "charts": {
+    "costBreakdown": "Distribuição de Custos",
+    "progressOverview": "Visão Geral do Progresso",
+    "budgetAnalysis": "Análise de Orçamento",
+    "timelineView": "Linha do Tempo",
+    "riskMatrix": "Matriz de Riscos"
+  },
+  "risks": {
+    "title": "Gerenciamento de Riscos",
+    "riskName": "Nome do Risco",
+    "riskDescription": "Descrição do Risco",
+    "probability": "Probabilidade",
+    "impact": "Impacto",
+    "mitigation": "Mitigação",
+    "contingency": "Contingência",
+    "owner": "Responsável",
+    "category": "Categoria",
+    "status": "Status",
+    "identificationDate": "Data de Identificação",
+    "reviewDate": "Data de Revisão",
+    "categories": {
+      "technical": "Técnico",
+      "financial": "Financeiro",
+      "operational": "Operacional",
+      "strategic": "Estratégico",
+      "external": "Externo"
+    }
+  },
+  "export": {
+    "title": "Exportar Dados",
+    "format": "Formato",
+    "options": "Opções",
+    "includeMetadata": "Incluir Metadados",
+    "includeCostBreakdown": "Incluir Detalhamento de Custos",
+    "includeGantt": "Incluir Cronograma Gantt",
+    "includeRisks": "Incluir Riscos",
+    "fileName": "Nome do Arquivo",
+    "exportButton": "Exportar Dados"
+  },
+  "language": {
+    "title": "Idioma",
+    "select": "Selecionar Idioma",
+    "current": "Idioma Atual",
+    "detected": "Idioma Detectado",
+    "supportedLanguages": "Idiomas Suportados",
+    "languages": {
+      "pt": "Português",
+      "en": "English",
+      "es": "Español",
+      "zh": "中文"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "general": "Geral",
+    "display": "Exibição",
+    "dataAndStorage": "Dados e Armazenamento",
+    "language": "Idioma",
+    "theme": "Tema",
+    "autoSave": "Salvamento Automático",
+    "currency": "Moeda",
+    "dateFormat": "Formato de Data",
+    "timeFormat": "Formato de Hora",
+    "autoDetect": "Detecção Automática",
+    "resetToAutoDetect": "Usar Idioma do Navegador",
+    "persistence": "Persistência Automática",
+    "persistenceDescription": "Suas preferências de idioma são salvas automaticamente no navegador e permanecerão entre as sessões.",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "autoSaveDescription": "Todas as alterações são salvas automaticamente no armazenamento local.",
+    "lightTheme": "Tema Claro",
+    "darkTheme": "Tema Escuro",
+    "themeDescription": "Personalização visual será implementada em versão futura."
+  },
+  "help": {
+    "title": "Ajuda",
+    "documentation": "Documentação",
+    "shortcuts": "Atalhos de Teclado",
+    "about": "Sobre",
+    "version": "Versão",
+    "support": "Suporte"
+  }
+} 

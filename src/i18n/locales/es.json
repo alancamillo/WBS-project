@@ -1,0 +1,241 @@
+{
+  "app": {
+    "title": "Sistema de Gestión EDT",
+    "subtitle": "Estructura de Desglose del Trabajo"
+  },
+  "navigation": {
+    "list": "Lista",
+    "tree": "Árbol",
+    "flow": "Flujo",
+    "gantt": "Gantt",
+    "table": "Tabla",
+    "budget": "Presupuesto",
+    "risks": "Riesgos"
+  },
+  "buttons": {
+    "export": "Exportar",
+    "importExcel": "Importar Excel",
+    "loadSampleData": "Cargar Ejemplo",
+    "clearWBS": "Limpiar EDT",
+    "download": "Descargar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "close": "Cerrar",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK"
+  },
+  "statistics": {
+    "totalCost": "Costo Total",
+    "totalNodes": "Total de Nodos",
+    "phases": "Fases",
+    "activities": "Actividades",
+    "leafNodes": "Nodos Hoja",
+    "completedTasks": "Tareas Completadas",
+    "pendingTasks": "Tareas Pendientes",
+    "progress": "Progreso"
+  },
+  "wbs": {
+    "project": "Proyecto",
+    "phase": "Fase",
+    "activity": "Actividad",
+    "task": "Tarea",
+    "name": "Nombre",
+    "cost": "Costo",
+    "duration": "Duración",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin",
+    "progress": "Progreso",
+    "status": "Estado",
+    "description": "Descripción",
+    "resources": "Recursos",
+    "responsible": "Responsable",
+    "priority": "Prioridad",
+    "budget": "Presupuesto",
+    "actualCost": "Costo Real",
+    "estimatedCost": "Costo Estimado",
+    "totalCost": "Costo Total"
+  },
+  "status": {
+    "notStarted": "No Iniciado",
+    "inProgress": "En Progreso",
+    "completed": "Completado",
+    "onHold": "En Espera",
+    "cancelled": "Cancelado"
+  },
+  "priority": {
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta",
+    "critical": "Crítica"
+  },
+  "modals": {
+    "loadSampleData": {
+      "title": "Cargar Datos de Ejemplo",
+      "content": "Ya tienes una estructura EDT con {{count}} nodo(s).",
+      "warning": "Cargar el ejemplo reemplazará la estructura actual.",
+      "question": "¿Deseas continuar?",
+      "replaceButton": "Sí, reemplazar"
+    },
+    "clearWBS": {
+      "title": "Limpiar Estructura EDT",
+      "content": "Esta acción eliminará toda la estructura EDT actual.",
+      "warning": "Esta acción no se puede deshacer.",
+      "question": "¿Estás seguro de que quieres continuar?"
+    },
+    "deleteNode": {
+      "title": "Eliminar Nodo",
+      "content": "Esta acción eliminará el nodo '{{name}}' y todos sus hijos.",
+      "warning": "Esta acción no se puede deshacer.",
+      "question": "¿Estás seguro de que quieres eliminar?"
+    },
+    "importWBS": {
+      "title": "Importar Estructura EDT",
+      "selectFile": "Selecciona un archivo Excel (.xlsx)",
+      "dragAndDrop": "Arrastra y suelta el archivo aquí o haz clic para seleccionar",
+      "supportedFormats": "Formatos soportados: .xlsx, .xls"
+    }
+  },
+  "messages": {
+    "success": {
+      "wbsImported": "¡Estructura EDT importada y guardada automáticamente!",
+      "wbsCleared": "¡Estructura EDT limpiada con éxito!",
+      "sampleDataLoaded": "¡Datos de ejemplo cargados con éxito!",
+      "nodeAdded": "¡Nodo agregado con éxito!",
+      "nodeUpdated": "¡Nodo actualizado con éxito!",
+      "nodeDeleted": "¡Nodo eliminado con éxito!",
+      "exportComplete": "¡Exportación completada con éxito!",
+      "dataSaved": "¡Datos guardados con éxito!",
+      "settingsUpdated": "¡Configuración actualizada con éxito!"
+    },
+    "error": {
+      "loadFailed": "Error al cargar estructura EDT del localStorage:",
+      "saveFailed": "Error al guardar estructura EDT en localStorage:",
+      "storageQuotaExceeded": "¡Almacenamiento local lleno! La estructura EDT podría no haberse guardado.",
+      "autoSaveFailed": "No se pudo guardar la estructura EDT automáticamente.",
+      "importFailed": "Error al importar archivo:",
+      "exportFailed": "Error al exportar datos:",
+      "invalidFile": "Archivo inválido o formato no soportado.",
+      "networkError": "Error de red. Verifica tu conexión."
+    },
+    "warning": {
+      "unsavedChanges": "Tienes cambios sin guardar.",
+      "confirmLeave": "¿Estás seguro de que quieres salir sin guardar?"
+    }
+  },
+  "forms": {
+    "placeholders": {
+      "nodeName": "Ingresa el nombre del nodo",
+      "nodeDescription": "Ingresa la descripción del nodo",
+      "nodeCost": "Ingresa el costo estimado",
+      "nodeProgress": "Ingresa el progreso (%)",
+      "nodeResponsible": "Ingresa el responsable",
+      "searchNodes": "Buscar nodos...",
+      "filterByStatus": "Filtrar por estado",
+      "filterByPriority": "Filtrar por prioridad"
+    },
+    "labels": {
+      "required": "Requerido",
+      "optional": "Opcional",
+      "currency": "$",
+      "percentage": "%",
+      "days": "días",
+      "hours": "horas"
+    },
+    "validation": {
+      "required": "Este campo es requerido",
+      "minLength": "Mínimo {{min}} caracteres",
+      "maxLength": "Máximo {{max}} caracteres",
+      "invalidNumber": "Número inválido",
+      "invalidDate": "Fecha inválida",
+      "invalidEmail": "Email inválido",
+      "invalidUrl": "URL inválida"
+    }
+  },
+  "charts": {
+    "costBreakdown": "Desglose de Costos",
+    "progressOverview": "Resumen de Progreso",
+    "budgetAnalysis": "Análisis de Presupuesto",
+    "timelineView": "Vista de Cronograma",
+    "riskMatrix": "Matriz de Riesgos"
+  },
+  "risks": {
+    "title": "Gestión de Riesgos",
+    "riskName": "Nombre del Riesgo",
+    "riskDescription": "Descripción del Riesgo",
+    "probability": "Probabilidad",
+    "impact": "Impacto",
+    "mitigation": "Mitigación",
+    "contingency": "Contingencia",
+    "owner": "Propietario",
+    "category": "Categoría",
+    "status": "Estado",
+    "identificationDate": "Fecha de Identificación",
+    "reviewDate": "Fecha de Revisión",
+    "categories": {
+      "technical": "Técnico",
+      "financial": "Financiero",
+      "operational": "Operacional",
+      "strategic": "Estratégico",
+      "external": "Externo"
+    }
+  },
+  "export": {
+    "title": "Exportar Datos",
+    "format": "Formato",
+    "options": "Opciones",
+    "includeMetadata": "Incluir Metadatos",
+    "includeCostBreakdown": "Incluir Desglose de Costos",
+    "includeGantt": "Incluir Cronograma Gantt",
+    "includeRisks": "Incluir Riesgos",
+    "fileName": "Nombre del Archivo",
+    "exportButton": "Exportar Datos"
+  },
+  "language": {
+    "title": "Idioma",
+    "select": "Seleccionar Idioma",
+    "current": "Idioma Actual",
+    "detected": "Idioma Detectado",
+    "supportedLanguages": "Idiomas Soportados",
+    "languages": {
+      "pt": "Português",
+      "en": "English",
+      "es": "Español",
+      "zh": "中文"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "general": "General",
+    "display": "Pantalla",
+    "dataAndStorage": "Datos y Almacenamiento",
+    "language": "Idioma",
+    "theme": "Tema",
+    "autoSave": "Guardado Automático",
+    "currency": "Moneda",
+    "dateFormat": "Formato de Fecha",
+    "timeFormat": "Formato de Hora",
+    "autoDetect": "Detección Automática",
+    "resetToAutoDetect": "Usar Idioma del Navegador",
+    "persistence": "Persistencia Automática",
+    "persistenceDescription": "Tus preferencias de idioma se guardan automáticamente en el navegador y persistirán entre sesiones.",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "autoSaveDescription": "Todos los cambios se guardan automáticamente en el almacenamiento local.",
+    "lightTheme": "Tema Claro",
+    "darkTheme": "Tema Oscuro",
+    "themeDescription": "La personalización visual se implementará en una versión futura."
+  },
+  "help": {
+    "title": "Ayuda",
+    "documentation": "Documentación",
+    "shortcuts": "Atajos de Teclado",
+    "about": "Acerca de",
+    "version": "Versión",
+    "support": "Soporte"
+  }
+} 
