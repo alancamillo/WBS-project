@@ -14,7 +14,7 @@
   },
   "buttons": {
     "export": "导出",
-    "importExcel": "导入Excel",
+    "importExcel": "导入WBS",
     "loadSampleData": "加载示例",
     "clearWBS": "清空WBS",
     "download": "下载",
@@ -44,6 +44,7 @@
     "phase": "阶段",
     "activity": "活动",
     "task": "任务",
+    "item": "项",
     "name": "名称",
     "cost": "成本",
     "duration": "持续时间",
@@ -58,7 +59,38 @@
     "budget": "预算",
     "actualCost": "实际成本",
     "estimatedCost": "预估成本",
-    "totalCost": "总成本"
+    "totalCost": "总成本",
+    "ownCost": "自身成本",
+    "level": "级别",
+    "subitems": "子项",
+    "treeViewTitle": "树状视图 - WBS结构",
+    "addSubitem": "添加子项",
+    "editMode": "编辑模式",
+    "viewMode": "查看模式",
+    "inheritedDate": "继承",
+    "autoInheritance": "自动继承",
+    "dependencies": "依赖关系",
+    "schedulingConflict": "计划冲突",
+    "dateRangeConflict": "日期范围问题",
+    "conflictingDependencies": "冲突的依赖关系",
+    "suggestStartDate": "建议开始日期",
+    "suggestEndDate": "建议结束日期",
+    "inheritanceTooltip": "此日期可从子项自动继承",
+    "inheritanceHelpStart": "提示：如果留空或设置为晚于子项的日期，将自动继承子项中最早的日期。",
+    "inheritanceHelpEnd": "提示：如果留空或设置为早于子项的日期，将自动继承子项中最晚的日期。",
+    "dependenciesHelp": "这些任务必须在此活动开始前完成。",
+    "selectDependencies": "选择必须先完成的任务",
+    "responsiblePlaceholder": "负责人姓名",
+    "descriptionPlaceholder": "活动详细描述",
+    "dateNotDefined": "未定义",
+    "notDefined": "未定义",
+    "notCalculated": "未计算",
+    "days": "天",
+    "taskNotFound": "任务未找到",
+    "inheritedFrom": "日期继承自",
+    "deleteConfirmation": "确定要删除此项吗？",
+    "leaveEmptyToInherit": "留空以从子项继承",
+    "selectDate": "选择日期"
   },
   "status": {
     "notStarted": "未开始",
@@ -125,6 +157,14 @@
     "warning": {
       "unsavedChanges": "您有未保存的更改。",
       "confirmLeave": "您确定要在不保存的情况下离开吗？"
+    },
+    "validation": {
+      "endDateAfterStart": "结束日期（{{endDate}}）必须晚于开始日期（{{startDate}}）。",
+      "startDateAfterDependencies": "开始日期（{{startDate}}）必须晚于所有依赖项的完成日期。",
+      "validDates": "日期有效。",
+      "validDatesWithDependencies": "相对于依赖关系和日期范围，日期有效。",
+      "combinedProblems": "检测到问题：{{dateRangeMessage}} 此外，开始日期与依赖关系冲突。",
+      "dependencyConflict": "{{taskName}}（结束于{{endDate}}）"
     }
   },
   "forms": {
@@ -155,6 +195,88 @@
       "invalidEmail": "无效邮箱",
       "invalidUrl": "无效URL"
     }
+  },
+  "budgetAllocation": {
+    "title": "预算分配",
+    "period": "周期",
+    "dateRange": "日期范围",
+    "wbsLevels": "WBS层级",
+    "chartGrouping": "图表分组",
+    "byLevel": "按层级",
+    "byPhase": "按阶段",
+    "monthly": "月度",
+    "quarterly": "季度",
+    "yearly": "年度",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "wbsLevel1": "第1级（项目）",
+    "wbsLevel2": "第2级（阶段）",
+    "wbsLevel3": "第3级（活动）",
+    "periodDetail": "周期明细",
+    "wbsStructure": "WBS结构",
+    "total": "总计",
+    "consolidated": "（合计）",
+    "consolidatedTotal": "合计总额",
+    "of": "共",
+    "items": "项",
+    "areaChart": "面积图",
+    "groupedByLevel": "按层级分组",
+    "separatedByPhase": "按阶段分离",
+    "updateChart": "更新图表",
+    "showAll": "显示全部",
+    "clickLegend": "💡 点击图例",
+    "seriesHidden": "系列已隐藏",
+    "seriesHiddenPlural": "系列已隐藏",
+    "cumulativeBudget": "累计预算",
+    "periodLabel": "周期：",
+    "accumulated": "累计",
+    "level": "级别"
+  },
+  "flowTree": {
+    "project": "项目",
+    "phase": "阶段",
+    "activity": "活动",
+    "item": "项目",
+    "level": "级别",
+    "ownCost": "自有成本：",
+    "totalCostLabel": "总成本：",
+    "subitems": "子项："
+  },
+  "gantt": {
+    "title": "甘特图",
+    "exportJson": "导出 JSON",
+    "exportCsv": "导出 CSV",
+    "totalTasks": "总任务数",
+    "completionRate": "完成率",
+    "totalCost": "总成本",
+    "durationDays": "持续时间（天）",
+    "viewSettings": "视图设置",
+    "levelsToShow": "显示层级：",
+    "selectLevels": "选择层级",
+    "level1Project": "第1级 - 项目",
+    "level2Phase": "第2级 - 阶段",
+    "level3Activity": "第3级 - 活动",
+    "viewMode": "视图模式：",
+    "quarterDay": "四分之一天",
+    "halfDay": "半天",
+    "day": "天",
+    "week": "周",
+    "month": "月",
+    "advancedOptions": "高级选项：",
+    "criticalPath": "关键路径",
+    "groupByLevel": "按层级分组",
+    "showCosts": "显示成本",
+    "criticalPathTooltip": "突出显示项目关键路径上的任务",
+    "groupByLevelTooltip": "按层级分组任务",
+    "showCostsTooltip": "在任务上显示成本信息",
+    "systemRecommendations": "系统建议",
+    "criticalPathDescription": "如果延迟，将直接影响项目最终截止日期的任务：",
+    "startDate": "开始：",
+    "endDate": "结束：",
+    "progress": "进度：",
+    "responsible": "负责人：",
+    "cost": "成本：",
+    "noTasksFound": "未找到所选层级的任务"
   },
   "charts": {
     "costBreakdown": "成本分解",
@@ -228,7 +350,18 @@
     "autoSaveDescription": "所有更改都会自动保存到本地存储。",
     "lightTheme": "浅色主题",
     "darkTheme": "深色主题",
-    "themeDescription": "视觉定制将在未来版本中实现。"
+    "themeDescription": "视觉定制将在未来版本中实现。",
+    "selectCurrency": "选择默认货币",
+    "currentCurrency": "当前货币:",
+    "currencyDescription": "货币独立于所选语言，将在整个系统中使用。",
+    "currencies": {
+      "BRL": "巴西雷亚尔",
+      "USD": "美元",
+      "EUR": "欧元",
+      "CNY": "人民币",
+      "GBP": "英镑",
+      "JPY": "日元"
+    }
   },
   "help": {
     "title": "帮助",
@@ -237,5 +370,290 @@
     "about": "关于",
     "version": "版本",
     "support": "支持"
+  },
+  "importWBS": {
+    "title": "导入WBS结构",
+    "description": "选择要导入工作分解结构的文件。支持的格式：JSON、Excel (.xlsx/.xls)、CSV",
+    "dragDropText": "点击或拖拽文件到此区域",
+    "supportedFormats": "支持JSON、Excel (.xlsx/.xls)和CSV",
+    "processing": "正在处理文件...",
+    "importError": "导入错误",
+    "line": "行",
+    "unexpectedError": "意外错误：",
+    "supportedFormatsTitle": "支持的格式",
+    "jsonDescription": "完整的WBS结构和元数据",
+    "excelDescription": "带有层次结构的.xlsx/.xls电子表格",
+    "csvDescription": "逗号分隔的表格数据",
+    "previewTitle": "导入预览",
+    "file": "文件：",
+    "totalNodes": "节点总数",
+    "level1": "第1级",
+    "level2": "第2级",
+    "level3": "第3级",
+    "totalCost": "总成本",
+    "status": "状态",
+    "readyToImport": "准备导入",
+    "warningsFound": "发现警告",
+    "importedStructure": "导入的结构",
+    "noDataToDisplay": "无数据显示",
+    "back": "返回",
+    "confirmImport": "确认导入",
+    "importCompleted": "导入完成！",
+    "importSuccess": "您的WBS结构已成功导入。",
+    "modalTitle": "导入WBS",
+    "columns": {
+      "name": "名称",
+      "level": "级别",
+      "ownCost": "自身成本",
+      "totalCost": "总成本",
+      "children": "子项",
+      "responsible": "负责人"
+    }
+  },
+  "riskManagement": {
+    "title": "风险管理",
+    "newRisk": "新风险",
+    "editRisk": "编辑风险",
+    "loadExamples": "加载示例",
+    "clearAll": "清除全部",
+    "clearAllConfirmTitle": "清除所有风险",
+    "clearAllConfirmDescription": "此操作将永久删除所有风险。您确定吗？",
+    "clearAllConfirmOk": "是的，清除",
+    "clearAllConfirmCancel": "取消",
+    "localStorage": {
+      "title": "💾 本地存储",
+      "description": "创建的风险会自动保存在您的浏览器中，即使在屏幕间导航或重新加载页面后也会保持可用。"
+    },
+    "alerts": {
+      "critical": "🚨 关键:",
+      "criticalDescription": "需要立即采取行动以防止项目损失的关键情况。",
+      "warning": "⚠️ 警告:",
+      "warningDescription": "需要关注和制定缓解计划的情况。",
+      "overdue": "已逾期",
+      "nearDue": "即将到期",
+      "veryHigh": "极高 (评分 11-12)",
+      "high": "高 (评分 9-10)"
+    },
+    "statistics": {
+      "totalRisks": "风险总数",
+      "averageScore": "平均评分",
+      "mitigated": "已缓解",
+      "open": "开放",
+      "veryHigh": "极高 (11-12)",
+      "high": "高 (9-10)",
+      "medium": "中等 (6-8)",
+      "low": "低 (1-5)",
+      "overdueRisks": "⏰ 逾期风险",
+      "nearDueRisks": "📅 7天内到期",
+      "onTimeRisks": "✅ 按时",
+      "addressedRisks": "📋 已处理"
+    },
+    "filters": {
+      "filterByStatus": "按状态筛选",
+      "filterByCategory": "按类别筛选",
+      "filterByOwner": "按负责人筛选",
+      "clear": "清除"
+    },
+    "probability": {
+      "veryLow": "极低 (1)",
+      "low": "低 (2)",
+      "medium": "中等 (3)",
+      "high": "高 (4)",
+      "veryHigh": "极高 (5)"
+    },
+    "impact": {
+      "veryLow": "极低 (1)",
+      "low": "低 (2)",
+      "medium": "中等 (3)",
+      "high": "高 (4)",
+      "veryHigh": "极高 (5)"
+    },
+    "categories": {
+      "technical": "技术",
+      "financial": "财务",
+      "operational": "运营",
+      "external": "外部",
+      "strategic": "战略"
+    },
+    "status": {
+      "identified": "已识别",
+      "assessed": "已评估",
+      "mitigated": "已缓解",
+      "closed": "已关闭"
+    },
+    "riskLevels": {
+      "veryLow": "极低",
+      "low": "低",
+      "medium": "中等",
+      "high": "高",
+      "veryHigh": "极高"
+    },
+    "table": {
+      "title": "标题",
+      "category": "类别",
+      "probability": "概率",
+      "impact": "影响",
+      "score": "评分",
+      "status": "状态",
+      "owner": "负责人",
+      "dueDate": "截止日期",
+      "actions": "操作",
+      "level": "级别",
+      "editTooltip": "编辑",
+      "deleteTooltip": "删除",
+      "deleteConfirm": "您确定要删除此风险吗？",
+      "yes": "是",
+      "no": "否",
+      "noRisksFound": "未找到风险",
+      "pagination": "共",
+      "risks": "个风险"
+    },
+    "tabs": {
+      "risksList": "风险列表",
+      "riskMatrix": "风险矩阵"
+    },
+    "form": {
+      "title": "标题",
+      "titlePlaceholder": "例：供应商交付延迟",
+      "titleRequired": "请输入风险标题",
+      "category": "类别",
+      "categoryPlaceholder": "选择类别",
+      "categoryRequired": "请选择类别",
+      "status": "状态",
+      "statusPlaceholder": "选择状态",
+      "statusRequired": "请选择状态",
+      "probability": "概率",
+      "probabilityPlaceholder": "选择概率",
+      "probabilityRequired": "请选择概率",
+      "impact": "影响",
+      "impactPlaceholder": "选择影响",
+      "impactRequired": "请选择影响",
+      "owner": "负责人",
+      "ownerPlaceholder": "负责人姓名",
+      "ownerRequired": "请输入负责人",
+      "dueDate": "截止日期",
+      "dueDatePlaceholder": "选择截止日期",
+      "associatedNodes": "相关WBS活动",
+      "associatedNodesPlaceholder": "选择相关活动",
+      "estimatedCost": "预估成本",
+      "estimatedCostPlaceholder": "0.00",
+      "actualCost": "实际成本",
+      "actualCostPlaceholder": "0.00",
+      "description": "描述",
+      "descriptionPlaceholder": "详细描述已识别的风险...",
+      "descriptionRequired": "请输入风险描述",
+      "mitigationPlan": "缓解计划",
+      "mitigationPlanPlaceholder": "描述降低风险概率或影响的行动...",
+      "contingencyPlan": "应急计划",
+      "contingencyPlanPlaceholder": "描述风险发生时采取的行动...",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "messages": {
+      "riskAdded": "风险添加成功！",
+      "riskUpdated": "风险更新成功！",
+      "riskDeleted": "风险删除成功！",
+      "sampleDataLoaded": "示例数据加载成功！",
+      "sampleDataLoadedReplace": "示例数据加载成功（已替换先前数据）！",
+      "sampleDataLoadedAdd": "个示例风险已添加到现有数据中！",
+      "allRisksCleared": "所有风险已被删除！",
+      "overdueRisksFound": "找到已逾期风险",
+      "nearDueRisksFound": "找到即将到期风险",
+      "storageError": "保存风险到本地存储时出错：",
+      "storageFull": "本地存储已满！某些数据可能未保存。",
+      "saveError": "无法自动保存。请检查浏览器设置。",
+      "loadError": "从本地存储加载风险时出错："
+    },
+    "sampleData": {
+      "confirmTitle": "加载示例数据",
+      "confirmContent": "您已有 {count} 个风险记录。",
+      "confirmQuestion": "您希望如何处理？",
+      "replace": "替换",
+      "add": "添加"
+    }
+  },
+  "riskMatrix": {
+    "title": "风险矩阵 - 项目进度",
+    "probability": "概率",
+    "impact": "影响",
+    "probabilityLabels": {
+      "veryHigh": "极高 (5)",
+      "high": "高 (4)",
+      "medium": "中等 (3)",
+      "low": "低 (2)",
+      "veryLow": "极低 (1)"
+    },
+    "impactLabels": {
+      "veryLow": "极低 (1)",
+      "low": "低 (2)",
+      "medium": "中等 (3)",
+      "high": "高 (4)",
+      "veryHigh": "极高 (5)"
+    },
+    "tooltip": {
+      "score": "评分:",
+      "risks": "风险:"
+    },
+    "legend": {
+      "score": "评分",
+      "scoreRange": "评分 {range}"
+    }
+  },
+  "tableView": {
+    "columns": {
+      "structure": "结构",
+      "level": "级别",
+      "responsible": "负责人",
+      "status": "状态",
+      "progress": "进度",
+      "ownCost": "自身成本",
+      "totalCost": "总成本",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "duration": "持续时间",
+      "description": "描述",
+      "dependencies": "依赖项"
+    },
+    "levels": {
+      "project": "项目",
+      "phase": "阶段",
+      "activity": "活动",
+      "item": "项目"
+    },
+    "status": {
+      "completed": "已完成",
+      "inProgress": "进行中",
+      "notStarted": "未开始",
+      "undefined": "未定义"
+    },
+    "stats": {
+      "totalItems": "项目总数:",
+      "totalProjectCost": "项目总成本:",
+      "itemsCount": "{count} 项目"
+    },
+    "controls": {
+      "expandAll": "展开全部",
+      "collapsePhases": "折叠阶段"
+    },
+    "tooltips": {
+      "items": "项目",
+      "workingDays": "{days} 工作日",
+      "dependsOn": "依赖于: {name}",
+      "progressBasedOnChildren": "基于子活动的进度:",
+      "completed": "完成: {count}",
+      "inProgress": "进行中: {count}",
+      "total": "总计: {count}",
+      "percentage": "百分比: {percent}%",
+      "ownStatus": "自身状态: {status}"
+    },
+    "pagination": {
+      "of": "的",
+      "items": "项目"
+    },
+    "dependencies": {
+      "none": "无",
+      "single": "{count} 个依赖项",
+      "multiple": "{count} 个依赖项"
+    }
   }
 } 

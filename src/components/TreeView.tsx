@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card, Tag, Space } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { TreeNode } from '../types';
 import './TreeView.css';
 
@@ -20,12 +22,8 @@ const TreeNodeView: React.FC<TreeNodeViewProps> = ({
   isLast = false,
   parentConnectors = []
 }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+  const { t } = useTranslation();
+  const { formatCurrency } = useCurrencySettings();
 
   const getLevelColor = (level: number) => {
     switch (level) {
@@ -38,10 +36,10 @@ const TreeNodeView: React.FC<TreeNodeViewProps> = ({
 
   const getLevelLabel = (level: number) => {
     switch (level) {
-      case 1: return 'Projeto';
-      case 2: return 'Fase';
-      case 3: return 'Atividade';
-      default: return 'Item';
+      case 1: return t('wbs.project');
+      case 2: return t('wbs.phase');
+      case 3: return t('wbs.activity');
+      default: return t('wbs.item');
     }
   };
 
@@ -76,7 +74,7 @@ const TreeNodeView: React.FC<TreeNodeViewProps> = ({
                 {getLevelLabel(node.level)}
               </Tag>
               <Tag color="blue">
-                Nível {node.level}
+                {t('wbs.level')} {node.level}
               </Tag>
             </div>
             
@@ -90,10 +88,10 @@ const TreeNodeView: React.FC<TreeNodeViewProps> = ({
             </div>
             
             <div style={{ fontSize: '10px', color: '#666' }}>
-              <div>Custo Próprio: <strong style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</strong></div>
-              <div>Custo Total: <strong style={{ color: '#52c41a' }}>{formatCurrency(node.totalCost)}</strong></div>
+              <div>{t('wbs.ownCost')}: <strong style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</strong></div>
+              <div>{t('wbs.totalCost')}: <strong style={{ color: '#52c41a' }}>{formatCurrency(node.totalCost)}</strong></div>
               {node.children.length > 0 && (
-                <div>Subitens: <strong>{node.children.length}</strong></div>
+                <div>{t('wbs.subitems')}: <strong>{node.children.length}</strong></div>
               )}
             </div>
           </Space>
@@ -120,10 +118,12 @@ const TreeNodeView: React.FC<TreeNodeViewProps> = ({
 };
 
 const TreeView: React.FC<TreeViewProps> = ({ rootNode }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="tree-view-container">
       <div className="tree-view-header" style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <h3 style={{ margin: 0, color: '#1890ff' }}>Visualização em Árvore - Estrutura WBS</h3>
+        <h3 style={{ margin: 0, color: '#1890ff' }}>{t('wbs.treeViewTitle')}</h3>
       </div>
       <div className="tree-view-content">
         <TreeNodeView node={rootNode} isRoot={true} />

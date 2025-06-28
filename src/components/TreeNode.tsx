@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Card, Input, Button, Space, InputNumber, Collapse, Tag, Popconfirm, DatePicker, Select, Row, Col, Divider, Alert } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined, SaveOutlined, CalendarOutlined, UserOutlined, LinkOutlined, WarningOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { TreeNode as TreeNodeType } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
@@ -33,6 +35,8 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   maxLevel = 3,
   rootNode 
 }) => {
+  const { t } = useTranslation();
+  const { formatCurrency } = useCurrencySettings();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(node.name);
   const [editedCost, setEditedCost] = useState(node.cost);
@@ -73,7 +77,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     // Validação 1: Data de fim deve ser posterior à data de início
     if (startDate && endDate && endDate <= startDate) {
       hasDateRangeError = true;
-      dateRangeMessage = `A data de fim (${endDate.toLocaleDateString('pt-BR')}) deve ser posterior à data de início (${startDate.toLocaleDateString('pt-BR')}).`;
+      dateRangeMessage = t('messages.validation.endDateAfterStart', { 
+        endDate: endDate.toLocaleDateString('pt-BR'),
+        startDate: startDate.toLocaleDateString('pt-BR')
+      });
       // Sugere uma data fim 7 dias após o início
       suggestedEndDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
     }
@@ -82,7 +89,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     if (!startDate || !rootNode || dependencies.length === 0) {
       return {
         isValid: !hasDateRangeError,
-        message: hasDateRangeError ? dateRangeMessage : 'Datas válidas.',
+        message: hasDateRangeError ? dateRangeMessage : t('messages.validation.validDates'),
         conflictingDependencies: [],
         hasDateRangeError,
         dateRangeMessage,
@@ -120,13 +127,15 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     // Monta mensagem combinada
     let message = '';
     if (hasDateRangeError && hasDependencyConflicts) {
-      message = `Problemas detectados: ${dateRangeMessage} Além disso, a data de início conflita com as dependências.`;
+      message = t('messages.validation.combinedProblems', { dateRangeMessage });
     } else if (hasDateRangeError) {
       message = dateRangeMessage;
     } else if (hasDependencyConflicts) {
-      message = `A data de início (${startDate.toLocaleDateString('pt-BR')}) deve ser posterior ao fim de todas as dependências.`;
+      message = t('messages.validation.startDateAfterDependencies', { 
+        startDate: startDate.toLocaleDateString('pt-BR')
+      });
     } else {
-      message = 'Datas válidas em relação às dependências e intervalo.';
+      message = t('messages.validation.validDatesWithDependencies');
     }
 
     return {
@@ -180,7 +189,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     
     return dependencyIds.map(id => {
       const task = findNodeById(rootNode, id);
-      return task ? task.name : `Tarefa não encontrada (${id})`;
+      return task ? task.name : `${t('wbs.taskNotFound')} (${id})`;
     });
   };
 
@@ -297,7 +306,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
 
     const newChild: TreeNodeType = {
       id: uuidv4(),
-      name: `Novo Item ${node.children.length + 1}`,
+      name: `${t('wbs.item')} ${node.children.length + 1}`,
       cost: 0,
       level: (node.level + 1) as 1 | 2 | 3,
       parentId: node.id,
@@ -383,22 +392,17 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
 
   const getStatusText = (status?: string) => {
     switch (status) {
-      case 'completed': return 'Concluído';
-      case 'in-progress': return 'Em Andamento';
-      case 'not-started': return 'Não Iniciado';
-      default: return 'Não Definido';
+      case 'completed': return t('status.completed');
+      case 'in-progress': return t('status.inProgress');
+      case 'not-started': return t('status.notStarted');
+      default: return t('wbs.notDefined');
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+
 
   const formatDate = (date?: Date) => {
-    if (!date) return 'Não definida';
+    if (!date) return t('wbs.dateNotDefined');
     return new Date(date).toLocaleDateString('pt-BR');
   };
 
@@ -485,7 +489,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       }}
       title={
         <Space>
-          <Tag color={getLevelColor(node.level)}>Nível {node.level}</Tag>
+          <Tag color={getLevelColor(node.level)}>{t('wbs.level')} {node.level}</Tag>
           {isEditing ? (
             <Input
               value={editedName}
@@ -503,13 +507,13 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           )}
           {node.dependencies && node.dependencies.length > 0 && (
             <Tag color="orange" icon={<LinkOutlined />}>
-              {node.dependencies.length} dependência(s)
+              {node.dependencies.length} {t('wbs.dependencies').toLowerCase()}
             </Tag>
           )}
           {/* Alerta visual para conflitos de data */}
           {!currentDateValidation.isValid && !isEditing && (
             <Tag color="red" icon={<WarningOutlined />}>
-              Conflito de datas
+              {t('wbs.schedulingConflict')}
             </Tag>
           )}
         </Space>
@@ -517,7 +521,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       extra={
         <Space>
           <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
-            Total: {formatCurrency(node.totalCost)}
+            {t('wbs.totalCost')}: {formatCurrency(node.totalCost)}
           </span>
           {isEditing ? (
             <Button
@@ -536,10 +540,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           )}
           {node.level > 1 && (
             <Popconfirm
-              title="Tem certeza que deseja excluir este item?"
+              title={t('wbs.deleteConfirmation')}
               onConfirm={() => onDelete(node.id)}
-              okText="Sim"
-              cancelText="Não"
+              okText={t('buttons.yes')}
+              cancelText={t('buttons.no')}
             >
               <Button
                 size="small"
@@ -557,16 +561,19 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           type="error"
           showIcon
           icon={<WarningOutlined />}
-          message="Conflito de Cronograma"
+          message={t('wbs.schedulingConflict')}
           description={
             <div>
               <p>{currentDateValidation.message}</p>
               <div style={{ marginTop: 8 }}>
-                <strong>Dependências conflitantes:</strong>
+                <strong>{t('wbs.conflictingDependencies')}:</strong>
                 <ul style={{ marginTop: 4, marginBottom: 0 }}>
                   {currentDateValidation.conflictingDependencies.map((dep, index) => (
                     <li key={index}>
-                      {dep.name} (termina em {dep.endDate.toLocaleDateString('pt-BR')})
+                      {t('messages.validation.dependencyConflict', { 
+                        taskName: dep.name, 
+                        endDate: dep.endDate.toLocaleDateString('pt-BR') 
+                      })}
                     </li>
                   ))}
                 </ul>
@@ -586,7 +593,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               type="warning"
               showIcon
               icon={<WarningOutlined />}
-              message={editedDateValidation.hasDateRangeError ? "Problema com Intervalo de Datas" : "Conflito de Cronograma"}
+              message={editedDateValidation.hasDateRangeError ? t('wbs.dateRangeConflict') : t('wbs.schedulingConflict')}
               description={
                 <div>
                   <p>{editedDateValidation.message}</p>
@@ -594,11 +601,14 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   {/* Seção de dependências conflitantes */}
                   {editedDateValidation.conflictingDependencies.length > 0 && (
                     <div style={{ marginTop: 8 }}>
-                      <strong>Dependências conflitantes:</strong>
+                      <strong>{t('wbs.conflictingDependencies')}:</strong>
                       <ul style={{ marginTop: 4, marginBottom: 8 }}>
                         {editedDateValidation.conflictingDependencies.map((dep, index) => (
                           <li key={index}>
-                            {dep.name} (termina em {dep.endDate.toLocaleDateString('pt-BR')})
+                            {t('messages.validation.dependencyConflict', { 
+                              taskName: dep.name, 
+                              endDate: dep.endDate.toLocaleDateString('pt-BR') 
+                            })}
                           </li>
                         ))}
                       </ul>
@@ -610,7 +620,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                             icon={<InfoCircleOutlined />}
                             onClick={handleSuggestStartDate}
                           >
-                            Sugerir data início: {editedDateValidation.suggestedStartDate.toLocaleDateString('pt-BR')}
+                            {t('wbs.suggestStartDate')}: {editedDateValidation.suggestedStartDate.toLocaleDateString('pt-BR')}
                           </Button>
                         </div>
                       )}
@@ -626,7 +636,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                         icon={<InfoCircleOutlined />}
                         onClick={handleSuggestEndDate}
                       >
-                        Sugerir data fim: {editedDateValidation.suggestedEndDate.toLocaleDateString('pt-BR')}
+                        {t('wbs.suggestEndDate')}: {editedDateValidation.suggestedEndDate.toLocaleDateString('pt-BR')}
                       </Button>
                     </div>
                   )}
@@ -640,7 +650,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={12}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Custo próprio:
+                  {t('wbs.ownCost')}:
                 </label>
                 <InputNumber
                   value={editedCost}
@@ -654,16 +664,16 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={12}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Status:
+                  {t('wbs.status')}:
                 </label>
                 <Select
                   value={editedStatus}
                   onChange={setEditedStatus}
                   style={{ width: '100%' }}
                 >
-                  <Option value="not-started">Não Iniciado</Option>
-                  <Option value="in-progress">Em Andamento</Option>
-                  <Option value="completed">Concluído</Option>
+                  <Option value="not-started">{t('status.notStarted')}</Option>
+                  <Option value="in-progress">{t('status.inProgress')}</Option>
+                  <Option value="completed">{t('status.completed')}</Option>
                 </Select>
               </div>
             </Col>
@@ -673,7 +683,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={12}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Data de Início:
+                  {t('wbs.startDate')}:
                   {!editedDateValidation.isValid && (
                     <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
                   )}
@@ -681,9 +691,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     <Tag 
                       color="lime" 
                       style={{ marginLeft: 8, fontSize: '10px' }}
-                      title="Esta data pode ser herdada automaticamente dos filhos"
+                      title={t('wbs.inheritanceTooltip')}
                     >
-                      Auto-herança
+                      {t('wbs.autoInheritance')}
                     </Tag>
                   )}
                 </label>
@@ -696,11 +706,11 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   }}
                   format="DD/MM/YYYY"
                   status={!editedDateValidation.isValid ? 'error' : undefined}
-                  placeholder={node.children.length > 0 ? "Deixe vazio para herdar dos filhos" : "Selecione uma data"}
+                  placeholder={node.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
                 />
                 {node.children.length > 0 && (
                   <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
-                    💡 <em>Dica: Se deixar vazio ou definir uma data posterior aos filhos, será herdada automaticamente a data mais cedo dos filhos.</em>
+                    💡 <em>{t('wbs.inheritanceHelpStart')}</em>
                   </div>
                 )}
               </div>
@@ -708,7 +718,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={12}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Data de Fim:
+                  {t('wbs.endDate')}:
                   {editedDateValidation.hasDateRangeError && (
                     <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
                   )}
@@ -716,9 +726,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     <Tag 
                       color="cyan" 
                       style={{ marginLeft: 8, fontSize: '10px' }}
-                      title="Esta data pode ser herdada automaticamente dos filhos"
+                      title={t('wbs.inheritanceTooltip')}
                     >
-                      Auto-herança
+                      {t('wbs.autoInheritance')}
                     </Tag>
                   )}
                 </label>
@@ -731,7 +741,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   }}
                   format="DD/MM/YYYY"
                   status={editedDateValidation.hasDateRangeError ? 'error' : undefined}
-                  placeholder={node.children.length > 0 ? "Deixe vazio para herdar dos filhos" : "Selecione uma data"}
+                  placeholder={node.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
                 />
                 {editedDateValidation.hasDateRangeError && editedDateValidation.suggestedEndDate && (
                   <div style={{ marginTop: 4 }}>
@@ -741,13 +751,13 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                       icon={<InfoCircleOutlined />}
                       onClick={handleSuggestEndDate}
                     >
-                      Sugerir data: {editedDateValidation.suggestedEndDate.toLocaleDateString('pt-BR')}
+                      {t('wbs.suggestEndDate')}: {editedDateValidation.suggestedEndDate.toLocaleDateString('pt-BR')}
                     </Button>
                   </div>
                 )}
                 {node.children.length > 0 && (
                   <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
-                    💡 <em>Dica: Se deixar vazio ou definir uma data anterior aos filhos, será herdada automaticamente a data mais distante dos filhos.</em>
+                    💡 <em>{t('wbs.inheritanceHelpEnd')}</em>
                   </div>
                 )}
               </div>
@@ -758,12 +768,12 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={12}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Responsável:
+                  {t('wbs.responsible')}:
                 </label>
                 <Input
                   value={editedResponsible}
                   onChange={(e) => setEditedResponsible(e.target.value)}
-                  placeholder="Nome do responsável"
+                  placeholder={t('wbs.responsiblePlaceholder')}
                   prefix={<UserOutlined />}
                 />
               </div>
@@ -772,14 +782,14 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
                   <LinkOutlined style={{ marginRight: 4 }} />
-                  Dependências:
+                  {t('wbs.dependencies')}:
                 </label>
                 <Select
                   mode="multiple"
                   value={editedDependencies}
                   onChange={setEditedDependencies}
                   style={{ width: '100%' }}
-                  placeholder="Selecione tarefas que devem ser concluídas antes"
+                  placeholder={t('wbs.selectDependencies')}
                   optionFilterProp="children"
                   filterOption={(input, option) =>
                     String(option?.children || '').toLowerCase().includes(input.toLowerCase())
@@ -802,13 +812,13 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  Descrição:
+                  {t('wbs.description')}:
                 </label>
                 <TextArea
                   value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
                   rows={3}
-                  placeholder="Descrição detalhada da atividade"
+                  placeholder={t('wbs.descriptionPlaceholder')}
                 />
               </div>
             </Col>
@@ -820,19 +830,19 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={8}>
               <div>
-                <span style={{ fontWeight: 'bold' }}>Custo próprio: </span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.ownCost')}: </span>
                 <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</span>
               </div>
             </Col>
             <Col xs={24} sm={8}>
               <div>
-                <span style={{ fontWeight: 'bold' }}>Responsável: </span>
-                <span>{node.responsible || 'Não definido'}</span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.responsible')}: </span>
+                <span>{node.responsible || t('wbs.notDefined')}</span>
               </div>
             </Col>
             <Col xs={24} sm={8}>
               <div>
-                <span style={{ fontWeight: 'bold' }}>Status: </span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.status')}: </span>
                 <Tag color={getStatusColor(node.status)}>
                   {getStatusText(node.status)}
                 </Tag>
@@ -844,7 +854,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={8}>
               <div>
                 <CalendarOutlined style={{ marginRight: 4, color: '#52c41a' }} />
-                <span style={{ fontWeight: 'bold' }}>Início: </span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.startDate')}: </span>
                 <span style={{ 
                   color: !currentDateValidation.isValid ? '#ff4d4f' : 'inherit',
                   fontWeight: !currentDateValidation.isValid ? 'bold' : 'normal'
@@ -858,9 +868,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                       <Tag 
                         color="green" 
                         style={{ marginLeft: 4, fontSize: '10px' }}
-                        title={`Data herdada de: ${inheritanceInfo.sourceChild}`}
+                        title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
                       >
-                        Herdada
+                        {t('wbs.inheritedDate')}
                       </Tag>
                     );
                   }
@@ -871,7 +881,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             <Col xs={24} sm={8}>
               <div>
                 <CalendarOutlined style={{ marginRight: 4, color: '#ff4d4f' }} />
-                <span style={{ fontWeight: 'bold' }}>Fim: </span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.endDate')}: </span>
                 <span style={{ 
                   color: currentDateValidation.hasDateRangeError ? '#ff4d4f' : 'inherit',
                   fontWeight: currentDateValidation.hasDateRangeError ? 'bold' : 'normal'
@@ -888,9 +898,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                       <Tag 
                         color="blue" 
                         style={{ marginLeft: 4, fontSize: '10px' }}
-                        title={`Data herdada de: ${inheritanceInfo.sourceChild}`}
+                        title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
                       >
-                        Herdada
+                        {t('wbs.inheritedDate')}
                       </Tag>
                     );
                   }
@@ -900,11 +910,11 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             </Col>
             <Col xs={24} sm={8}>
               <div>
-                <span style={{ fontWeight: 'bold' }}>Duração: </span>
+                <span style={{ fontWeight: 'bold' }}>{t('wbs.duration')}: </span>
                 <span>
                   {node.startDate && node.endDate 
-                    ? `${Math.ceil((new Date(node.endDate).getTime() - new Date(node.startDate).getTime()) / (1000 * 60 * 60 * 24))} dias`
-                    : 'Não calculada'
+                    ? `${Math.ceil((new Date(node.endDate).getTime() - new Date(node.startDate).getTime()) / (1000 * 60 * 60 * 24))} ${t('wbs.days')}`
+                    : t('wbs.notCalculated')
                   }
                 </span>
               </div>
@@ -917,7 +927,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               <Col xs={24}>
                 <div>
                   <LinkOutlined style={{ marginRight: 4, color: '#fa8c16' }} />
-                  <span style={{ fontWeight: 'bold' }}>Dependências: </span>
+                  <span style={{ fontWeight: 'bold' }}>{t('wbs.dependencies')}: </span>
                   <div style={{ marginTop: 4 }}>
                     {getDependencyNames(node.dependencies).map((depName, index) => (
                       <Tag key={index} color="orange" style={{ marginBottom: 4 }}>
@@ -926,7 +936,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     ))}
                   </div>
                   <span style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
-                    Estas tarefas devem ser concluídas antes desta atividade começar.
+                    {t('wbs.dependenciesHelp')}
                   </span>
                 </div>
               </Col>
@@ -935,7 +945,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
 
           {node.description && (
             <div style={{ marginTop: 8 }}>
-              <span style={{ fontWeight: 'bold' }}>Descrição: </span>
+              <span style={{ fontWeight: 'bold' }}>{t('wbs.description')}: </span>
               <span style={{ fontStyle: 'italic', color: '#666' }}>{node.description}</span>
             </div>
           )}
@@ -951,7 +961,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           onClick={handleAddChild}
           style={{ marginBottom: 16 }}
         >
-          Adicionar Subitem
+          {t('wbs.addSubitem')}
         </Button>
       )}
 
@@ -962,7 +972,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         >
           <Collapse.Panel
             key="children"
-            header={`Subitens (${node.children.length})`}
+            header={`${t('wbs.subitems')} (${node.children.length})`}
           >
             <div style={{ paddingLeft: 16 }}>
               {node.children.map(child => (

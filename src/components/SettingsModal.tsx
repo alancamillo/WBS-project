@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Modal, Tabs, Form, Select, Switch, Card, Space, Button, message, Divider, Tag, Typography } from 'antd';
-import { SettingOutlined, GlobalOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import { SettingOutlined, GlobalOutlined, SaveOutlined, ReloadOutlined, DollarCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useI18nSettings } from '../hooks/useI18nSettings';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 
 const { TabPane } = Tabs;
 const { Text, Title } = Typography;
@@ -15,6 +16,7 @@ interface SettingsModalProps {
 const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
   const { t } = useTranslation();
   const { settings, changeLanguage, resetToAutoDetect, getCurrentLanguageInfo, availableLanguages } = useI18nSettings();
+  const { settings: currencySettings, changeCurrency, getCurrentCurrencyInfo, availableCurrencies } = useCurrencySettings();
   const [loading, setLoading] = useState(false);
 
   const handleLanguageChange = async (languageCode: string) => {
@@ -42,6 +44,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCurrencyChange = (currencyCode: string) => {
+    const success = changeCurrency(currencyCode);
+    if (success) {
+      message.success(t('messages.success.settingsUpdated'));
+    } else {
+      message.error(t('messages.error.networkError'));
     }
   };
 
@@ -208,6 +219,41 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                 <div style={{ marginTop: 8 }}>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
                     {t('settings.themeDescription')}
+                  </Text>
+                </div>
+              </Form.Item>
+
+              <Divider />
+
+              <Form.Item label={t('settings.currency')}>
+                <Card size="small" style={{ backgroundColor: '#f6ffed', marginBottom: 16 }}>
+                  <div>
+                    <Text strong>{t('settings.currentCurrency')} </Text>
+                    <Tag color="green" icon={<DollarCircleOutlined />}>
+                      {getCurrentCurrencyInfo().name} ({getCurrentCurrencyInfo().symbol})
+                    </Tag>
+                  </div>
+                </Card>
+                <Select
+                  value={currencySettings.currency.code}
+                  onChange={handleCurrencyChange}
+                  size="large"
+                  style={{ width: '100%' }}
+                >
+                  {availableCurrencies.map((currency) => (
+                    <Select.Option key={currency.code} value={currency.code}>
+                      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                        <span>{currency.symbol} {currency.name}</span>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          {currency.code}
+                        </Text>
+                      </Space>
+                    </Select.Option>
+                  ))}
+                </Select>
+                <div style={{ marginTop: 8 }}>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    {t('settings.currencyDescription')}
                   </Text>
                 </div>
               </Form.Item>

@@ -14,7 +14,7 @@
   },
   "buttons": {
     "export": "Exportar",
-    "importExcel": "Importar Excel",
+    "importExcel": "Importar WBS",
     "loadSampleData": "Carregar Exemplo",
     "clearWBS": "Limpar WBS",
     "download": "Baixar",
@@ -44,6 +44,7 @@
     "phase": "Fase",
     "activity": "Atividade",
     "task": "Tarefa",
+    "item": "Item",
     "name": "Nome",
     "cost": "Custo",
     "duration": "Duração",
@@ -58,7 +59,38 @@
     "budget": "Orçamento",
     "actualCost": "Custo Real",
     "estimatedCost": "Custo Estimado",
-    "totalCost": "Custo Total"
+    "totalCost": "Custo Total",
+    "ownCost": "Custo Próprio",
+    "level": "Nível",
+    "subitems": "Subitens",
+    "treeViewTitle": "Visualização em Árvore - Estrutura WBS",
+    "addSubitem": "Adicionar Subitem",
+    "editMode": "Modo de Edição",
+    "viewMode": "Modo de Visualização",
+    "inheritedDate": "Herdada",
+    "autoInheritance": "Auto-herança",
+    "dependencies": "Dependências",
+    "schedulingConflict": "Conflito de Cronograma",
+    "dateRangeConflict": "Problema com Intervalo de Datas",
+    "conflictingDependencies": "Dependências conflitantes",
+    "suggestStartDate": "Sugerir data início",
+    "suggestEndDate": "Sugerir data fim",
+    "inheritanceTooltip": "Esta data pode ser herdada automaticamente dos filhos",
+    "inheritanceHelpStart": "Dica: Se deixar vazio ou definir uma data posterior aos filhos, será herdada automaticamente a data mais cedo dos filhos.",
+    "inheritanceHelpEnd": "Dica: Se deixar vazio ou definir uma data anterior aos filhos, será herdada automaticamente a data mais distante dos filhos.",
+    "dependenciesHelp": "Estas tarefas devem ser concluídas antes desta atividade começar.",
+    "selectDependencies": "Selecione tarefas que devem ser concluídas antes",
+    "responsiblePlaceholder": "Nome do responsável",
+    "descriptionPlaceholder": "Descrição detalhada da atividade",
+    "dateNotDefined": "Não definida",
+    "notDefined": "Não definido",
+    "notCalculated": "Não calculada",
+    "days": "dias",
+    "taskNotFound": "Tarefa não encontrada",
+    "inheritedFrom": "Data herdada de",
+    "deleteConfirmation": "Tem certeza que deseja excluir este item?",
+    "leaveEmptyToInherit": "Deixe vazio para herdar dos filhos",
+    "selectDate": "Selecione uma data"
   },
   "status": {
     "notStarted": "Não Iniciado",
@@ -125,6 +157,14 @@
     "warning": {
       "unsavedChanges": "Você tem alterações não salvas.",
       "confirmLeave": "Tem certeza de que deseja sair sem salvar?"
+    },
+    "validation": {
+      "endDateAfterStart": "A data de fim ({{endDate}}) deve ser posterior à data de início ({{startDate}}).",
+      "startDateAfterDependencies": "A data de início ({{startDate}}) deve ser posterior ao fim de todas as dependências.",
+      "validDates": "Datas válidas.",
+      "validDatesWithDependencies": "Datas válidas em relação às dependências e intervalo.",
+      "combinedProblems": "Problemas detectados: {{dateRangeMessage}} Além disso, a data de início conflita com as dependências.",
+      "dependencyConflict": "{{taskName}} (termina em {{endDate}})"
     }
   },
   "forms": {
@@ -155,6 +195,88 @@
       "invalidEmail": "Email inválido",
       "invalidUrl": "URL inválida"
     }
+  },
+  "budgetAllocation": {
+    "title": "Alocação de Budget",
+    "period": "Período",
+    "dateRange": "Intervalo de Datas",
+    "wbsLevels": "Níveis WBS",
+    "chartGrouping": "Agrupamento do Gráfico",
+    "byLevel": "Por Nível",
+    "byPhase": "Por Fase",
+    "monthly": "Mensal",
+    "quarterly": "Trimestral",
+    "yearly": "Anual",
+    "startDate": "Data Início",
+    "endDate": "Data Fim",
+    "wbsLevel1": "Nível 1 (Projeto)",
+    "wbsLevel2": "Nível 2 (Fase)",
+    "wbsLevel3": "Nível 3 (Atividade)",
+    "periodDetail": "Detalhamento por Período",
+    "wbsStructure": "Estrutura WBS",
+    "total": "Total",
+    "consolidated": "(consolidado)",
+    "consolidatedTotal": "Total Consolidado",
+    "of": "de",
+    "items": "itens",
+    "areaChart": "Gráfico de Áreas",
+    "groupedByLevel": "Agrupado por Nível",
+    "separatedByPhase": "Separado por Fase",
+    "updateChart": "Atualizar gráfico",
+    "showAll": "Mostrar Todas",
+    "clickLegend": "💡 Clique na legenda",
+    "seriesHidden": "série oculta",
+    "seriesHiddenPlural": "séries ocultas",
+    "cumulativeBudget": "Orçamento Cumulativo",
+    "periodLabel": "Período:",
+    "accumulated": "Acumulado",
+    "level": "Nível"
+  },
+  "flowTree": {
+    "project": "Projeto",
+    "phase": "Fase", 
+    "activity": "Atividade",
+    "item": "Item",
+    "level": "Nível",
+    "ownCost": "Custo Próprio:",
+    "totalCostLabel": "Custo Total:",
+    "subitems": "Subitens:"
+  },
+  "gantt": {
+    "title": "Gantt Chart",
+    "exportJson": "Exportar JSON",
+    "exportCsv": "Exportar CSV",
+    "totalTasks": "Total de Tarefas",
+    "completionRate": "Taxa de Conclusão",
+    "totalCost": "Custo Total", 
+    "durationDays": "Duração (dias)",
+    "viewSettings": "Configurações de Visualização",
+    "levelsToShow": "Níveis para Exibir:",
+    "selectLevels": "Selecione os níveis",
+    "level1Project": "Nível 1 - Projeto",
+    "level2Phase": "Nível 2 - Fase", 
+    "level3Activity": "Nível 3 - Atividade",
+    "viewMode": "Modo de Visualização:",
+    "quarterDay": "Quarto de Dia",
+    "halfDay": "Meio Dia",
+    "day": "Dia",
+    "week": "Semana",
+    "month": "Mês",
+    "advancedOptions": "Opções Avançadas:",
+    "criticalPath": "Caminho Crítico",
+    "groupByLevel": "Agrupar por Nível",
+    "showCosts": "Mostrar Custos",
+    "criticalPathTooltip": "Destacar tarefas no caminho crítico do projeto",
+    "groupByLevelTooltip": "Agrupar tarefas por nível hierárquico",
+    "showCostsTooltip": "Exibir informações de custo nas tarefas",
+    "systemRecommendations": "Recomendações do Sistema",
+    "criticalPathDescription": "Tarefas que, se atrasadas, impactarão diretamente o prazo final do projeto:",
+    "startDate": "Início:",
+    "endDate": "Fim:",
+    "progress": "Progresso:",
+    "responsible": "Responsável:",
+    "cost": "Custo:",
+    "noTasksFound": "Nenhuma tarefa encontrada para os níveis selecionados"
   },
   "charts": {
     "costBreakdown": "Distribuição de Custos",
@@ -228,7 +350,18 @@
     "autoSaveDescription": "Todas as alterações são salvas automaticamente no armazenamento local.",
     "lightTheme": "Tema Claro",
     "darkTheme": "Tema Escuro",
-    "themeDescription": "Personalização visual será implementada em versão futura."
+    "themeDescription": "Personalização visual será implementada em versão futura.",
+    "selectCurrency": "Selecione a moeda padrão",
+    "currentCurrency": "Moeda atual:",
+    "currencyDescription": "A moeda é independente do idioma selecionado e será usada em todo o sistema.",
+    "currencies": {
+      "BRL": "Real Brasileiro",
+      "USD": "Dólar Americano",
+      "EUR": "Euro",
+      "CNY": "Yuan Chinês",
+      "GBP": "Libra Esterlina",
+      "JPY": "Iene Japonês"
+    }
   },
   "help": {
     "title": "Ajuda",
@@ -237,5 +370,290 @@
     "about": "Sobre",
     "version": "Versão",
     "support": "Suporte"
+  },
+  "importWBS": {
+    "title": "Importar Estrutura WBS",
+    "description": "Selecione um arquivo para importar sua estrutura de trabalho. Formatos suportados: JSON, Excel (.xlsx/.xls), CSV",
+    "dragDropText": "Clique ou arraste um arquivo para esta área",
+    "supportedFormats": "Suporte para JSON, Excel (.xlsx/.xls) e CSV",
+    "processing": "Processando arquivo...",
+    "importError": "Erro na Importação",
+    "line": "Linha",
+    "unexpectedError": "Erro inesperado:",
+    "supportedFormatsTitle": "Formatos Suportados",
+    "jsonDescription": "Estrutura WBS completa com metadados",
+    "excelDescription": "Planilhas .xlsx/.xls com hierarquia",
+    "csvDescription": "Dados tabulares separados por vírgula",
+    "previewTitle": "Preview da Importação",
+    "file": "Arquivo:",
+    "totalNodes": "Total de Nós",
+    "level1": "Nível 1",
+    "level2": "Nível 2",
+    "level3": "Nível 3",
+    "totalCost": "Custo Total",
+    "status": "Status",
+    "readyToImport": "Pronto para Importar",
+    "warningsFound": "Aviso(s) Encontrado(s)",
+    "importedStructure": "Estrutura Importada",
+    "noDataToDisplay": "Nenhum dado para exibir",
+    "back": "Voltar",
+    "confirmImport": "Confirmar Importação",
+    "importCompleted": "Importação Concluída!",
+    "importSuccess": "Sua estrutura WBS foi importada com sucesso.",
+    "modalTitle": "Importar WBS",
+    "columns": {
+      "name": "Nome",
+      "level": "Nível",
+      "ownCost": "Custo Próprio",
+      "totalCost": "Custo Total",
+      "children": "Filhos",
+      "responsible": "Responsável"
+    }
+  },
+  "riskManagement": {
+    "title": "Gestão de Riscos",
+    "newRisk": "Novo Risco",
+    "editRisk": "Editar Risco",
+    "loadExamples": "Carregar Exemplos",
+    "clearAll": "Limpar Tudo",
+    "clearAllConfirmTitle": "Limpar todos os riscos",
+    "clearAllConfirmDescription": "Esta ação irá remover todos os riscos permanentemente. Tem certeza?",
+    "clearAllConfirmOk": "Sim, limpar",
+    "clearAllConfirmCancel": "Cancelar",
+    "localStorage": {
+      "title": "💾 Armazenamento Local",
+      "description": "Os riscos criados são automaticamente salvos no seu navegador e permanecerão disponíveis mesmo depois de navegar entre as telas ou recarregar a página."
+    },
+    "alerts": {
+      "critical": "🚨 CRÍTICOS:",
+      "criticalDescription": "Situações críticas que requerem ação imediata para evitar danos ao projeto.",
+      "warning": "⚠️ ALERTAS:",
+      "warningDescription": "Situações que precisam de atenção e planejamento para mitigação.",
+      "overdue": "vencido(s)",
+      "nearDue": "próximo(s) do vencimento",
+      "veryHigh": "muito alto(s) (score 11-12)",
+      "high": "alto(s) (score 9-10)"
+    },
+    "statistics": {
+      "totalRisks": "Total de Riscos",
+      "averageScore": "Score Médio",
+      "mitigated": "Mitigados",
+      "open": "Em Aberto",
+      "veryHigh": "Muito Alto (11-12)",
+      "high": "Alto (9-10)",
+      "medium": "Médio (6-8)",
+      "low": "Baixo (1-5)",
+      "overdueRisks": "⏰ Riscos Vencidos",
+      "nearDueRisks": "📅 Vencimento em 7 dias",
+      "onTimeRisks": "✅ Dentro do Prazo",
+      "addressedRisks": "📋 Endereçados"
+    },
+    "filters": {
+      "filterByStatus": "Filtrar por Status",
+      "filterByCategory": "Filtrar por Categoria",
+      "filterByOwner": "Filtrar por Responsável",
+      "clear": "Limpar"
+    },
+    "probability": {
+      "veryLow": "Muito Baixa (1)",
+      "low": "Baixa (2)",
+      "medium": "Média (3)",
+      "high": "Alta (4)",
+      "veryHigh": "Muito Alta (5)"
+    },
+    "impact": {
+      "veryLow": "Muito Baixo (1)",
+      "low": "Baixo (2)",
+      "medium": "Médio (3)",
+      "high": "Alto (4)",
+      "veryHigh": "Muito Alto (5)"
+    },
+    "categories": {
+      "technical": "Técnico",
+      "financial": "Financeiro",
+      "operational": "Operacional",
+      "external": "Externo",
+      "strategic": "Estratégico"
+    },
+    "status": {
+      "identified": "Identificado",
+      "assessed": "Avaliado",
+      "mitigated": "Mitigado",
+      "closed": "Fechado"
+    },
+    "riskLevels": {
+      "veryLow": "Muito Baixo",
+      "low": "Baixo",
+      "medium": "Médio",
+      "high": "Alto",
+      "veryHigh": "Muito Alto"
+    },
+    "table": {
+      "title": "Título",
+      "category": "Categoria",
+      "probability": "Probabilidade",
+      "impact": "Impacto",
+      "score": "Score",
+      "status": "Status",
+      "owner": "Responsável",
+      "dueDate": "Data Limite",
+      "actions": "Ações",
+      "level": "Nível",
+      "editTooltip": "Editar",
+      "deleteTooltip": "Excluir",
+      "deleteConfirm": "Tem certeza que deseja excluir este risco?",
+      "yes": "Sim",
+      "no": "Não",
+      "noRisksFound": "Nenhum risco encontrado",
+      "pagination": "de",
+      "risks": "riscos"
+    },
+    "tabs": {
+      "risksList": "Lista de Riscos",
+      "riskMatrix": "Matriz de Risco"
+    },
+    "form": {
+      "title": "Título",
+      "titlePlaceholder": "Ex: Atraso na entrega do fornecedor",
+      "titleRequired": "Por favor, insira o título do risco",
+      "category": "Categoria",
+      "categoryPlaceholder": "Selecione a categoria",
+      "categoryRequired": "Por favor, selecione a categoria",
+      "status": "Status",
+      "statusPlaceholder": "Selecione o status",
+      "statusRequired": "Por favor, selecione o status",
+      "probability": "Probabilidade",
+      "probabilityPlaceholder": "Selecione a probabilidade",
+      "probabilityRequired": "Por favor, selecione a probabilidade",
+      "impact": "Impacto",
+      "impactPlaceholder": "Selecione o impacto",
+      "impactRequired": "Por favor, selecione o impacto",
+      "owner": "Responsável",
+      "ownerPlaceholder": "Nome do responsável",
+      "ownerRequired": "Por favor, insira o responsável",
+      "dueDate": "Data Limite",
+      "dueDatePlaceholder": "Selecione a data limite",
+      "associatedNodes": "Atividades WBS Relacionadas",
+      "associatedNodesPlaceholder": "Selecione as atividades relacionadas",
+      "estimatedCost": "Custo Estimado",
+      "estimatedCostPlaceholder": "0.00",
+      "actualCost": "Custo Real",
+      "actualCostPlaceholder": "0.00",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva detalhadamente o risco identificado...",
+      "descriptionRequired": "Por favor, insira a descrição do risco",
+      "mitigationPlan": "Plano de Mitigação",
+      "mitigationPlanPlaceholder": "Descreva as ações para reduzir a probabilidade ou impacto do risco...",
+      "contingencyPlan": "Plano de Contingência",
+      "contingencyPlanPlaceholder": "Descreva as ações a serem tomadas caso o risco se materialize...",
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "messages": {
+      "riskAdded": "Risco adicionado com sucesso!",
+      "riskUpdated": "Risco atualizado com sucesso!",
+      "riskDeleted": "Risco removido com sucesso!",
+      "sampleDataLoaded": "Dados de exemplo carregados com sucesso!",
+      "sampleDataLoadedReplace": "Dados de exemplo carregados (dados anteriores substituídos)!",
+      "sampleDataLoadedAdd": "riscos de exemplo adicionados aos existentes!",
+      "allRisksCleared": "Todos os riscos foram removidos!",
+      "overdueRisksFound": "riscos vencidos encontrados",
+      "nearDueRisksFound": "riscos próximos do vencimento",
+      "storageError": "Erro ao salvar riscos no localStorage:",
+      "storageFull": "Armazenamento local cheio! Alguns dados podem não ter sido salvos.",
+      "saveError": "Não foi possível salvar automaticamente. Verifique as configurações do navegador.",
+      "loadError": "Erro ao carregar riscos do localStorage:"
+    },
+    "sampleData": {
+      "confirmTitle": "Carregar Dados de Exemplo",
+      "confirmContent": "Você já possui {count} risco(s) cadastrados.",
+      "confirmQuestion": "Como deseja proceder?",
+      "replace": "Substituir",
+      "add": "Adicionar"
+    }
+  },
+  "riskMatrix": {
+    "title": "Matriz de Risco - Cronograma do Projeto",
+    "probability": "Probabilidade",
+    "impact": "Impacto",
+    "probabilityLabels": {
+      "veryHigh": "Muito Alta (5)",
+      "high": "Alta (4)",
+      "medium": "Média (3)",
+      "low": "Baixa (2)",
+      "veryLow": "Muito Baixa (1)"
+    },
+    "impactLabels": {
+      "veryLow": "Muito Baixo (1)",
+      "low": "Baixo (2)",
+      "medium": "Médio (3)",
+      "high": "Alto (4)",
+      "veryHigh": "Muito Alto (5)"
+    },
+    "tooltip": {
+      "score": "Score:",
+      "risks": "Riscos:"
+    },
+    "legend": {
+      "score": "Score",
+      "scoreRange": "Score {range}"
+    }
+  },
+  "tableView": {
+    "columns": {
+      "structure": "Estrutura",
+      "level": "Nível",
+      "responsible": "Responsável",
+      "status": "Status",
+      "progress": "Progresso",
+      "ownCost": "Custo Próprio",
+      "totalCost": "Custo Total",
+      "startDate": "Data Início",
+      "endDate": "Data Fim",
+      "duration": "Duração",
+      "description": "Descrição",
+      "dependencies": "Dependências"
+    },
+    "levels": {
+      "project": "Projeto",
+      "phase": "Fase",
+      "activity": "Atividade",
+      "item": "Item"
+    },
+    "status": {
+      "completed": "Concluído",
+      "inProgress": "Em Progresso",
+      "notStarted": "Não Iniciado",
+      "undefined": "Indefinido"
+    },
+    "stats": {
+      "totalItems": "Total de itens:",
+      "totalProjectCost": "Custo total do projeto:",
+      "itemsCount": "{count} itens"
+    },
+    "controls": {
+      "expandAll": "Expandir Todas",
+      "collapsePhases": "Colapsar Fases"
+    },
+    "tooltips": {
+      "items": "itens",
+      "workingDays": "{days} dias corridos",
+      "dependsOn": "Depende de: {name}",
+      "progressBasedOnChildren": "Progresso baseado em atividades filhas:",
+      "completed": "Concluídas: {count}",
+      "inProgress": "Em progresso: {count}",
+      "total": "Total: {count}",
+      "percentage": "Percentual: {percent}%",
+      "ownStatus": "Status próprio: {status}"
+    },
+    "pagination": {
+      "of": "de",
+      "items": "itens"
+    },
+    "dependencies": {
+      "none": "Nenhuma",
+      "single": "{count} dependência",
+      "multiple": "{count} dependências"
+    }
   }
 } 

@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Card, Row, Col, Select, DatePicker, Space, Typography, Table, Tag, Switch, Button } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import dayjs from 'dayjs';
 import { ColumnType } from 'antd/es/table';
 import {
@@ -18,7 +20,7 @@ import {
   Bar
 } from 'recharts';
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, eachMonthOfInterval, eachQuarterOfInterval, eachYearOfInterval, isWithinInterval } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS, es, zhCN } from 'date-fns/locale';
 import { TreeNode } from '../types';
 import { PieChartOutlined, FolderOutlined, FileOutlined } from '@ant-design/icons';
 
@@ -41,6 +43,8 @@ interface PeriodData {
 
 
 const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode }) => {
+  const { t, i18n } = useTranslation();
+  const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [periodType, setPeriodType] = useState<PeriodType>('month');
   const [dateRange, setDateRange] = useState<[Date, Date] | null>(null);
   const [selectedLevels, setSelectedLevels] = useState<number[]>([2, 3]); // Padrão: mostrar fases e atividades
@@ -49,6 +53,22 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
   const [chartKey, setChartKey] = useState<number>(0); // Key para forçar re-render do gráfico
   const [pageSize, setPageSize] = useState<number>(10); // Tamanho da página
   const [currentPage, setCurrentPage] = useState<number>(1); // Página atual
+
+  // Função para obter o locale do date-fns baseado no idioma atual
+  const getDateFnsLocale = React.useCallback(() => {
+    switch (i18n.language) {
+      case 'pt':
+        return ptBR;
+      case 'en':
+        return enUS;
+      case 'es':
+        return es;
+      case 'zh':
+        return zhCN;
+      default:
+        return ptBR;
+    }
+  }, [i18n.language]);
 
   // Função para alternar visibilidade de uma série
   const toggleSeriesVisibility = (seriesKey: string) => {
@@ -90,7 +110,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
   // Função para obter todas as datas do projeto
-  const getProjectDateRange = (): [Date, Date] => {
+  const getProjectDateRange = React.useCallback((): [Date, Date] => {
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
@@ -118,7 +138,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
     return result;
-  };
+  }, [rootNode]);
 
   // Função para gerar períodos baseado no tipo selecionado
   const generatePeriods = (startDate: Date, endDate: Date, type: PeriodType): Date[] => {
@@ -152,18 +172,19 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
   };
 
   // Função para formatar período
-  const formatPeriod = (date: Date, type: PeriodType): string => {
+  const formatPeriod = React.useCallback((date: Date, type: PeriodType): string => {
+    const locale = getDateFnsLocale();
     switch (type) {
       case 'month':
-        return format(date, 'MMM/yy', { locale: ptBR });
+        return format(date, 'MMM/yy', { locale });
       case 'quarter':
-        return format(date, 'QQQ/yy', { locale: ptBR });
+        return format(date, 'QQQ/yy', { locale });
       case 'year':
-        return format(date, 'yyyy');
+        return format(date, 'yyyy', { locale });
       default:
-        return format(date, 'MMM/yy', { locale: ptBR });
+        return format(date, 'MMM/yy', { locale });
     }
-  };
+  }, [getDateFnsLocale]);
 
   // Função para obter cor por nível
   const getLevelColor = (level: number): string => {
@@ -235,7 +256,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
     });
 
     return data;
-  }, [rootNode, periodType, dateRange, selectedLevels]);
+  }, [rootNode, periodType, dateRange, selectedLevels, i18n.language, getProjectDateRange, formatPeriod]);
 
   // Função para calcular alocação separada por fases individuais
   const calculateSeparatedBudgetAllocation = useMemo(() => {
@@ -308,7 +329,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
     });
 
     return { data, phases };
-  }, [rootNode, periodType, dateRange, selectedLevels]);
+  }, [rootNode, periodType, dateRange, selectedLevels, i18n.language, getProjectDateRange, formatPeriod]);
 
   // Função para calcular dados cumulativos
   const cumulativeData = useMemo(() => {
@@ -398,13 +419,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
 
-  // Função para formatar moeda
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+
 
 
 
@@ -490,7 +505,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
     return result;
-  }, [rootNode, periodType, dateRange]);
+  }, [rootNode, periodType, dateRange, i18n.language, getProjectDateRange, formatPeriod]);
 
   // Colunas da tabela transposta
   const tableColumns: ColumnType<any>[] = useMemo(() => {
@@ -499,7 +514,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
     
     const baseColumns: ColumnType<any>[] = [
       {
-        title: 'Estrutura WBS',
+        title: t('budgetAllocation.wbsStructure'),
         dataIndex: 'name',
         key: 'name',
         width: 250,
@@ -526,7 +541,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
               </Text>
               {!record.isLeaf && (
                 <Text type="secondary" style={{ fontSize: '10px', marginLeft: 4 }}>
-                  (consolidado)
+                  {t('budgetAllocation.consolidated')}
                 </Text>
               )}
             </Space>
@@ -559,7 +574,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
     // Adiciona coluna de total
     const totalColumn: ColumnType<any> = {
-      title: 'Total',
+      title: t('budgetAllocation.total'),
       dataIndex: 'total',
       key: 'total',
       width: 120,
@@ -577,13 +592,13 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
     };
 
     return [...baseColumns, ...periodColumns, totalColumn];
-  }, [periodType, dateRange]);
+  }, [periodType, dateRange, t, i18n.language, getProjectDateRange, formatPeriod]);
 
   return (
     <div style={{ padding: '0 16px' }}>
       <Title level={3} style={{ marginBottom: 24 }}>
         <PieChartOutlined style={{ marginRight: 8 }} />
-        Alocação de Budget
+        {t('budgetAllocation.title')}
       </Title>
 
       {/* Controles */}
@@ -591,22 +606,22 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} sm={12} md={6}>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text type="secondary">Período</Text>
+              <Text type="secondary">{t('budgetAllocation.period')}</Text>
               <Select
                 value={periodType}
                 onChange={setPeriodType}
                 style={{ width: '100%' }}
                 options={[
-                  { value: 'month', label: 'Mensal' },
-                  { value: 'quarter', label: 'Trimestral' },
-                  { value: 'year', label: 'Anual' }
+                  { value: 'month', label: t('budgetAllocation.monthly') },
+                  { value: 'quarter', label: t('budgetAllocation.quarterly') },
+                  { value: 'year', label: t('budgetAllocation.yearly') }
                 ]}
               />
             </Space>
           </Col>
           <Col xs={24} sm={12} md={8}>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text type="secondary">Intervalo de Datas</Text>
+              <Text type="secondary">{t('budgetAllocation.dateRange')}</Text>
               <RangePicker
                 style={{ width: '100%' }}
                 value={dateRange ? [dayjs(dateRange[0]), dayjs(dateRange[1])] : null}
@@ -617,32 +632,32 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                     setDateRange(null);
                   }
                 }}
-                placeholder={['Data Início', 'Data Fim']}
+                placeholder={[t('budgetAllocation.startDate'), t('budgetAllocation.endDate')]}
               />
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text type="secondary">Níveis WBS</Text>
+              <Text type="secondary">{t('budgetAllocation.wbsLevels')}</Text>
               <Select
                 mode="multiple"
                 value={selectedLevels}
                 onChange={setSelectedLevels}
                 style={{ width: '100%' }}
                 options={[
-                  { value: 1, label: 'Nível 1 (Projeto)' },
-                  { value: 2, label: 'Nível 2 (Fase)' },
-                  { value: 3, label: 'Nível 3 (Atividade)' }
+                  { value: 1, label: t('budgetAllocation.wbsLevel1') },
+                  { value: 2, label: t('budgetAllocation.wbsLevel2') },
+                  { value: 3, label: t('budgetAllocation.wbsLevel3') }
                 ]}
               />
             </Space>
           </Col>
           <Col xs={24} sm={12} md={4}>
             <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Text type="secondary">Agrupamento do Gráfico</Text>
+              <Text type="secondary">{t('budgetAllocation.chartGrouping')}</Text>
               <Space align="center">
                 <Text style={{ fontSize: '12px', color: chartGroupMode === 'grouped' ? '#1890ff' : '#999' }}>
-                  Por Nível
+                  {t('budgetAllocation.byLevel')}
                 </Text>
                 <Switch
                   checked={chartGroupMode === 'separated'}
@@ -650,7 +665,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                   size="small"
                 />
                 <Text style={{ fontSize: '12px', color: chartGroupMode === 'separated' ? '#1890ff' : '#999' }}>
-                  Por Fase
+                  {t('budgetAllocation.byPhase')}
                 </Text>
               </Space>
             </Space>
@@ -662,7 +677,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
       {/* Tabela de Detalhes */}
-      <Card title="Detalhamento por Período" style={{ marginBottom: 24 }}>
+      <Card title={t('budgetAllocation.periodDetail')} style={{ marginBottom: 24 }}>
         <Table
           columns={tableColumns}
           dataSource={tableData}
@@ -673,7 +688,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             showQuickJumper: true,
             pageSizeOptions: ['10', '20', '50', '100'],
             showTotal: (total, range) => 
-              `${range[0]}-${range[1]} de ${total} itens`,
+              `${range[0]}-${range[1]} ${t('budgetAllocation.of')} ${total} ${t('budgetAllocation.items')}`,
             size: 'small',
             onChange: (page, size) => {
               setCurrentPage(page);
@@ -709,7 +724,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             return (
               <Table.Summary.Row style={{ backgroundColor: '#fafafa' }}>
                 <Table.Summary.Cell index={0}>
-                  <Text strong>Total Consolidado</Text>
+                  <Text strong>{t('budgetAllocation.consolidatedTotal')}</Text>
                 </Table.Summary.Cell>
                 {periods.map((periodDate, index) => {
                   const periodKey = formatPeriod(periodDate, periodType);
@@ -736,7 +751,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={12}>
           <Card 
-            title={`Gráfico de Áreas - ${chartGroupMode === 'grouped' ? 'Agrupado por Nível' : 'Separado por Fase'}`}
+            title={`${t('budgetAllocation.areaChart')} - ${chartGroupMode === 'grouped' ? t('budgetAllocation.groupedByLevel') : t('budgetAllocation.separatedByPhase')}`}
             extra={
               <Space size={8} align="center">
                 <Button 
@@ -744,7 +759,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                   type="text" 
                   icon={<ReloadOutlined />}
                   onClick={() => setChartKey(prev => prev + 1)}
-                  title="Atualizar gráfico"
+                  title={t('budgetAllocation.updateChart')}
                   style={{ padding: '4px', minWidth: '24px' }}
                 />
                 <Button 
@@ -757,10 +772,10 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                   disabled={hiddenSeries.size === 0}
                   style={{ padding: '0 4px', fontSize: '11px' }}
                 >
-                  Mostrar Todas
+                  {t('budgetAllocation.showAll')}
                 </Button>
                 <Text type="secondary" style={{ fontSize: '11px' }}>
-                  💡 Clique na legenda
+                  {t('budgetAllocation.clickLegend')}
                 </Text>
               </Space>
             }
@@ -782,7 +797,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 backdropFilter: 'blur(4px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
-                📊 {hiddenSeries.size} série{hiddenSeries.size > 1 ? 's' : ''} oculta{hiddenSeries.size > 1 ? 's' : ''}
+                📊 {hiddenSeries.size} {hiddenSeries.size > 1 ? t('budgetAllocation.seriesHiddenPlural') : t('budgetAllocation.seriesHidden')}
               </div>
             )}
             <ResponsiveContainer width="100%" height={300}>
@@ -794,13 +809,13 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" tick={{ fontSize: 12 }} />
                 <YAxis 
-                  tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  tickFormatter={(value) => `${getCurrencySymbol()} ${(value / 1000).toFixed(0)}k`}
                   domain={getYAxisDomain}
                 />
                 <Tooltip 
                   formatter={(value: number, name: string) => {
                     if (chartGroupMode === 'grouped') {
-                      return [formatCurrency(value), name.replace('level', 'Nível ')];
+                      return [formatCurrency(value), name.replace('level', t('budgetAllocation.level') + ' ')];
                     } else {
                       // Encontrar o nome da fase pelo ID
                       const phaseId = name.replace('phase_', '');
@@ -808,13 +823,13 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                       return [formatCurrency(value), phase?.name || name];
                     }
                   }}
-                  labelFormatter={(label) => `Período: ${label}`}
+                  labelFormatter={(label) => `${t('budgetAllocation.periodLabel')} ${label}`}
                 />
                 <Legend 
                   formatter={(value: string) => {
                     const isHidden = hiddenSeries.has(value);
                     const displayName = chartGroupMode === 'grouped' 
-                      ? value.replace('level', 'Nível ')
+                      ? value.replace('level', t('budgetAllocation.level') + ' ')
                       : (() => {
                           const phaseId = value.replace('phase_', '');
                           const phase = calculateSeparatedBudgetAllocation.phases.find(p => p.id === phaseId);
@@ -893,15 +908,15 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Orçamento Cumulativo" style={{ height: 400 }}>
+          <Card title={t('budgetAllocation.cumulativeBudget')} style={{ height: 400 }}>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={cumulativeData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
+                <YAxis tickFormatter={(value) => `${getCurrencySymbol()} ${(value / 1000).toFixed(0)}k`} />
                 <Tooltip 
-                  formatter={(value: number) => [formatCurrency(value), 'Acumulado']}
-                  labelFormatter={(label) => `Período: ${label}`}
+                  formatter={(value: number) => [formatCurrency(value), t('budgetAllocation.accumulated')]}
+                  labelFormatter={(label) => `${t('budgetAllocation.periodLabel')} ${label}`}
                 />
                 <Line
                   type="monotone"
