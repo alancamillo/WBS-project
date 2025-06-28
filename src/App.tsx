@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Typography, Button, Space, Card, Statistic, Row, Col } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Badge, message, Popconfirm } from 'antd';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import TreeNodeComponent from './components/TreeNode';
 import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
@@ -19,18 +19,69 @@ import './App.css';
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
+// Chave para localStorage da estrutura WBS
+const WBS_STORAGE_KEY = 'wbs-project-structure';
+
 function App() {
-  const [rootNode, setRootNode] = useState<TreeNode>(() => ({
-    id: uuidv4(),
-    name: 'Projeto Principal',
-    cost: 0,
-    level: 1,
-    children: [],
-    totalCost: 0
-  }));
+  // Função para carregar estrutura WBS do localStorage
+  const loadWBSFromStorage = (): TreeNode => {
+    try {
+      const stored = localStorage.getItem(WBS_STORAGE_KEY);
+      if (stored) {
+        const parsedWBS = JSON.parse(stored);
+        
+        // Função recursiva para converter strings de data de volta para objetos Date
+        const convertDates = (node: any): TreeNode => {
+          return {
+            ...node,
+            startDate: node.startDate ? new Date(node.startDate) : undefined,
+            endDate: node.endDate ? new Date(node.endDate) : undefined,
+            children: node.children ? node.children.map((child: any) => convertDates(child)) : []
+          };
+        };
+        
+        return convertDates(parsedWBS);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estrutura WBS do localStorage:', error);
+    }
+    
+    // Retorna estrutura padrão se não houver dados salvos
+    return {
+      id: uuidv4(),
+      name: 'Projeto Principal',
+      cost: 0,
+      level: 1,
+      children: [],
+      totalCost: 0
+    };
+  };
+
+  // Função para salvar estrutura WBS no localStorage
+  const saveWBSToStorage = (wbs: TreeNode) => {
+    try {
+      localStorage.setItem(WBS_STORAGE_KEY, JSON.stringify(wbs));
+    } catch (error) {
+      console.error('Erro ao salvar estrutura WBS no localStorage:', error);
+      
+      // Verificar se é erro de quota excedida
+      if (error instanceof DOMException && error.code === 22) {
+        message.error('Armazenamento local cheio! A estrutura WBS pode não ter sido salva.');
+      } else {
+        message.warning('Não foi possível salvar a estrutura WBS automaticamente.');
+      }
+    }
+  };
+
+  const [rootNode, setRootNode] = useState<TreeNode>(() => loadWBSFromStorage());
 
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
+
+  // Salvar no localStorage sempre que a estrutura WBS mudar
+  useEffect(() => {
+    saveWBSToStorage(rootNode);
+  }, [rootNode]);
 
   // Recalcula custos, datas e durações automaticamente quando a estrutura muda
   useEffect(() => {
@@ -43,6 +94,7 @@ function App() {
 
   const handleRootUpdate = (updatedNode: TreeNode) => {
     setRootNode(updatedNode);
+    // A persistência acontece automaticamente via useEffect
   };
 
   const handleExportExcel = () => {
@@ -60,15 +112,96 @@ function App() {
 
   const handleLoadSampleData = () => {
     const sampleProject = createSampleProject();
-    setRootNode(sampleProject);
+    
+    // Contar nós existentes (excluindo o nó raiz vazio)
+    const countNodes = (node: TreeNode): number => {
+      return 1 + node.children.reduce((sum, child) => sum + countNodes(child), 0);
+    };
+    
+    const existingNodes = countNodes(rootNode);
+    const hasExistingData = existingNodes > 1 || rootNode.children.length > 0;
+    
+    if (hasExistingData) {
+      Modal.confirm({
+        title: 'Carregar Dados de Exemplo',
+        content: (
+          <div>
+            <p>Você já possui uma estrutura WBS com {existingNodes} nó(s).</p>
+            <p>Carregar o exemplo irá substituir a estrutura atual.</p>
+            <p>Deseja continuar?</p>
+          </div>
+        ),
+        okText: 'Sim, substituir',
+        cancelText: 'Cancelar',
+        onOk: () => {
+          setRootNode(sampleProject);
+          message.success('Dados de exemplo carregados com sucesso!');
+        },
+      });
+    } else {
+      setRootNode(sampleProject);
+      message.success('Dados de exemplo carregados com sucesso!');
+    }
+  };
+
+  const handleClearWBS = () => {
+    const emptyProject: TreeNode = {
+      id: uuidv4(),
+      name: 'Projeto Principal',
+      cost: 0,
+      level: 1,
+      children: [],
+      totalCost: 0
+    };
+    
+    setRootNode(emptyProject);
+    localStorage.removeItem(WBS_STORAGE_KEY);
+    message.success('Estrutura WBS limpa com sucesso!');
   };
 
   const handleImportWBS = (importedNode: TreeNode) => {
     setRootNode(importedNode);
     setImportModalVisible(false);
+    message.success('Estrutura WBS importada e salva automaticamente!');
   };
 
   const costBreakdown = CostCalculator.getCostBreakdown(rootNode);
+
+  // Função para contar diferentes tipos de nós na estrutura
+  const getWBSStatistics = () => {
+    let totalNodes = 0;
+    let phases = 0; // Nível 2
+    let activities = 0; // Nível 3
+    let hasChildren = 0;
+    let leafNodes = 0;
+
+    const traverse = (node: TreeNode) => {
+      totalNodes++;
+      
+      if (node.level === 2) phases++;
+      if (node.level === 3) activities++;
+      
+      if (node.children.length > 0) {
+        hasChildren++;
+        node.children.forEach(child => traverse(child));
+      } else if (node.level > 1) { // Não contar o projeto raiz como folha se não tiver filhos
+        leafNodes++;
+      }
+    };
+
+    traverse(rootNode);
+    
+    return {
+      totalNodes,
+      phases,
+      activities,
+      hasChildren,
+      leafNodes,
+      hasData: totalNodes > 1 || rootNode.children.length > 0
+    };
+  };
+
+  const wbsStats = getWBSStatistics();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -86,7 +219,7 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="Custo Total"
+                title="💰 Custo Total"
                 value={costBreakdown.total}
                 prefix="R$"
                 precision={2}
@@ -97,21 +230,19 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="Nível 1"
-                value={costBreakdown.level1}
-                prefix="R$"
-                precision={2}
-                valueStyle={{ color: '#1890ff' }}
+                title="📊 Total de Nós"
+                value={wbsStats.totalNodes}
+                suffix={wbsStats.hasData ? '(Salvos)' : ''}
+                valueStyle={{ color: wbsStats.hasData ? '#52c41a' : '#999' }}
               />
             </Card>
           </Col>
           <Col span={6}>
             <Card>
               <Statistic
-                title="Nível 2"
-                value={costBreakdown.level2}
-                prefix="R$"
-                precision={2}
+                title="🎯 Fases (Nível 2)"
+                value={wbsStats.phases}
+                prefix="📁"
                 valueStyle={{ color: '#52c41a' }}
               />
             </Card>
@@ -119,10 +250,9 @@ function App() {
           <Col span={6}>
             <Card>
               <Statistic
-                title="Nível 3"
-                value={costBreakdown.level3}
-                prefix="R$"
-                precision={2}
+                title="⚡ Atividades (Nível 3)"
+                value={wbsStats.activities}
+                prefix="📝"
                 valueStyle={{ color: '#faad14' }}
               />
             </Card>
@@ -130,7 +260,18 @@ function App() {
         </Row>
 
         <Card
-          title="Estrutura do Projeto"
+          title={
+            <Space>
+              <span>Estrutura do Projeto</span>
+              {wbsStats.hasData && (
+                <Badge 
+                  count={wbsStats.totalNodes} 
+                  style={{ backgroundColor: '#1890ff' }}
+                  title={`${wbsStats.totalNodes} nó(s) na estrutura WBS (${wbsStats.phases} fases, ${wbsStats.activities} atividades)`}
+                />
+              )}
+            </Space>
+          }
           extra={
             <Space>
               <Button
@@ -140,6 +281,24 @@ function App() {
               >
                 Carregar Exemplo
               </Button>
+              
+              <Popconfirm
+                title="Limpar Estrutura WBS"
+                description="Esta ação irá remover toda a estrutura do projeto. Tem certeza?"
+                onConfirm={handleClearWBS}
+                okText="Sim, limpar"
+                cancelText="Cancelar"
+                okButtonProps={{ danger: true }}
+              >
+                <Button
+                  danger
+                  type="dashed"
+                  icon={<DeleteOutlined />}
+                  disabled={rootNode.children.length === 0}
+                >
+                  Limpar WBS
+                </Button>
+              </Popconfirm>
               
               <Button
                 icon={<UploadOutlined />}
@@ -210,6 +369,22 @@ function App() {
             </Space>
           }
         >
+          {/* Informação sobre persistência automática */}
+          {!wbsStats.hasData && (
+            <div style={{ marginBottom: 16, padding: 16, background: '#f6ffed', borderRadius: 6, border: '1px solid #b7eb8f' }}>
+              <Space direction="vertical" size="small">
+                <div style={{ fontWeight: 'bold', color: '#389e0d' }}>
+                  💾 Armazenamento Automático Ativado
+                </div>
+                <div style={{ color: '#666', fontSize: 14 }}>
+                  Sua estrutura WBS é automaticamente salva no navegador. Todas as modificações, 
+                  incluindo adição/edição de fases e atividades, permanecerão disponíveis mesmo 
+                  depois de navegar entre as telas ou recarregar a página.
+                </div>
+              </Space>
+            </div>
+          )}
+
           {viewMode === 'list' ? (
             <TreeNodeComponent
               node={rootNode}

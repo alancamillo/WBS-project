@@ -53,8 +53,47 @@ interface RiskManagementProps {
   rootNode: TreeNode;
 }
 
+// Chave para localStorage
+const RISKS_STORAGE_KEY = 'wbs-project-risks';
+
 const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
-  const [risks, setRisks] = useState<Risk[]>([]);
+  // Função para carregar riscos do localStorage
+  const loadRisksFromStorage = (): Risk[] => {
+    try {
+      const stored = localStorage.getItem(RISKS_STORAGE_KEY);
+      if (stored) {
+        const parsedRisks = JSON.parse(stored);
+        // Converter strings de data de volta para objetos Date
+        return parsedRisks.map((risk: any) => ({
+          ...risk,
+          createdAt: new Date(risk.createdAt),
+          updatedAt: new Date(risk.updatedAt),
+          dueDate: risk.dueDate ? new Date(risk.dueDate) : undefined,
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar riscos do localStorage:', error);
+    }
+    return [];
+  };
+
+  // Função para salvar riscos no localStorage
+  const saveRisksToStorage = (risks: Risk[]) => {
+    try {
+      localStorage.setItem(RISKS_STORAGE_KEY, JSON.stringify(risks));
+    } catch (error) {
+      console.error('Erro ao salvar riscos no localStorage:', error);
+      
+      // Verificar se é erro de quota excedida
+      if (error instanceof DOMException && error.code === 22) {
+        message.error('Armazenamento local cheio! Alguns dados podem não ter sido salvos.');
+      } else {
+        message.warning('Não foi possível salvar automaticamente. Verifique as configurações do navegador.');
+      }
+    }
+  };
+
+  const [risks, setRisks] = useState<Risk[]>(() => loadRisksFromStorage());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRisk, setEditingRisk] = useState<Risk | null>(null);
   const [filters, setFilters] = useState<RiskFilterOptions>({});
@@ -159,6 +198,11 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
     setCurrentPage(1);
   }, [filters]);
 
+  // Salvar no localStorage sempre que risks mudarem
+  useEffect(() => {
+    saveRisksToStorage(risks);
+  }, [risks]);
+
   // Métricas calculadas
   const metrics: RiskMetrics = useMemo(() => {
     // Função para aplicar filtros
@@ -246,8 +290,37 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
 
   const handleLoadSampleRisks = () => {
     const sampleRisks = createSampleRisks();
-    setRisks(sampleRisks);
-    message.success('Dados de exemplo carregados com sucesso!');
+    
+    if (risks.length > 0) {
+      Modal.confirm({
+        title: 'Carregar Dados de Exemplo',
+        content: (
+          <div>
+            <p>Você já possui {risks.length} risco(s) cadastrados.</p>
+            <p>Como deseja proceder?</p>
+          </div>
+        ),
+        okText: 'Substituir',
+        cancelText: 'Adicionar',
+        onOk: () => {
+          setRisks(sampleRisks);
+          message.success('Dados de exemplo carregados (dados anteriores substituídos)!');
+        },
+        onCancel: () => {
+          setRisks(prev => [...prev, ...sampleRisks]);
+          message.success(`${sampleRisks.length} riscos de exemplo adicionados aos existentes!`);
+        },
+      });
+    } else {
+      setRisks(sampleRisks);
+      message.success('Dados de exemplo carregados com sucesso!');
+    }
+  };
+
+  const handleClearAllRisks = () => {
+    setRisks([]);
+    localStorage.removeItem(RISKS_STORAGE_KEY);
+    message.success('Todos os riscos foram removidos!');
   };
 
   const handleSubmit = async () => {
@@ -573,6 +646,18 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
         </Col>
       </Row>
 
+      {/* Informação sobre persistência */}
+      {risks.length === 0 && (
+        <Alert
+          message="💾 Armazenamento Local"
+          description="Os riscos criados são automaticamente salvos no seu navegador e permanecerão disponíveis mesmo depois de navegar entre as telas ou recarregar a página."
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          closable
+        />
+      )}
+
       {/* Alertas */}
       {(metrics.overdueRisks > 0 || metrics.criticalRisks > 0) && (
         <Alert
@@ -604,7 +689,18 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
 
       {/* Cabeçalho */}
       <Card
-        title="Gestão de Riscos"
+        title={
+          <Space>
+            <span>Gestão de Riscos</span>
+            {risks.length > 0 && (
+              <Badge 
+                count={risks.length} 
+                style={{ backgroundColor: '#52c41a' }}
+                title={`${risks.length} risco(s) salvos localmente`}
+              />
+            )}
+          </Space>
+        }
         extra={
           <Space>
             <Button
@@ -614,6 +710,23 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
             >
               Carregar Exemplos
             </Button>
+            <Popconfirm
+              title="Limpar todos os riscos"
+              description="Esta ação irá remover todos os riscos permanentemente. Tem certeza?"
+              onConfirm={handleClearAllRisks}
+              okText="Sim, limpar"
+              cancelText="Cancelar"
+              okButtonProps={{ danger: true }}
+            >
+              <Button
+                danger
+                type="dashed"
+                icon={<DeleteOutlined />}
+                disabled={risks.length === 0}
+              >
+                Limpar Tudo
+              </Button>
+            </Popconfirm>
             <Button
               type="primary"
               icon={<PlusOutlined />}
