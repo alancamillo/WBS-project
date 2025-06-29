@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Badge, message, Popconfirm } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
+import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Badge, message, Popconfirm, Dropdown, Menu } from 'antd';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import TreeNodeComponent from './components/TreeNode';
 import FlowTreeView from './components/FlowTreeView';
@@ -340,40 +340,6 @@ function App() {
           }
           extra={
             <Space>
-              <Button
-                icon={<BulbOutlined />}
-                onClick={handleLoadSampleData}
-                type="dashed"
-              >
-                {t('buttons.loadSampleData')}
-              </Button>
-              
-              <Popconfirm
-                title={t('modals.clearWBS.title')}
-                description={t('modals.clearWBS.question')}
-                onConfirm={handleClearWBS}
-                okText={t('buttons.yes')}
-                cancelText={t('buttons.cancel')}
-                okButtonProps={{ danger: true }}
-              >
-                <Button
-                  danger
-                  type="dashed"
-                  icon={<DeleteOutlined />}
-                  disabled={rootNode.children.length === 0}
-                >
-                  {t('buttons.clearWBS')}
-                </Button>
-              </Popconfirm>
-              
-              <Button
-                icon={<UploadOutlined />}
-                onClick={() => setImportModalVisible(true)}
-                type="default"
-              >
-                {t('buttons.importExcel')}
-              </Button>
-              
               <Button.Group>
                 <Button
                   icon={<UnorderedListOutlined />}
@@ -410,28 +376,43 @@ function App() {
                 >
                   {t('navigation.budget')}
                 </Button>
-                <Button
-                  icon={<ExclamationCircleOutlined />}
-                  onClick={() => setViewMode('risks')}
-                  type={viewMode === 'risks' ? 'primary' : 'default'}
-                >
-                  {t('navigation.risks')}
-                </Button>
               </Button.Group>
-              
-              <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={handleExportExcel}
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key="loadSample" icon={<BulbOutlined />} onClick={handleLoadSampleData}>
+                      {t('buttons.loadSampleData')}
+                    </Menu.Item>
+                    <Menu.Item key="clearWBS" icon={<DeleteOutlined />} disabled={rootNode.children.length === 0}>
+                      <Popconfirm
+                        title={t('modals.clearWBS.title')}
+                        description={t('modals.clearWBS.question')}
+                        onConfirm={handleClearWBS}
+                        okText={t('buttons.yes')}
+                        cancelText={t('buttons.cancel')}
+                        okButtonProps={{ danger: true }}
+                      >
+                        <span>{t('buttons.clearWBS')}</span>
+                      </Popconfirm>
+                    </Menu.Item>
+                    <Menu.Item key="importWBS" icon={<UploadOutlined />} onClick={() => setImportModalVisible(true)}>
+                      {t('buttons.importExcel')}
+                    </Menu.Item>
+                    <Menu.Item key="exportExcel" icon={<FileExcelOutlined />} onClick={handleExportExcel}>
+                      {t('buttons.export')} Excel
+                    </Menu.Item>
+                    <Menu.Item key="exportJSON" icon={<DownloadOutlined />} onClick={handleExportJSON}>
+                      {t('buttons.export')} JSON
+                    </Menu.Item>
+                    <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => setSettingsModalVisible(true)}>
+                      {t('settings.title')}
+                    </Menu.Item>
+                  </Menu>
+                }
+                trigger={['click']}
               >
-                {t('buttons.export')} Excel
-              </Button>
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={handleExportJSON}
-              >
-                {t('buttons.export')} JSON
-              </Button>
+                <Button icon={<EllipsisOutlined />} />
+              </Dropdown>
             </Space>
           }
         >
