@@ -3,7 +3,6 @@ import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Ba
 import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import TreeNodeComponent from './components/TreeNode';
-import TreeView from './components/TreeView';
 import FlowTreeView from './components/FlowTreeView';
 import ImportWBS from './components/ImportWBS';
 import GanttChart from './components/GanttChart';
@@ -25,6 +24,7 @@ const { Title } = Typography;
 
 // Chave para localStorage da estrutura WBS
 const WBS_STORAGE_KEY = 'wbs-project-structure';
+const GROUPING_STORAGE_KEY = 'wbs-grouping-state';
 
 function App() {
   const { t } = useTranslation();
@@ -64,6 +64,25 @@ function App() {
       };
   };
 
+  // Função para carregar estado de agrupamento do localStorage
+  const loadGroupingFromStorage = () => {
+    try {
+      const savedGrouping = localStorage.getItem(GROUPING_STORAGE_KEY);
+      if (savedGrouping) {
+        const parsedGrouping = JSON.parse(savedGrouping);
+        if (parsedGrouping.groupedPhaseIds && Array.isArray(parsedGrouping.groupedPhaseIds)) {
+          return {
+            groupedPhaseIds: parsedGrouping.groupedPhaseIds,
+            groupedExpanded: parsedGrouping.groupedExpanded || false
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Erro ao carregar estado de agrupamento:', error);
+    }
+    return { groupedPhaseIds: [], groupedExpanded: false };
+  };
+
   // Função para salvar estrutura WBS no localStorage
   const saveWBSToStorage = (wbs: TreeNode) => {
     try {
@@ -81,6 +100,7 @@ function App() {
   };
 
   const [rootNode, setRootNode] = useState<TreeNode>(() => loadWBSFromStorage());
+  const [groupingState, setGroupingState] = useState(() => loadGroupingFromStorage());
 
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
@@ -90,6 +110,19 @@ function App() {
   useEffect(() => {
     saveWBSToStorage(rootNode);
   }, [rootNode]);
+
+  // Salvar estado de agrupamento no localStorage
+  useEffect(() => {
+    try {
+      const groupingData = {
+        ...groupingState,
+        lastUpdated: new Date().toISOString()
+      };
+      localStorage.setItem(GROUPING_STORAGE_KEY, JSON.stringify(groupingData));
+    } catch (error) {
+      console.warn('Erro ao salvar estado de agrupamento:', error);
+    }
+  }, [groupingState]);
 
   // Recalcula custos, datas e durações automaticamente quando a estrutura muda
   useEffect(() => {
@@ -171,6 +204,20 @@ function App() {
     setRootNode(importedNode);
     setImportModalVisible(false);
     message.success(t('messages.success.wbsImported'));
+  };
+
+  // Funções para gerenciar agrupamento
+  const handleGroupingUpdate = (newGroupingState: { groupedPhaseIds: string[]; groupedExpanded: boolean }) => {
+    setGroupingState(newGroupingState);
+  };
+
+  const handleClearGrouping = () => {
+    setGroupingState({ groupedPhaseIds: [], groupedExpanded: false });
+    try {
+      localStorage.removeItem(GROUPING_STORAGE_KEY);
+    } catch (error) {
+      console.warn('Erro ao limpar estado de agrupamento:', error);
+    }
   };
 
   const costBreakdown = CostCalculator.getCostBreakdown(rootNode);
@@ -410,6 +457,9 @@ function App() {
               onUpdate={handleRootUpdate}
               onDelete={() => {}} // Root não pode ser deletado
               rootNode={rootNode} // Passando rootNode para acesso às dependências
+              groupingState={groupingState}
+              onGroupingUpdate={handleGroupingUpdate}
+              onClearGrouping={handleClearGrouping}
             />
           ) : viewMode === 'table' ? (
             <TableView rootNode={rootNode} />
@@ -418,11 +468,19 @@ function App() {
           ) : viewMode === 'risks' ? (
             <RiskManagement rootNode={rootNode} />
           ) : viewMode === 'flow' ? (
-            <FlowTreeView rootNode={rootNode} />
+            <FlowTreeView rootNode={rootNode} groupingState={groupingState} />
           ) : viewMode === 'gantt' ? (
             <GanttChart rootNode={rootNode} />
           ) : (
-            <TreeView rootNode={rootNode} />
+            <TreeNodeComponent
+              node={rootNode}
+              onUpdate={handleRootUpdate}
+              onDelete={() => {}}
+              rootNode={rootNode}
+              groupingState={groupingState}
+              onGroupingUpdate={handleGroupingUpdate}
+              onClearGrouping={handleClearGrouping}
+            />
           )}
         </Card>
 

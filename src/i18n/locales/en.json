@@ -92,6 +92,25 @@
     "leaveEmptyToInherit": "Leave empty to inherit from children",
     "selectDate": "Select a date"
   },
+  "treeView": {
+    "othersGroup": "Others ({{count}} phases)",
+    "othersGroupDescription": "Grouped phases to simplify tree visualization",
+    "groupedPhases": "Grouped Phases",
+    "expand": "Expand grouped phases",
+    "collapse": "Collapse grouped phases",
+    "groupingInfo": "Showing {{visible}} of {{total}} phases ({{grouped}} phases grouped)",
+    "configureGrouping": "Configure Grouping",
+    "editGrouping": "Edit Grouping ({{count}} phases)",
+    "clearGrouping": "Clear Grouping",
+    "groupingModal": {
+      "title": "Configure Phase Grouping",
+      "description": "Select the phases you want to group in the 'Others' node. Non-selected phases will remain individually visible.",
+      "confirm": "Apply Grouping",
+      "cancel": "Cancel",
+      "selectAll": "Select All",
+      "selectNone": "Clear Selection"
+    }
+  },
   "status": {
     "notStarted": "Not Started",
     "inProgress": "In Progress",

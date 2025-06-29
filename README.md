@@ -19,11 +19,12 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **💰 Automatic Cost Aggregation**: Real-time cost calculation and rollup from child to parent nodes
 - **📤 Multi-format Export**: Export to Excel (.xlsx), JSON, and CSV with professional formatting
 - **📥 Smart Import**: Import existing structures from Excel, CSV, or JSON with automatic column detection
+- **📦 Phase Grouping**: Group phases into consolidated nodes for simplified visualization while preserving cost aggregation
 
 ### Advanced Visualizations
 - **📈 Gantt Chart**: Timeline view of your project structure with dependencies and critical path
-- **🌲 Tree View**: Interactive hierarchical display with expand/collapse functionality
-- **🌊 Flow Tree**: Visual flow representation of project structure
+- **🌲 Tree View**: Interactive hierarchical display with expand/collapse functionality and phase grouping
+- **🌊 Flow Tree**: Visual flow representation of project structure with grouped phase support
 - **📋 Table View**: Comprehensive tabular display with hierarchical indicators and phase collapsing
 - **💹 Budget Allocation**: Advanced budget analysis with temporal distribution and interactive charts
 
@@ -39,6 +40,8 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **⚡ Real-time Updates**: Instant recalculation of costs and totals as you edit
 - **🔍 Data Validation**: Built-in validation to ensure data consistency and integrity
 - **📱 Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **📦 Smart Grouping**: Phase grouping controls for simplified project navigation
+- **🔄 Persistent State**: All user preferences and configurations automatically saved
 
 ### Internationalization & Currency Support
 - **🌍 Multi-language Support**: Full internationalization with 4 supported languages:
@@ -102,12 +105,20 @@ The application will open at `http://localhost:3000`
 - Expand/collapse functionality
 - Real-time editing capabilities
 - Visual hierarchy indicators
+- **📦 Phase Grouping**: Group selected phases into consolidated "Others" nodes for simplified visualization
+- **🔄 Persistent Grouping**: Grouping configuration automatically saved and restored between sessions
+- **📊 Cost Preservation**: Aggregated costs maintained when phases are grouped
+- **🎯 On-demand Grouping**: Manual selection of phases to group via intuitive modal interface
 
 #### 🌊 Flow Tree View  
 - Visual flow representation
 - Connection lines between nodes
 - Ideal for process visualization
 - Clean, modern layout
+- **📦 Grouped Phase Visualization**: Consolidated phases displayed as special nodes with tooltips
+- **🎨 Visual Differentiation**: Grouped nodes highlighted with dashed borders and purple color scheme
+- **📋 Phase Details**: Hover tooltips show all phases included in grouped nodes
+- **🔄 Real-time Sync**: Grouping changes immediately reflected in flow visualization
 
 #### 📋 Table View
 - Comprehensive tabular display
@@ -151,6 +162,47 @@ Software Development Project                 ($53,000)
 
 Total Project Cost: $53,000 (auto-calculated)
 ```
+
+### Phase Grouping Feature
+
+**Simplify Complex Project Visualizations**
+
+The Phase Grouping feature allows you to consolidate multiple phases into a single "Others" node, making complex project structures easier to navigate and understand.
+
+**How to Use Phase Grouping:**
+
+1. **Access Grouping Controls**: In Tree View, click the "Configure Grouping" button (📦 icon) next to your project name
+2. **Select Phases**: Use the modal interface to select which phases you want to group together
+3. **Apply Grouping**: Confirm your selection to create a consolidated "Others (X phases)" node
+4. **Visual Feedback**: Grouped phases are displayed with special styling and tooltips
+5. **Cross-View Sync**: Grouping is automatically applied across all visualization modes
+
+**Grouping Benefits:**
+
+- **📊 Simplified Navigation**: Reduce visual clutter in complex projects
+- **💰 Cost Preservation**: All cost calculations and aggregations are maintained
+- **🔄 Persistent Configuration**: Grouping settings saved automatically between sessions
+- **🎯 Flexible Control**: Add or remove phases from grouping at any time
+- **📋 Detailed Information**: Hover tooltips show all phases included in grouped nodes
+
+**Example with Grouping:**
+
+```
+Software Development Project                 ($53,000)
+├── 📋 Planning Phase                        ($8,000)
+│   ├── Requirements Analysis               ($5,000)
+│   └── Technical Documentation             ($3,000)
+├── 📦 Others (2 phases)                     ($45,000)
+│   ├── 💻 Development Phase                ($35,000)
+│   └── 🧪 Testing Phase                    ($10,000)
+```
+
+**Visual Indicators:**
+
+- **🟣 Purple Border**: Grouped nodes have dashed purple borders
+- **📁 Folder Icon**: Special folder icon indicates grouped content
+- **💬 Tooltip Details**: Hover to see all phases included in the group
+- **🔄 Expand/Collapse**: Toggle visibility of grouped phases within the node
 
 ### Importing Data
 
@@ -280,6 +332,12 @@ src/
 - Handles complex hierarchies with multiple levels
 - Automatic recalculation on data changes
 
+**Phase Grouping System**
+- Dynamic phase consolidation with cost preservation
+- Persistent grouping configuration across sessions
+- Cross-view synchronization (Tree, Flow, Table views)
+- Real-time grouping state management
+
 **Temporal Budget Distribution**
 - Proportional cost allocation based on task duration
 - Intersection calculation for overlapping periods
@@ -298,6 +356,8 @@ src/
 - **Responsive design** works on desktop, tablet, and mobile
 - **Chart optimization** with series visibility controls for large datasets
 - **Lazy loading** for improved initial load times
+- **Efficient grouping** with instant phase consolidation and cost recalculation
+- **Persistent state management** with optimized localStorage operations
 
 ## 🎨 UI/UX Features
 
@@ -311,6 +371,10 @@ src/
 - Drag-and-drop functionality (planned)
 - Context menus for quick actions
 - Keyboard shortcuts for power users
+- **📦 Phase Grouping Controls**: Intuitive modal interface for selecting phases to group
+- **🔄 Expand/Collapse Grouped Nodes**: Toggle visibility of grouped phases
+- **💬 Interactive Tooltips**: Hover to see detailed information about grouped phases
+- **🎯 One-click Grouping**: Quick grouping and ungrouping of phases
 
 ### Accessibility
 - Screen reader compatible

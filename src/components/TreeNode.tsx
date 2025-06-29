@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Card, Input, Button, Space, InputNumber, Collapse, Tag, Popconfirm, DatePicker, Select, Row, Col, Divider, Alert } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined, SaveOutlined, CalendarOutlined, UserOutlined, LinkOutlined, WarningOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Card, Input, Button, Space, InputNumber, Collapse, Tag, Popconfirm, DatePicker, Select, Row, Col, Divider, Alert, Modal, List, Typography, Tooltip, Checkbox } from 'antd';
+import { PlusOutlined, DeleteOutlined, EditOutlined, SaveOutlined, CalendarOutlined, UserOutlined, LinkOutlined, WarningOutlined, InfoCircleOutlined, GroupOutlined, FolderOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import { TreeNode as TreeNodeType } from '../types';
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Option } = Select;
+const { Text } = Typography;
 
 interface TreeNodeProps {
   node: TreeNodeType;
@@ -16,6 +17,17 @@ interface TreeNodeProps {
   onDelete: (nodeId: string) => void;
   maxLevel?: number;
   rootNode?: TreeNodeType;
+  groupingState?: { groupedPhaseIds: string[]; groupedExpanded: boolean };
+  onGroupingUpdate?: (groupingState: { groupedPhaseIds: string[]; groupedExpanded: boolean }) => void;
+  onClearGrouping?: () => void;
+}
+
+interface GroupingModalProps {
+  visible: boolean;
+  onCancel: () => void;
+  onConfirm: (groupedPhaseIds: string[]) => void;
+  phases: TreeNodeType[];
+  currentGroupedIds: string[];
 }
 
 interface DateValidation {
@@ -28,12 +40,90 @@ interface DateValidation {
   dateRangeMessage?: string;
 }
 
+// Modal para seleção de fases para agrupar
+const GroupingModal: React.FC<GroupingModalProps> = ({
+  visible,
+  onCancel,
+  onConfirm,
+  phases,
+  currentGroupedIds
+}) => {
+  const { t } = useTranslation();
+  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>(currentGroupedIds);
+
+  const handlePhaseToggle = (phaseId: string) => {
+    setSelectedPhaseIds(prev => 
+      prev.includes(phaseId) 
+        ? prev.filter(id => id !== phaseId)
+        : [...prev, phaseId]
+    );
+  };
+
+  const handleConfirm = () => {
+    onConfirm(selectedPhaseIds);
+  };
+
+  const handleSelectAll = () => {
+    setSelectedPhaseIds(phases.map(p => p.id));
+  };
+
+  const handleSelectNone = () => {
+    setSelectedPhaseIds([]);
+  };
+
+  return (
+    <Modal
+      title={t('treeView.groupingModal.title')}
+      open={visible}
+      onCancel={onCancel}
+      onOk={handleConfirm}
+      okText={t('treeView.groupingModal.confirm')}
+      cancelText={t('treeView.groupingModal.cancel')}
+      width={600}
+    >
+      <div style={{ marginBottom: 16 }}>
+        <Text type="secondary">{t('treeView.groupingModal.description')}</Text>
+      </div>
+      
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+        <Button size="small" onClick={handleSelectAll}>
+          {t('treeView.groupingModal.selectAll')}
+        </Button>
+        <Button size="small" onClick={handleSelectNone}>
+          {t('treeView.groupingModal.selectNone')}
+        </Button>
+      </div>
+
+      <List
+        size="small"
+        dataSource={phases}
+        renderItem={(phase) => (
+          <List.Item>
+            <Checkbox
+              checked={selectedPhaseIds.includes(phase.id)}
+              onChange={() => handlePhaseToggle(phase.id)}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <Text strong>{phase.name}</Text>
+                <Text type="secondary">{phase.children.length} {t('wbs.subitems')}</Text>
+              </div>
+            </Checkbox>
+          </List.Item>
+        )}
+      />
+    </Modal>
+  );
+};
+
 const TreeNodeComponent: React.FC<TreeNodeProps> = ({ 
   node, 
   onUpdate, 
   onDelete, 
   maxLevel = 3,
-  rootNode 
+  rootNode,
+  groupingState = { groupedPhaseIds: [], groupedExpanded: false },
+  onGroupingUpdate,
+  onClearGrouping
 }) => {
   const { t } = useTranslation();
   const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
@@ -46,6 +136,98 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   const [editedStartDate, setEditedStartDate] = useState(node.startDate);
   const [editedEndDate, setEditedEndDate] = useState(node.endDate);
   const [editedDependencies, setEditedDependencies] = useState(node.dependencies || []);
+  
+  // Estados para agrupamento (apenas modal visível, estado vem das props)
+  const [groupingModalVisible, setGroupingModalVisible] = useState(false);
+
+  // Obter fases (nós de nível 2) do projeto
+  const phases = useMemo(() => {
+    if (!rootNode || rootNode.level !== 1) return [];
+    return rootNode.children.filter(child => child.level === 2);
+  }, [rootNode]);
+
+  // Criar nó agrupado "outros"
+  const createGroupedNode = (groupedNodes: TreeNodeType[]): TreeNodeType => {
+    const totalCost = groupedNodes.reduce((sum, node) => sum + node.cost, 0);
+    const totalChildrenCost = groupedNodes.reduce((sum, node) => sum + node.totalCost, 0);
+    
+    return {
+      id: 'grouped-others',
+      name: t('treeView.othersGroup', { count: groupedNodes.length }),
+      cost: totalCost,
+      level: 2 as const,
+      children: groupedNodes,
+      totalCost: totalChildrenCost,
+      description: t('treeView.othersGroupDescription')
+    };
+  };
+
+  // Processar nós para aplicar agrupamento
+  const processedNode = useMemo(() => {
+    if (node.level !== 1 || groupingState.groupedPhaseIds.length === 0) {
+      return node;
+    }
+
+    const groupedPhases = phases.filter(phase => groupingState.groupedPhaseIds.includes(phase.id));
+    const visiblePhases = phases.filter(phase => !groupingState.groupedPhaseIds.includes(phase.id));
+    const otherChildren = node.children.filter(child => child.level !== 2);
+
+    if (groupedPhases.length === 0) {
+      return node;
+    }
+
+    const groupedNode = createGroupedNode(groupedPhases);
+
+    return {
+      ...node,
+      children: [...visiblePhases, groupedNode, ...otherChildren]
+    };
+  }, [node, groupingState.groupedPhaseIds, phases, t]);
+
+  const handleGroupingConfirm = (selectedPhaseIds: string[]) => {
+    // Validar que todos os IDs selecionados correspondem a fases existentes
+    const validPhaseIds = selectedPhaseIds.filter(id => 
+      phases.some(phase => phase.id === id)
+    );
+    
+    if (onGroupingUpdate) {
+      onGroupingUpdate({
+        groupedPhaseIds: validPhaseIds,
+        groupedExpanded: groupingState.groupedExpanded
+      });
+    }
+    setGroupingModalVisible(false);
+  };
+
+  const handleOpenGroupingModal = () => {
+    setGroupingModalVisible(true);
+  };
+
+  // Função para limpar o estado de agrupamento
+  const clearGroupingState = () => {
+    if (onClearGrouping) {
+      onClearGrouping();
+    }
+  };
+
+  // Validar IDs salvos quando as fases mudam
+  useEffect(() => {
+    if (phases.length > 0 && groupingState.groupedPhaseIds.length > 0 && onGroupingUpdate) {
+      const validIds = groupingState.groupedPhaseIds.filter(id => 
+        phases.some(phase => phase.id === id)
+      );
+      
+      if (validIds.length !== groupingState.groupedPhaseIds.length) {
+        console.log('Removendo IDs inválidos do agrupamento:', 
+          groupingState.groupedPhaseIds.filter(id => !validIds.includes(id))
+        );
+        onGroupingUpdate({
+          groupedPhaseIds: validIds,
+          groupedExpanded: groupingState.groupedExpanded
+        });
+      }
+    }
+  }, [phases, groupingState.groupedPhaseIds, onGroupingUpdate, groupingState.groupedExpanded]);
 
   // Verifica se um nó é descendente de outro (para evitar dependências circulares)
   const isDescendantOf = (potentialDescendant: TreeNodeType, ancestor: TreeNodeType): boolean => {
@@ -399,14 +581,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     }
   };
 
-
-
   const formatDate = (date?: Date) => {
     if (!date) return t('wbs.dateNotDefined');
     return new Date(date).toLocaleDateString('pt-BR');
   };
-
-
 
   // Obtém informações sobre a herança da data de fim
   const getEndDateInheritanceInfo = (nodeToCheck: TreeNodeType): { isInherited: boolean; sourceChild?: string } => {
@@ -476,11 +654,19 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       style={{ 
         marginBottom: 8,
         borderLeft: `4px solid ${getLevelColor(node.level)}`,
-        backgroundColor: node.level === 1 ? '#f0f9ff' : node.level === 2 ? '#f6ffed' : '#fffbe6'
+        backgroundColor: node.level === 1 ? '#f0f9ff' : node.level === 2 ? '#f6ffed' : '#fffbe6',
+        ...(node.id === 'grouped-others' && {
+          borderStyle: 'dashed',
+          borderWidth: '2px',
+          backgroundColor: '#f9f0ff',
+          borderColor: '#722ed1'
+        })
       }}
       title={
         <Space>
-          <Tag color={getLevelColor(node.level)}>{t('wbs.level')} {node.level}</Tag>
+          <Tag color={getLevelColor(node.level)} icon={node.id === 'grouped-others' ? <FolderOutlined /> : undefined}>
+            {node.id === 'grouped-others' ? t('treeView.groupedPhases') : `${t('wbs.level')} ${node.level}`}
+          </Tag>
           {isEditing ? (
             <Input
               value={editedName}
@@ -514,6 +700,42 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
             {t('wbs.totalCost')}: {formatCurrency(node.totalCost)}
           </span>
+          {/* Botão de agrupamento apenas para projetos (nível 1) */}
+          {node.level === 1 && phases.length > 0 && (
+            <Space>
+              <Tooltip title={t('treeView.configureGrouping')}>
+                <Button
+                  type="primary"
+                  icon={<GroupOutlined />}
+                  size="small"
+                  onClick={handleOpenGroupingModal}
+                  style={{ 
+                    background: groupingState.groupedPhaseIds.length > 0 ? '#722ed1' : '#1890ff',
+                    borderColor: groupingState.groupedPhaseIds.length > 0 ? '#722ed1' : '#1890ff'
+                  }}
+                >
+                  {groupingState.groupedPhaseIds.length > 0 
+                    ? t('treeView.editGrouping', { count: groupingState.groupedPhaseIds.length })
+                    : t('treeView.configureGrouping')
+                  }
+                </Button>
+              </Tooltip>
+              
+              {groupingState.groupedPhaseIds.length > 0 && (
+                <Tooltip title={t('treeView.clearGrouping')}>
+                  <Button
+                    type="default"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    onClick={clearGroupingState}
+                    danger
+                  >
+                    {t('treeView.clearGrouping')}
+                  </Button>
+                </Tooltip>
+              )}
+            </Space>
+          )}
           {isEditing ? (
             <Button
               type="primary"
@@ -947,6 +1169,26 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
 
       <Divider style={{ margin: '16px 0' }} />
 
+      {/* Informação sobre agrupamento ativo */}
+      {node.level === 1 && groupingState.groupedPhaseIds.length > 0 && (
+        <div style={{ 
+          marginBottom: 16, 
+          padding: 12, 
+          background: '#f9f0ff', 
+          borderRadius: 6, 
+          border: '1px solid #d3adf7',
+          fontSize: '12px',
+          color: '#722ed1'
+        }}>
+          <FolderOutlined style={{ marginRight: 4 }} />
+          {t('treeView.groupingInfo', { 
+            visible: phases.length - groupingState.groupedPhaseIds.length, 
+            total: phases.length,
+            grouped: groupingState.groupedPhaseIds.length
+          })}
+        </div>
+      )}
+
       {node.level < maxLevel && (
         <Button
           type="dashed"
@@ -968,20 +1210,68 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             header={`${t('wbs.subitems')} (${node.children.length})`}
           >
             <div style={{ paddingLeft: 16 }}>
-              {node.children.map(child => (
-                <TreeNodeComponent
-                  key={child.id}
-                  node={child}
-                  onUpdate={handleChildUpdate}
-                  onDelete={handleChildDelete}
-                  maxLevel={maxLevel}
-                  rootNode={rootNode} // Propagando o rootNode para os filhos
-                />
-              ))}
+              {processedNode.children.map(child => {
+                const isGroupedNode = child.id === 'grouped-others';
+                const shouldShowChildren = isGroupedNode ? groupingState.groupedExpanded : true;
+                
+                return (
+                  <div key={child.id}>
+                    <TreeNodeComponent
+                      node={child}
+                      onUpdate={handleChildUpdate}
+                      onDelete={handleChildDelete}
+                      maxLevel={maxLevel}
+                      rootNode={rootNode}
+                    />
+                    
+                    {/* Botão expandir/recolher para nó agrupado */}
+                    {isGroupedNode && child.children.length > 0 && (
+                      <div style={{ marginTop: 8, marginBottom: 16, textAlign: 'center' }}>
+                        <Button
+                          type="dashed"
+                          size="small"
+                          icon={groupingState.groupedExpanded ? <FolderOutlined /> : <FolderOutlined />}
+                          onClick={() => onGroupingUpdate && onGroupingUpdate({
+                            groupedPhaseIds: groupingState.groupedPhaseIds,
+                            groupedExpanded: !groupingState.groupedExpanded
+                          })}
+                        >
+                          {groupingState.groupedExpanded ? t('treeView.collapse') : t('treeView.expand')}
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Filhos do nó agrupado */}
+                    {isGroupedNode && shouldShowChildren && child.children.length > 0 && (
+                      <div style={{ paddingLeft: 16, marginTop: 8 }}>
+                        {child.children.map(grandChild => (
+                          <TreeNodeComponent
+                            key={grandChild.id}
+                            node={grandChild}
+                            onUpdate={handleChildUpdate}
+                            onDelete={handleChildDelete}
+                            maxLevel={maxLevel}
+                            rootNode={rootNode}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </Collapse.Panel>
         </Collapse>
       )}
+
+      {/* Modal de agrupamento */}
+      <GroupingModal
+        visible={groupingModalVisible}
+        onCancel={() => setGroupingModalVisible(false)}
+        onConfirm={handleGroupingConfirm}
+        phases={phases}
+        currentGroupedIds={groupingState.groupedPhaseIds}
+      />
     </Card>
   );
 };

@@ -655,5 +655,24 @@
       "single": "{count} 个依赖项",
       "multiple": "{count} 个依赖项"
     }
+  },
+  "treeView": {
+    "othersGroup": "其他（{{count}}个阶段）",
+    "othersGroupDescription": "为简化可视化而分组的阶段",
+    "groupedPhases": "分组阶段",
+    "expand": "展开分组阶段",
+    "collapse": "收起分组阶段",
+    "groupingInfo": "显示{{visible}}个，共{{total}}个阶段（{{grouped}}个阶段已分组）",
+    "configureGrouping": "配置分组",
+    "editGrouping": "编辑分组 ({{count}} 阶段)",
+    "clearGrouping": "清除分组",
+    "groupingModal": {
+      "title": "配置阶段分组",
+      "description": "选择要分组到'其他'节点中的阶段。未选择的阶段将保持单独可见。",
+      "confirm": "应用分组",
+      "cancel": "取消",
+      "selectAll": "全选",
+      "selectNone": "清除选择"
+    }
   }
 } 
