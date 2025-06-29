@@ -92,6 +92,25 @@
     "leaveEmptyToInherit": "Deixe vazio para herdar dos filhos",
     "selectDate": "Selecione uma data"
   },
+  "treeView": {
+    "othersGroup": "Outras ({{count}} fases)",
+    "othersGroupDescription": "Fases agrupadas para simplificar a visualização",
+    "groupedPhases": "Fases Agrupadas",
+    "expand": "Expandir fases agrupadas",
+    "collapse": "Recolher fases agrupadas",
+    "groupingInfo": "Mostrando {{visible}} de {{total}} fases ({{grouped}} fases agrupadas)",
+    "configureGrouping": "Configurar Agrupamento",
+    "editGrouping": "Editar Agrupamento ({{count}} fases)",
+    "clearGrouping": "Limpar Agrupamento",
+    "groupingModal": {
+      "title": "Configurar Agrupamento de Fases",
+      "description": "Selecione as fases que deseja agrupar no nó 'Outros'. As fases não selecionadas permanecerão visíveis individualmente.",
+      "confirm": "Aplicar Agrupamento",
+      "cancel": "Cancelar",
+      "selectAll": "Selecionar Todas",
+      "selectNone": "Limpar Seleção"
+    }
+  },
   "status": {
     "notStarted": "Não Iniciado",
     "inProgress": "Em Andamento",

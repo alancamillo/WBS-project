@@ -655,5 +655,24 @@
       "single": "{count} dependencia",
       "multiple": "{count} dependencias"
     }
+  },
+  "treeView": {
+    "othersGroup": "Otras ({{count}} fases)",
+    "othersGroupDescription": "Fases agrupadas para simplificar la visualización",
+    "groupedPhases": "Fases Agrupadas",
+    "expand": "Expandir fases agrupadas",
+    "collapse": "Contraer fases agrupadas",
+    "groupingInfo": "Mostrando {{visible}} de {{total}} fases ({{grouped}} fases agrupadas)",
+    "configureGrouping": "Configurar Agrupamiento",
+    "editGrouping": "Editar Agrupamiento ({{count}} fases)",
+    "clearGrouping": "Limpiar Agrupamiento",
+    "groupingModal": {
+      "title": "Configurar Agrupamiento de Fases",
+      "description": "Selecciona las fases que quieres agrupar en el nodo 'Otras'. Las fases no seleccionadas permanecerán visibles individualmente.",
+      "confirm": "Aplicar Agrupamiento",
+      "cancel": "Cancelar",
+      "selectAll": "Seleccionar Todas",
+      "selectNone": "Limpiar Selección"
+    }
   }
 } 

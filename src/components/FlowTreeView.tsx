@@ -16,9 +16,12 @@ import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import dagre from 'dagre';
 import 'reactflow/dist/style.css';
 import { TreeNode } from '../types';
+import { Tooltip } from 'antd';
+import { FolderOutlined } from '@ant-design/icons';
 
 interface FlowTreeViewProps {
   rootNode: TreeNode;
+  groupingState?: { groupedPhaseIds: string[]; groupedExpanded: boolean };
 }
 
 interface CustomNodeData {
@@ -27,13 +30,19 @@ interface CustomNodeData {
   cost: number;
   totalCost: number;
   childrenCount: number;
+  isGroupedNode?: boolean;
+  groupedPhases?: string[];
 }
 
 const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
   const { t } = useTranslation();
   const { formatCurrency } = useCurrencySettings();
 
-  const getLevelColor = (level: number) => {
+  const getLevelColor = (level: number, isGroupedNode?: boolean) => {
+    if (isGroupedNode) {
+      return { bg: '#f9f0ff', border: '#722ed1', text: '#722ed1' };
+    }
+    
     switch (level) {
       case 1: return { bg: '#e6f7ff', border: '#1890ff', text: '#1890ff' };
       case 2: return { bg: '#f6ffed', border: '#52c41a', text: '#52c41a' };
@@ -42,7 +51,9 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
     }
   };
 
-  const getLevelLabel = (level: number) => {
+  const getLevelLabel = (level: number, isGroupedNode?: boolean) => {
+    if (isGroupedNode) return t('treeView.groupedPhases');
+    
     switch (level) {
       case 1: return t('flowTree.project');
       case 2: return t('flowTree.phase');
@@ -51,9 +62,25 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
     }
   };
 
-  const colors = getLevelColor(data.level);
+  const colors = getLevelColor(data.level, data.isGroupedNode);
 
-  return (
+  // Tooltip para nó agrupado
+  const groupedTooltip = data.isGroupedNode && data.groupedPhases ? (
+    <div>
+      <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+        {t('treeView.groupedPhases')}:
+      </div>
+      <ul style={{ margin: 0, paddingLeft: '16px' }}>
+        {data.groupedPhases.map((phase, index) => (
+          <li key={index} style={{ marginBottom: '4px' }}>
+            {phase}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : null;
+
+  const nodeContent = (
     <div
       style={{
         background: colors.bg,
@@ -64,6 +91,10 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
         maxWidth: '250px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         position: 'relative',
+        ...(data.isGroupedNode && {
+          borderStyle: 'dashed',
+          borderWidth: '3px',
+        }),
       }}
     >
       {/* Handle de entrada (top) */}
@@ -97,10 +128,14 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
             padding: '2px 8px',
             borderRadius: '4px',
             fontSize: '10px',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
           }}
         >
-          {getLevelLabel(data.level)}
+          {data.isGroupedNode && <FolderOutlined />}
+          {getLevelLabel(data.level, data.isGroupedNode)}
         </span>
         <span
           style={{
@@ -135,6 +170,14 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
         )}
       </div>
     </div>
+  );
+
+  return data.isGroupedNode ? (
+    <Tooltip title={groupedTooltip} placement="top">
+      {nodeContent}
+    </Tooltip>
+  ) : (
+    nodeContent
   );
 };
 
@@ -179,13 +222,22 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   return { nodes, edges };
 };
 
-const FlowTreeView: React.FC<FlowTreeViewProps> = ({ rootNode }) => {
+const FlowTreeView: React.FC<FlowTreeViewProps> = ({ rootNode, groupingState = { groupedPhaseIds: [], groupedExpanded: false } }) => {
   const { nodes, edges } = useMemo(() => {
     const initialNodes: Node[] = [];
     const initialEdges: Edge[] = [];
 
     // Função recursiva para processar nós e criar arestas
     const processNode = (node: TreeNode) => {
+      // Verificar se é um nó agrupado
+      const isGroupedNode = node.id === 'grouped-others';
+      let groupedPhases: string[] = [];
+      
+      if (isGroupedNode) {
+        // Extrair nomes das fases agrupadas
+        groupedPhases = node.children.map(child => child.name);
+      }
+
       // Criar nó
       initialNodes.push({
         id: node.id,
@@ -197,32 +249,149 @@ const FlowTreeView: React.FC<FlowTreeViewProps> = ({ rootNode }) => {
           cost: node.cost,
           totalCost: node.totalCost,
           childrenCount: node.children.length,
+          isGroupedNode,
+          groupedPhases,
         },
       });
 
-      // Criar arestas para os filhos
-      node.children.forEach((child) => {
-        initialEdges.push({
-          id: `edge-${node.id}-${child.id}`,
-          source: node.id,
-          target: child.id,
-          type: 'smoothstep',
-          animated: false,
-          style: {
-            stroke: '#8c8c8c',
-            strokeWidth: 3,
-          },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 15,
-            height: 15,
-            color: '#8c8c8c',
-          },
-        });
+      // Para nós agrupados, não processar os filhos individualmente
+      if (isGroupedNode) {
+        return;
+      }
 
-        // Processar filho recursivamente
-        processNode(child);
-      });
+      // Se é o nó raiz e há agrupamento ativo, aplicar lógica de agrupamento
+      if (node.level === 1 && groupingState.groupedPhaseIds.length > 0) {
+        const phases = node.children.filter(child => child.level === 2);
+        const groupedPhases = phases.filter(phase => groupingState.groupedPhaseIds.includes(phase.id));
+        const visiblePhases = phases.filter(phase => !groupingState.groupedPhaseIds.includes(phase.id));
+        const otherChildren = node.children.filter(child => child.level !== 2);
+
+        // Criar nó agrupado se há fases para agrupar
+        if (groupedPhases.length > 0) {
+          const totalCost = groupedPhases.reduce((sum, phase) => sum + phase.cost, 0);
+          const totalChildrenCost = groupedPhases.reduce((sum, phase) => sum + phase.totalCost, 0);
+          
+          const groupedNode: TreeNode = {
+            id: 'grouped-others',
+            name: `Outras (${groupedPhases.length} fases)`,
+            cost: totalCost,
+            level: 2,
+            children: groupedPhases,
+            totalCost: totalChildrenCost,
+            description: 'Fases agrupadas para simplificar a visualização'
+          };
+
+          // Criar aresta para o nó agrupado
+          initialEdges.push({
+            id: `edge-${node.id}-${groupedNode.id}`,
+            source: node.id,
+            target: groupedNode.id,
+            type: 'smoothstep',
+            animated: false,
+            style: {
+              stroke: '#8c8c8c',
+              strokeWidth: 3,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 15,
+              height: 15,
+              color: '#8c8c8c',
+            },
+          });
+
+          // Processar nó agrupado
+          processNode(groupedNode);
+
+          // Criar arestas e processar fases visíveis
+          visiblePhases.forEach(phase => {
+            initialEdges.push({
+              id: `edge-${node.id}-${phase.id}`,
+              source: node.id,
+              target: phase.id,
+              type: 'smoothstep',
+              animated: false,
+              style: {
+                stroke: '#8c8c8c',
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 15,
+                height: 15,
+                color: '#8c8c8c',
+              },
+            });
+            processNode(phase);
+          });
+
+          // Criar arestas e processar outros filhos
+          otherChildren.forEach(child => {
+            initialEdges.push({
+              id: `edge-${node.id}-${child.id}`,
+              source: node.id,
+              target: child.id,
+              type: 'smoothstep',
+              animated: false,
+              style: {
+                stroke: '#8c8c8c',
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 15,
+                height: 15,
+                color: '#8c8c8c',
+              },
+            });
+            processNode(child);
+          });
+        } else {
+          // Sem agrupamento, processar normalmente
+          node.children.forEach((child) => {
+            initialEdges.push({
+              id: `edge-${node.id}-${child.id}`,
+              source: node.id,
+              target: child.id,
+              type: 'smoothstep',
+              animated: false,
+              style: {
+                stroke: '#8c8c8c',
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 15,
+                height: 15,
+                color: '#8c8c8c',
+              },
+            });
+            processNode(child);
+          });
+        }
+      } else {
+        // Para nós não-raiz ou sem agrupamento, processar normalmente
+        node.children.forEach((child) => {
+          initialEdges.push({
+            id: `edge-${node.id}-${child.id}`,
+            source: node.id,
+            target: child.id,
+            type: 'smoothstep',
+            animated: false,
+            style: {
+              stroke: '#8c8c8c',
+              strokeWidth: 3,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 15,
+              height: 15,
+              color: '#8c8c8c',
+            },
+          });
+          processNode(child);
+        });
+      }
     };
 
     // Processar toda a árvore
@@ -235,10 +404,8 @@ const FlowTreeView: React.FC<FlowTreeViewProps> = ({ rootNode }) => {
       'TB' // Top to Bottom (de cima para baixo)
     );
 
-    // Debug removido - funcionando corretamente
-
     return { nodes: layoutedNodes, edges: layoutedEdges };
-  }, [rootNode]);
+  }, [rootNode, groupingState.groupedPhaseIds]);
 
   const [flowNodes, , onNodesChange] = useNodesState(nodes);
   const [flowEdges, , onEdgesChange] = useEdgesState(edges);
@@ -266,10 +433,10 @@ const FlowTreeView: React.FC<FlowTreeViewProps> = ({ rootNode }) => {
   );
 };
 
-const FlowTreeViewWrapper: React.FC<FlowTreeViewProps> = ({ rootNode }) => {
+const FlowTreeViewWrapper: React.FC<FlowTreeViewProps> = ({ rootNode, groupingState }) => {
   return (
     <ReactFlowProvider>
-      <FlowTreeView rootNode={rootNode} />
+      <FlowTreeView rootNode={rootNode} groupingState={groupingState} />
     </ReactFlowProvider>
   );
 };
