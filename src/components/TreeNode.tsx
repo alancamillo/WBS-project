@@ -736,22 +736,26 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               )}
             </Space>
           )}
-          {isEditing ? (
-            <Button
-              type="primary"
-              size="small"
-              icon={<SaveOutlined />}
-              onClick={handleSave}
-              disabled={!editedDateValidation.isValid} // Desabilita salvar se há conflitos
-            />
-          ) : (
-            <Button
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => setIsEditing(true)}
-            />
+          {/* Botão de edição apenas para nós que não são agrupados */}
+          {node.id !== 'grouped-others' && (
+            isEditing ? (
+              <Button
+                type="primary"
+                size="small"
+                icon={<SaveOutlined />}
+                onClick={handleSave}
+                disabled={!editedDateValidation.isValid} // Desabilita salvar se há conflitos
+              />
+            ) : (
+              <Button
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => setIsEditing(true)}
+              />
+            )
           )}
-          {node.level > 1 && (
+          {/* Botão de exclusão apenas para nós que não são agrupados e não são nível 1 */}
+          {node.id !== 'grouped-others' && node.level > 1 && (
             <Popconfirm
               title={t('wbs.deleteConfirmation')}
               onConfirm={() => onDelete(node.id)}
@@ -797,7 +801,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         />
       )}
 
-      {isEditing ? (
+      {isEditing && node.id !== 'grouped-others' ? (
         // Modo de Edição
         <div>
           {/* Alerta de validação durante edição */}
@@ -1041,130 +1045,134 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         </div>
       ) : (
         // Modo de Visualização
-        <div>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={8}>
-              <div>
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.ownCost')}: </span>
-                <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</span>
-              </div>
-            </Col>
-            <Col xs={24} sm={8}>
-              <div>
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.responsible')}: </span>
-                <span>{node.responsible || t('wbs.notDefined')}</span>
-              </div>
-            </Col>
-            <Col xs={24} sm={8}>
-              <div>
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.status')}: </span>
-                <Tag color={getStatusColor(node.status)}>
-                  {getStatusText(node.status)}
-                </Tag>
-              </div>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
-            <Col xs={24} sm={8}>
-              <div>
-                <CalendarOutlined style={{ marginRight: 4, color: '#52c41a' }} />
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.startDate')}: </span>
-                <span style={{ 
-                  color: !currentDateValidation.isValid ? '#ff4d4f' : 'inherit',
-                  fontWeight: !currentDateValidation.isValid ? 'bold' : 'normal'
-                }}>
-                  {formatDate(node.startDate)}
-                </span>
-                {(() => {
-                  const inheritanceInfo = getStartDateInheritanceInfo(node);
-                  if (inheritanceInfo.isInherited) {
-                    return (
-                      <Tag 
-                        color="green" 
-                        style={{ marginLeft: 4, fontSize: '10px' }}
-                        title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
-                      >
-                        {t('wbs.inheritedDate')}
-                      </Tag>
-                    );
-                  }
-                  return null;
-                })()}
-              </div>
-            </Col>
-            <Col xs={24} sm={8}>
-              <div>
-                <CalendarOutlined style={{ marginRight: 4, color: '#ff4d4f' }} />
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.endDate')}: </span>
-                <span style={{ 
-                  color: currentDateValidation.hasDateRangeError ? '#ff4d4f' : 'inherit',
-                  fontWeight: currentDateValidation.hasDateRangeError ? 'bold' : 'normal'
-                }}>
-                  {formatDate(node.endDate)}
-                </span>
-                {currentDateValidation.hasDateRangeError && (
-                  <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
-                )}
-                {(() => {
-                  const inheritanceInfo = getEndDateInheritanceInfo(node);
-                  if (inheritanceInfo.isInherited) {
-                    return (
-                      <Tag 
-                        color="blue" 
-                        style={{ marginLeft: 4, fontSize: '10px' }}
-                        title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
-                      >
-                        {t('wbs.inheritedDate')}
-                      </Tag>
-                    );
-                  }
-                  return null;
-                })()}
-              </div>
-            </Col>
-            <Col xs={24} sm={8}>
-              <div>
-                <span style={{ fontWeight: 'bold' }}>{t('wbs.duration')}: </span>
-                <span>
-                  {node.startDate && node.endDate 
-                    ? `${Math.ceil((new Date(node.endDate).getTime() - new Date(node.startDate).getTime()) / (1000 * 60 * 60 * 24))} ${t('wbs.days')}`
-                    : t('wbs.notCalculated')
-                  }
-                </span>
-              </div>
-            </Col>
-          </Row>
-
-          {/* Dependências */}
-          {node.dependencies && node.dependencies.length > 0 && (
-            <Row style={{ marginTop: 8 }}>
-              <Col xs={24}>
-                <div>
-                  <LinkOutlined style={{ marginRight: 4, color: '#fa8c16' }} />
-                  <span style={{ fontWeight: 'bold' }}>{t('wbs.dependencies')}: </span>
-                  <div style={{ marginTop: 4 }}>
-                    {getDependencyNames(node.dependencies).map((depName, index) => (
-                      <Tag key={index} color="orange" style={{ marginBottom: 4 }}>
-                        {depName}
-                      </Tag>
-                    ))}
+        (!isEditing || node.id === 'grouped-others') && (
+          node.id === 'grouped-others' ? <></> : (
+            <div>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.ownCost')}: </span>
+                    <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</span>
                   </div>
-                  <span style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
-                    {t('wbs.dependenciesHelp')}
-                  </span>
-                </div>
-              </Col>
-            </Row>
-          )}
+                </Col>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.responsible')}: </span>
+                    <span>{node.responsible || t('wbs.notDefined')}</span>
+                  </div>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.status')}: </span>
+                    <Tag color={getStatusColor(node.status)}>
+                      {getStatusText(node.status)}
+                    </Tag>
+                  </div>
+                </Col>
+              </Row>
 
-          {node.description && (
-            <div style={{ marginTop: 8 }}>
-              <span style={{ fontWeight: 'bold' }}>{t('wbs.description')}: </span>
-              <span style={{ fontStyle: 'italic', color: '#666' }}>{node.description}</span>
+              <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <CalendarOutlined style={{ marginRight: 4, color: '#52c41a' }} />
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.startDate')}: </span>
+                    <span style={{ 
+                      color: !currentDateValidation.isValid ? '#ff4d4f' : 'inherit',
+                      fontWeight: !currentDateValidation.isValid ? 'bold' : 'normal'
+                    }}>
+                      {formatDate(node.startDate)}
+                    </span>
+                    {(() => {
+                      const inheritanceInfo = getStartDateInheritanceInfo(node);
+                      if (inheritanceInfo.isInherited) {
+                        return (
+                          <Tag 
+                            color="green" 
+                            style={{ marginLeft: 4, fontSize: '10px' }}
+                            title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
+                          >
+                            {t('wbs.inheritedDate')}
+                          </Tag>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <CalendarOutlined style={{ marginRight: 4, color: '#ff4d4f' }} />
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.endDate')}: </span>
+                    <span style={{ 
+                      color: currentDateValidation.hasDateRangeError ? '#ff4d4f' : 'inherit',
+                      fontWeight: currentDateValidation.hasDateRangeError ? 'bold' : 'normal'
+                    }}>
+                      {formatDate(node.endDate)}
+                    </span>
+                    {currentDateValidation.hasDateRangeError && (
+                      <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
+                    )}
+                    {(() => {
+                      const inheritanceInfo = getEndDateInheritanceInfo(node);
+                      if (inheritanceInfo.isInherited) {
+                        return (
+                          <Tag 
+                            color="blue" 
+                            style={{ marginLeft: 4, fontSize: '10px' }}
+                            title={`${t('wbs.inheritedFrom')}: ${inheritanceInfo.sourceChild}`}
+                          >
+                            {t('wbs.inheritedDate')}
+                          </Tag>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <div>
+                    <span style={{ fontWeight: 'bold' }}>{t('wbs.duration')}: </span>
+                    <span>
+                      {node.startDate && node.endDate 
+                        ? `${Math.ceil((new Date(node.endDate).getTime() - new Date(node.startDate).getTime()) / (1000 * 60 * 60 * 24))} ${t('wbs.days')}`
+                        : t('wbs.notCalculated')
+                      }
+                    </span>
+                  </div>
+                </Col>
+              </Row>
+
+              {/* Dependências */}
+              {Array.isArray(node.dependencies) && node.dependencies.length > 0 && (
+                <Row style={{ marginTop: 8 }}>
+                  <Col xs={24}>
+                    <div>
+                      <LinkOutlined style={{ marginRight: 4, color: '#fa8c16' }} />
+                      <span style={{ fontWeight: 'bold' }}>{t('wbs.dependencies')}: </span>
+                      <div style={{ marginTop: 4 }}>
+                        {getDependencyNames(node.dependencies).map((depName, index) => (
+                          <Tag key={index} color="orange" style={{ marginBottom: 4 }}>
+                            {depName}
+                          </Tag>
+                        ))}
+                      </div>
+                      <span style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
+                        {t('wbs.dependenciesHelp')}
+                      </span>
+                    </div>
+                  </Col>
+                </Row>
+              )}
+
+              {node.description && (
+                <div style={{ marginTop: 8 }}>
+                  <span style={{ fontWeight: 'bold' }}>{t('wbs.description')}: </span>
+                  <span style={{ fontStyle: 'italic', color: '#666' }}>{node.description}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          )
+        )
       )}
 
       <Divider style={{ margin: '16px 0' }} />
@@ -1189,7 +1197,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         </div>
       )}
 
-      {node.level < maxLevel && (
+      {node.level < maxLevel && node.id !== 'grouped-others' && (
         <Button
           type="dashed"
           icon={<PlusOutlined />}
