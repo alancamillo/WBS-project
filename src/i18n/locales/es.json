@@ -11,7 +11,64 @@
     "table": "Tabla",
     "budget": "Presupuesto",
     "risks": "Riesgos",
-    "meritFigures": "Méritos"
+    "meritFigures": "Méritos",
+    "trl": "Vista TRL"
+  },
+  "trlView": {
+    "title": "Visión General de los Niveles de Madurez Tecnológica (TRL)",
+    "noPhasesFound": "No se encontraron fases con información de TRL.",
+    "undefinedTrl": "TRL Indefinido",
+    "trlLevel": "TRL {{level}}",
+    "phases": "fases",
+    "phase": "fase",
+    "expandAll": "Expandir Todo",
+    "collapseAll": "Colapsar Todo",
+    "viewPhases": "Ver {{count}} fase(s)",
+    "statistics": {
+      "totalPhases": "Total de Fases",
+      "phasesWithTrl": "Fases con TRL",
+      "averageTrl": "TRL Promedio",
+      "completionRate": "Tasa de Finalización",
+      "phasesWithoutTrl": "fases aún no tienen TRL definido"
+    },
+    "info": {
+      "level1": {
+        "title": "Investigación Básica",
+        "description": "Principios fundamentales observados y reportados"
+      },
+      "level2": {
+        "title": "Conceptos Teóricos",
+        "description": "Concepto de tecnología y/o aplicación formulado"
+      },
+      "level3": {
+        "title": "Prueba de Concepto",
+        "description": "Función crítica y/o prueba de concepto analítica"
+      },
+      "level4": {
+        "title": "Validación en Laboratorio",
+        "description": "Componente/subsistema validado en entorno de laboratorio"
+      },
+      "level5": {
+        "title": "Integración de Componentes",
+        "description": "Componentes integrados y validados en entorno simulado"
+      },
+      "level6": {
+        "title": "Demostración de Sistema",
+        "description": "Demostración en entorno operativo relevante"
+      },
+      "level7": {
+        "title": "Prototipo Operacional",
+        "description": "Prototipo demostrado en entorno operativo"
+      },
+      "level8": {
+        "title": "Sistema Calificado",
+        "description": "Sistema calificado y probado"
+      },
+      "level9": {
+        "title": "Sistema Operacional",
+        "description": "Sistema real probado en operaciones de misión exitosas"
+      }
+    }
   },
   "buttons": {
     "export": "Exportar",
@@ -91,10 +148,13 @@
     "inheritedFrom": "Fecha heredada de",
     "deleteConfirmation": "¿Estás seguro de que quieres eliminar este elemento?",
     "leaveEmptyToInherit": "Dejar vacío para heredar de los hijos",
-    "selectDate": "Seleccionar una fecha"
+    "selectDate": "Seleccionar una fecha",
+    "trl": "TRL",
+    "trlPlaceholder": "Ingresar TRL (1-9)"
   },
+  "wbsAutoSave": "Su estructura WBS se guarda automáticamente en el navegador. Todas las modificaciones, incluidas la adición/edición de fases y actividades, permanecerán disponibles incluso después de navegar entre pantallas o recargar la página.",
   "status": {
-    "notStarted": "No Iniciado",
+    "not-started": "No Iniciado",
     "inProgress": "En Progreso",
     "completed": "Completado",
     "onHold": "En Espera",
@@ -624,7 +684,6 @@
     "status": {
       "completed": "Completado",
       "inProgress": "En Progreso",
-      "notStarted": "No Iniciado",
       "undefined": "Indefinido"
     },
     "stats": {

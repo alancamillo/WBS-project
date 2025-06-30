@@ -10,6 +10,7 @@ import TableView from './components/TableView';
 import BudgetAllocationView from './components/BudgetAllocationView';
 import RiskManagement from './components/RiskManagement';
 import MeritFigures from './components/MeritFigures';
+import TrlView from './components/TrlView';
 import LanguageSelector from './components/LanguageSelector';
 import SettingsModal from './components/SettingsModal';
 import { TreeNode, ExportOptions } from './types/index';
@@ -103,7 +104,7 @@ function App() {
   const [rootNode, setRootNode] = useState<TreeNode>(() => loadWBSFromStorage());
   const [groupingState, setGroupingState] = useState(() => loadGroupingFromStorage());
 
-  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks' | 'meritFigures'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks' | 'meritFigures' | 'trl'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
@@ -384,6 +385,13 @@ function App() {
                 >
                   {t('navigation.meritFigures')}
                 </Button>
+                <Button
+                  icon={<BulbOutlined />}
+                  onClick={() => setViewMode('trl')}
+                  type={viewMode === 'trl' ? 'primary' : 'default'}
+                >
+                  {t('navigation.trl')}
+                </Button>
               </Button.Group>
               <Dropdown
                 overlay={
@@ -429,12 +437,10 @@ function App() {
             <div style={{ marginBottom: 16, padding: 16, background: '#f6ffed', borderRadius: 6, border: '1px solid #b7eb8f' }}>
               <Space direction="vertical" size="small">
                 <div style={{ fontWeight: 'bold', color: '#389e0d' }}>
-                  💾 {t('settings.autoSave')} Ativado
+                  💾 {t('settings.autoSave')} {t('settings.enabled')}
                 </div>
                 <div style={{ color: '#666', fontSize: 14 }}>
-                  Sua estrutura WBS é automaticamente salva no navegador. Todas as modificações, 
-                  incluindo adição/edição de fases e atividades, permanecerão disponíveis mesmo 
-                  depois de navegar entre as telas ou recarregar a página.
+                  {t('wbsAutoSave')}
                 </div>
               </Space>
             </div>
@@ -462,6 +468,8 @@ function App() {
             <GanttChart rootNode={rootNode} />
           ) : viewMode === 'meritFigures' ? (
             <MeritFigures rootNode={rootNode} />
+          ) : viewMode === 'trl' ? (
+            <TrlView rootNode={rootNode} />
           ) : (
             <TreeNodeComponent
               node={rootNode}

@@ -17,6 +17,7 @@ export interface TreeNode {
   durationDays?: number;
   // Dependências para Gantt
   dependencies?: string[]; // IDs dos nós que devem ser concluídos antes
+  trl?: number; // Technology Readiness Level (1-9)
 }
 
 export interface Project {
@@ -182,4 +183,5 @@ export interface MeritFigureCalculation {
   variance: number;
   trend: 'improving' | 'declining' | 'stable';
   lastUpdate: Date;
-} 
+}
+

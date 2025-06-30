@@ -69,6 +69,14 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **🔄 Persistent Settings**: Language and currency preferences automatically saved and restored
 - **📊 Localized Data**: Numbers, dates, and currencies formatted according to selected locale
 
+### TRL Visualization
+- **🔬 TRL Levels**: Visualize the Technology Readiness Levels (TRL) for different project phases.
+- **📊 Phase Grouping**: Group phases by TRL levels to simplify analysis and reporting.
+- **🎨 Color-Coded Levels**: Each TRL level is color-coded for easy identification.
+- **📈 Statistics**: View statistics such as total phases, phases with TRL, and average TRL.
+- **🔍 Detailed View**: Expand phases to see detailed information and responsible parties.
+- **🌍 Internationalization**: Fully localized support for multiple languages.
+
 <img src="screenshots/main-dashboard.png" alt="WBS Dynamic Tree Dashboard" width="100%">
 
 ## 🚀 Quick Start
