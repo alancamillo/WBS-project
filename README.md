@@ -27,6 +27,7 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **🌊 Flow Tree**: Visual flow representation of project structure with grouped phase support
 - **📋 Table View**: Comprehensive tabular display with hierarchical indicators and phase collapsing
 - **💹 Budget Allocation**: Advanced budget analysis with temporal distribution and interactive charts
+- **🏆 Merit Figures**: Performance indicators (KPIs) with phase impact analysis and real-time monitoring
 
 ### Budget Analysis & Reporting
 - **📊 Temporal Budget Distribution**: Analyze budget allocation across different time periods (monthly, quarterly, yearly)
@@ -34,6 +35,14 @@ WBS Dynamic Tree is a powerful web application designed to help project managers
 - **🎯 Multi-level Analysis**: View costs by project level or individual phases
 - **📅 Date Range Filtering**: Focus analysis on specific time periods
 - **💼 Executive Dashboard**: Key metrics and budget variance analysis
+
+### Performance Management
+- **🎯 Custom KPIs**: Create and manage performance indicators with customizable categories
+- **📊 Real-time Progress**: Automatic progress calculation and status classification
+- **🔗 Phase Impact Analysis**: Configure how each project phase affects performance indicators
+- **📈 Trend Monitoring**: Track performance trends with visual progress indicators
+- **⚖️ Weighted Prioritization**: Prioritize indicators with configurable weights (1-10)
+- **🌍 Multi-directional Goals**: Support for increase, decrease, or maintain objectives
 
 ### Modern Interface
 - **🎨 Clean UI**: Intuitive interface built with Ant Design components
@@ -286,6 +295,39 @@ WBS Dynamic Tree supports multiple import formats:
 - Key performance indicators
 - Export charts and data for presentations
 
+### Merit Figures (Performance Indicators)
+
+**Create and Manage KPIs**
+- Define custom performance indicators with multiple categories (Cost, Time, Quality, Scope, Risk, Resources, Custom)
+- Set baseline, current, and target values with customizable units
+- Configure indicator direction (increase, decrease, or maintain)
+- Assign priority weights (1-10) to focus on critical indicators
+
+**Phase Impact Analysis**
+- Configure how each project phase affects performance indicators
+- Set impact percentages from -100% to +100% (negative = hinders, positive = helps)
+- Document impact descriptions for transparency and understanding
+- Weight phase importance within each indicator
+
+**Real-time Monitoring**
+- Automatic progress calculation based on current vs target values
+- Status classification: On Track, At Risk, Off Track, Completed
+- Visual progress indicators with color-coded status
+- Aggregated metrics and trend analysis
+
+**Example Use Cases**
+```
+Cost Efficiency Indicator:
+- Baseline: 75%, Current: 82%, Target: 90%
+- Phase Impacts: Planning (+15%), Development (-5%), Testing (+10%)
+- Status: On Track (70% progress)
+
+Quality Score Indicator:
+- Baseline: 6.5/10, Current: 7.2/10, Target: 8.5/10
+- Phase Impacts: Planning (+20%), Development (+30%), Testing (+50%)
+- Status: At Risk (40% progress)
+```
+
 <img src="screenshots/gantt-chart.png" alt="Gantt chart visualization" width="100%">
 
 ## 🏗️ Architecture
@@ -313,6 +355,7 @@ src/
 │   ├── FlowTreeView.tsx          # Flow-based tree visualization
 │   ├── GanttChart.tsx            # Timeline visualization
 │   ├── BudgetAllocationView.tsx  # Budget analysis dashboard
+│   ├── MeritFigures.tsx          # Performance indicators management
 │   └── ImportWBS.tsx             # Data import interface
 ├── services/                      # Business logic and utilities
 │   ├── exportService.ts          # Export functionality

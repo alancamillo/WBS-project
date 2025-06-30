@@ -10,7 +10,8 @@
     "gantt": "Gantt",
     "table": "Tabela",
     "budget": "Orçamento",
-    "risks": "Riscos"
+    "risks": "Riscos",
+    "meritFigures": "Méritos"
   },
   "buttons": {
     "export": "Exportar",
@@ -673,6 +674,132 @@
       "none": "Nenhuma",
       "single": "{count} dependência",
       "multiple": "{count} dependências"
+    }
+  },
+  "meritFigures": {
+    "title": "Figuras de Mérito",
+    "subtitle": "Indicadores de Performance do Projeto",
+    "addNew": "Adicionar Figura de Mérito",
+    "tabs": {
+      "overview": "Visão Geral",
+      "analysis": "Análise"
+    },
+    "categories": {
+      "cost": "Custo",
+      "time": "Tempo",
+      "quality": "Qualidade",
+      "scope": "Escopo",
+      "risk": "Risco",
+      "resource": "Recursos",
+      "custom": "Personalizado"
+    },
+    "direction": {
+      "increase": "Aumentar",
+      "decrease": "Diminuir",
+      "maintain": "Manter"
+    },
+    "status": {
+      "on-track": "No Prazo",
+      "at-risk": "Em Risco",
+      "off-track": "Fora do Prazo",
+      "completed": "Concluído"
+    },
+    "impactType": {
+      "positive": "Positivo",
+      "negative": "Negativo",
+      "neutral": "Neutro"
+    },
+    "metrics": {
+      "total": "Total de Indicadores",
+      "onTrack": "No Prazo",
+      "atRisk": "Em Risco",
+      "offTrack": "Fora do Prazo",
+      "averageProgress": "Progresso Médio",
+      "figures": "indicadores"
+    },
+    "table": {
+      "title": "Indicadores de Performance",
+      "name": "Nome",
+      "currentValue": "Valor Atual",
+      "values": "Valores",
+      "target": "Meta",
+      "progress": "Progresso",
+      "phaseImpacts": "Impactos das Fases",
+      "weight": "Peso",
+      "actions": "Ações",
+      "items": "indicadores"
+    },
+    "actions": {
+      "view": "Visualizar Impactos",
+      "edit": "Editar",
+      "delete": "Excluir"
+    },
+    "form": {
+      "name": "Nome do Indicador",
+      "namePlaceholder": "Ex: Eficiência de Custos",
+      "nameRequired": "Por favor, insira o nome do indicador",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva o que este indicador mede...",
+      "descriptionRequired": "Por favor, insira a descrição",
+      "category": "Categoria",
+      "categoryPlaceholder": "Selecione a categoria",
+      "categoryRequired": "Por favor, selecione a categoria",
+      "unit": "Unidade",
+      "unitRequired": "Por favor, insira a unidade",
+      "baselineValue": "Valor Base",
+      "baselineRequired": "Por favor, insira o valor base",
+      "currentValue": "Valor Atual",
+      "currentRequired": "Por favor, insira o valor atual",
+      "targetValue": "Valor Meta",
+      "targetRequired": "Por favor, insira o valor meta",
+      "direction": "Direção",
+      "directionPlaceholder": "Selecione a direção desejada",
+      "directionRequired": "Por favor, selecione a direção",
+      "weight": "Peso (1-10)",
+      "weightRequired": "Por favor, insira o peso"
+    },
+    "impactModal": {
+      "title": "Impactos das Fases - {name}",
+      "description": "Configure como cada fase do projeto impacta este indicador. Use valores positivos para impactos favoráveis e negativos para impactos desfavoráveis.",
+      "impactPercentage": "Impacto",
+      "impactType": "Tipo de Impacto",
+      "weight": "Peso da Fase",
+      "description": "Descrição do Impacto",
+      "descriptionPlaceholder": "Descreva como esta fase impacta o indicador..."
+    },
+    "criticalFigures": "Indicadores Críticos",
+    "modal": {
+      "addTitle": "Adicionar Figura de Mérito",
+      "editTitle": "Editar Figura de Mérito"
+    },
+    "analysis": {
+      "title": "Análise de Indicadores",
+      "description": "Análise detalhada dos indicadores de performance do projeto",
+      "noData": "Nenhum indicador cadastrado",
+      "noDataDescription": "Adicione indicadores de performance para começar a análise",
+      "byCategory": "Por Categoria",
+      "topPerformers": "Melhores Performances",
+      "progress": "de progresso",
+      "figures": "indicadores",
+      "phaseContributions": "Contribuições das Fases",
+      "totalImpact": "Impacto Total",
+      "chartTitle": "Evolução dos Indicadores Selecionados",
+      "selectIndicators": "Selecione indicadores para o gráfico",
+      "selectIndicatorsToView": "Selecione indicadores para visualizar o gráfico",
+      "day": "Dia",
+      "week": "Semana",
+      "month": "Mês",
+      "year": "Ano"
+    },
+    "delete": {
+      "confirm": "Tem certeza que deseja excluir este indicador?"
+    },
+    "messages": {
+      "added": "Indicador adicionado com sucesso!",
+      "updated": "Indicador atualizado com sucesso!",
+      "deleted": "Indicador excluído com sucesso!",
+      "impactsUpdated": "Impactos das fases atualizados com sucesso!",
+      "saveError": "Erro ao salvar indicadores"
     }
   }
 } 

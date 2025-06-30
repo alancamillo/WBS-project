@@ -10,7 +10,8 @@
     "gantt": "Gantt",
     "table": "Table",
     "budget": "Budget",
-    "risks": "Risks"
+    "risks": "Risks",
+    "meritFigures": "Merits"
   },
   "buttons": {
     "export": "Export",
@@ -673,6 +674,132 @@
       "none": "None",
       "single": "{count} dependency",
       "multiple": "{count} dependencies"
+    }
+  },
+  "meritFigures": {
+    "title": "Merit Figures",
+    "subtitle": "Project Performance Indicators",
+    "addNew": "Add Merit Figure",
+    "tabs": {
+      "overview": "Overview",
+      "analysis": "Analysis"
+    },
+    "categories": {
+      "cost": "Cost",
+      "time": "Time",
+      "quality": "Quality",
+      "scope": "Scope",
+      "risk": "Risk",
+      "resource": "Resource",
+      "custom": "Custom"
+    },
+    "direction": {
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "maintain": "Maintain"
+    },
+    "status": {
+      "on-track": "On Track",
+      "at-risk": "At Risk",
+      "off-track": "Off Track",
+      "completed": "Completed"
+    },
+    "impactType": {
+      "positive": "Positive",
+      "negative": "Negative",
+      "neutral": "Neutral"
+    },
+    "metrics": {
+      "total": "Total Indicators",
+      "onTrack": "On Track",
+      "atRisk": "At Risk",
+      "offTrack": "Off Track",
+      "averageProgress": "Average Progress",
+      "figures": "indicators"
+    },
+    "table": {
+      "title": "Performance Indicators",
+      "name": "Name",
+      "currentValue": "Current Value",
+      "values": "Values",
+      "target": "Target",
+      "progress": "Progress",
+      "phaseImpacts": "Phase Impacts",
+      "weight": "Weight",
+      "actions": "Actions",
+      "items": "indicators"
+    },
+    "actions": {
+      "view": "View Impacts",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "form": {
+      "name": "Indicator Name",
+      "namePlaceholder": "Ex: Cost Efficiency",
+      "nameRequired": "Please enter the indicator name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe what this indicator measures...",
+      "descriptionRequired": "Please enter the description",
+      "category": "Category",
+      "categoryPlaceholder": "Select category",
+      "categoryRequired": "Please select a category",
+      "unit": "Unit",
+      "unitRequired": "Please enter the unit",
+      "baselineValue": "Baseline Value",
+      "baselineRequired": "Please enter the baseline value",
+      "currentValue": "Current Value",
+      "currentRequired": "Please enter the current value",
+      "targetValue": "Target Value",
+      "targetRequired": "Please enter the target value",
+      "direction": "Direction",
+      "directionPlaceholder": "Select desired direction",
+      "directionRequired": "Please select the direction",
+      "weight": "Weight (1-10)",
+      "weightRequired": "Please enter the weight"
+    },
+    "impactModal": {
+      "title": "Phase Impacts - {name}",
+      "description": "Configure how each project phase impacts this indicator. Use positive values for favorable impacts and negative values for unfavorable impacts.",
+      "impactPercentage": "Impact",
+      "impactType": "Impact Type",
+      "weight": "Phase Weight",
+      "description": "Impact Description",
+      "descriptionPlaceholder": "Describe how this phase impacts the indicator..."
+    },
+    "criticalFigures": "Critical Indicators",
+    "modal": {
+      "addTitle": "Add Merit Figure",
+      "editTitle": "Edit Merit Figure"
+    },
+    "analysis": {
+      "title": "Indicator Analysis",
+      "description": "Detailed analysis of project performance indicators",
+      "noData": "No indicators registered",
+      "noDataDescription": "Add performance indicators to start the analysis",
+      "byCategory": "By Category",
+      "topPerformers": "Top Performers",
+      "progress": "progress",
+      "figures": "indicators",
+      "phaseContributions": "Phase Contributions",
+      "totalImpact": "Total Impact",
+      "chartTitle": "Selected Indicators Evolution",
+      "selectIndicators": "Select indicators for the chart",
+      "selectIndicatorsToView": "Select indicators to view the chart",
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this indicator?"
+    },
+    "messages": {
+      "added": "Indicator added successfully!",
+      "updated": "Indicator updated successfully!",
+      "deleted": "Indicator deleted successfully!",
+      "impactsUpdated": "Phase impacts updated successfully!",
+      "saveError": "Error saving indicators"
     }
   }
 } 
