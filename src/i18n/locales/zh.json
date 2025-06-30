@@ -11,7 +11,64 @@
     "table": "表格",
     "budget": "预算",
     "risks": "风险",
-    "meritFigures": "绩效指标"
+    "meritFigures": "绩效指标",
+    "trl": "TRL视图"
+  },
+  "trlView": {
+    "title": "技术成熟度级别 (TRL) 概览",
+    "noPhasesFound": "未找到包含TRL信息的阶段。",
+    "undefinedTrl": "未定义TRL",
+    "trlLevel": "TRL {{level}}",
+    "phases": "阶段",
+    "phase": "阶段",
+    "expandAll": "全部展开",
+    "collapseAll": "全部折叠",
+    "viewPhases": "查看 {{count}} 阶段",
+    "statistics": {
+      "totalPhases": "总阶段数",
+      "phasesWithTrl": "有TRL的阶段",
+      "averageTrl": "平均TRL",
+      "completionRate": "完成率",
+      "phasesWithoutTrl": "阶段尚未定义TRL"
+    },
+    "info": {
+      "level1": {
+        "title": "基础研究",
+        "description": "观察并报告基本原理"
+      },
+      "level2": {
+        "title": "理论概念",
+        "description": "技术概念和/或应用形成"
+      },
+      "level3": {
+        "title": "概念验证",
+        "description": "关键功能和/或分析概念验证"
+      },
+      "level4": {
+        "title": "实验室验证",
+        "description": "组件/子系统在实验室环境中验证"
+      },
+      "level5": {
+        "title": "组件集成",
+        "description": "组件在模拟环境中集成和验证"
+      },
+      "level6": {
+        "title": "系统演示",
+        "description": "在相关操作环境中进行演示"
+      },
+      "level7": {
+        "title": "操作原型",
+        "description": "原型在操作环境中演示"
+      },
+      "level8": {
+        "title": "合格系统",
+        "description": "系统合格并经过测试"
+      },
+      "level9": {
+        "title": "操作系统",
+        "description": "实际系统在成功的任务操作中得到验证"
+      }
+    }
   },
   "buttons": {
     "export": "导出",
@@ -91,10 +148,13 @@
     "inheritedFrom": "日期继承自",
     "deleteConfirmation": "确定要删除此项吗？",
     "leaveEmptyToInherit": "留空以从子项继承",
-    "selectDate": "选择日期"
+    "selectDate": "选择日期",
+    "trl": "TRL",
+    "trlPlaceholder": "输入TRL (1-9)"
   },
+  "wbsAutoSave": "您的WBS结构会自动保存在浏览器中。所有修改，包括添加/编辑阶段和活动，即使在屏幕之间导航或重新加载页面后仍将可用。",
   "status": {
-    "notStarted": "未开始",
+    "not-started": "未开始",
     "inProgress": "进行中",
     "completed": "已完成",
     "onHold": "暂停",
@@ -624,7 +684,6 @@
     "status": {
       "completed": "已完成",
       "inProgress": "进行中",
-      "notStarted": "未开始",
       "undefined": "未定义"
     },
     "stats": {

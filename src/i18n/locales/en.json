@@ -11,7 +11,64 @@
     "table": "Table",
     "budget": "Budget",
     "risks": "Risks",
-    "meritFigures": "Merits"
+    "meritFigures": "Merits",
+    "trl": "TRL View"
+  },
+  "trlView": {
+    "title": "Technology Readiness Levels (TRL) Overview",
+    "noPhasesFound": "No phases with TRL information found.",
+    "undefinedTrl": "Undefined TRL",
+    "trlLevel": "TRL {{level}}",
+    "phases": "phases",
+    "phase": "phase",
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "viewPhases": "View {{count}} phase(s)",
+    "statistics": {
+      "totalPhases": "Total Phases",
+      "phasesWithTrl": "Phases with TRL",
+      "averageTrl": "Average TRL",
+      "completionRate": "Completion Rate",
+      "phasesWithoutTrl": "phases still have no TRL defined"
+    },
+    "info": {
+      "level1": {
+        "title": "Basic Research",
+        "description": "Basic principles observed and reported"
+      },
+      "level2": {
+        "title": "Theoretical Concepts",
+        "description": "Technology concept and/or application formulated"
+      },
+      "level3": {
+        "title": "Proof of Concept",
+        "description": "Critical function and/or analytical proof of concept"
+      },
+      "level4": {
+        "title": "Laboratory Validation",
+        "description": "Component/subsystem validated in laboratory environment"
+      },
+      "level5": {
+        "title": "Component Integration",
+        "description": "Components integrated and validated in simulated environment"
+      },
+      "level6": {
+        "title": "System Demonstration",
+        "description": "Demonstration in relevant operational environment"
+      },
+      "level7": {
+        "title": "Operational Prototype",
+        "description": "Prototype demonstrated in operational environment"
+      },
+      "level8": {
+        "title": "Qualified System",
+        "description": "System qualified and tested"
+      },
+      "level9": {
+        "title": "Operational System",
+        "description": "Actual system proven in successful mission operations"
+      }
+    }
   },
   "buttons": {
     "export": "Export",
@@ -91,7 +148,9 @@
     "inheritedFrom": "Date inherited from",
     "deleteConfirmation": "Are you sure you want to delete this item?",
     "leaveEmptyToInherit": "Leave empty to inherit from children",
-    "selectDate": "Select a date"
+    "selectDate": "Select a date",
+    "trl": "TRL",
+    "trlPlaceholder": "Enter TRL (1-9)"
   },
   "treeView": {
     "othersGroup": "Others ({{count}} phases)",
@@ -113,7 +172,7 @@
     }
   },
   "status": {
-    "notStarted": "Not Started",
+    "not-started": "Not Started",
     "inProgress": "In Progress",
     "completed": "Completed",
     "onHold": "On Hold",
@@ -643,7 +702,6 @@
     "status": {
       "completed": "Completed",
       "inProgress": "In Progress",
-      "notStarted": "Not Started",
       "undefined": "Undefined"
     },
     "stats": {
@@ -801,5 +859,6 @@
       "impactsUpdated": "Phase impacts updated successfully!",
       "saveError": "Error saving indicators"
     }
-  }
+  },
+  "wbsAutoSave": "Your WBS structure is automatically saved in the browser. All modifications, including adding/editing phases and activities, will remain available even after navigating between screens or reloading the page."
 } 

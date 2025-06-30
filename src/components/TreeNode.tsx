@@ -136,6 +136,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   const [editedStartDate, setEditedStartDate] = useState(node.startDate);
   const [editedEndDate, setEditedEndDate] = useState(node.endDate);
   const [editedDependencies, setEditedDependencies] = useState(node.dependencies || []);
+  const [editedTrl, setEditedTrl] = useState(node.trl);
   
   // Estados para agrupamento (apenas modal visível, estado vem das props)
   const [groupingModalVisible, setGroupingModalVisible] = useState(false);
@@ -420,53 +421,27 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   };
 
   const handleSave = () => {
-    let finalStartDate = editedStartDate;
-    let finalEndDate = editedEndDate;
-
-    // Se o nó tem filhos, herda datas dos filhos
-    if (node.children.length > 0) {
-      const tempNode = {
-        ...node,
-        name: editedName,
-        cost: editedCost,
-        description: editedDescription || undefined,
-        responsible: editedResponsible || undefined,
-        status: editedStatus as 'not-started' | 'in-progress' | 'completed',
-        startDate: editedStartDate,
-        endDate: editedEndDate,
-        dependencies: editedDependencies.length > 0 ? editedDependencies : undefined
-      };
-
-      // Herda data de início mais cedo
-      const inheritedStartDate = calculateInheritedStartDate(tempNode);
-      if (inheritedStartDate) {
-        // Se não há data manual ou a herdada é mais cedo, usa a herdada
-        if (!editedStartDate || inheritedStartDate < editedStartDate) {
-          finalStartDate = inheritedStartDate;
-        }
-      }
-
-      // Herda data de fim mais distante
-      const inheritedEndDate = calculateInheritedEndDate(tempNode);
-      if (inheritedEndDate) {
-        // Se não há data manual ou a herdada é mais distante, usa a herdada
-        if (!editedEndDate || inheritedEndDate > editedEndDate) {
-          finalEndDate = inheritedEndDate;
-        }
-      }
+    // Validar datas antes de salvar
+    const validation = validateDependencyDates(editedStartDate, editedEndDate, editedDependencies);
+    if (!validation.isValid) {
+      // A validação será mostrada automaticamente pelo useMemo editedDateValidation
+      return;
     }
 
-    const updatedNode = {
+    const updatedNode: TreeNodeType = {
       ...node,
       name: editedName,
       cost: editedCost,
-      description: editedDescription || undefined,
-      responsible: editedResponsible || undefined,
       status: editedStatus as 'not-started' | 'in-progress' | 'completed',
-      startDate: finalStartDate,
-      endDate: finalEndDate,
-      dependencies: editedDependencies.length > 0 ? editedDependencies : undefined
+      startDate: editedStartDate,
+      endDate: editedEndDate,
+      responsible: editedResponsible,
+      description: editedDescription,
+      dependencies: editedDependencies,
+      // Só salvar TRL se for nível 2 (fase)
+      trl: node.level === 2 ? (editedTrl || undefined) : undefined
     };
+
     onUpdate(updatedNode);
     setIsEditing(false);
   };
@@ -576,7 +551,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     switch (status) {
       case 'completed': return t('status.completed');
       case 'in-progress': return t('status.inProgress');
-      case 'not-started': return t('status.notStarted');
+              case 'not-started': return t('status.not-started');
       default: return t('wbs.notDefined');
     }
   };
@@ -890,7 +865,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   onChange={setEditedStatus}
                   style={{ width: '100%' }}
                 >
-                  <Option value="not-started">{t('status.notStarted')}</Option>
+                  <Option value="not-started">{t('status.not-started')}</Option>
                   <Option value="in-progress">{t('status.inProgress')}</Option>
                   <Option value="completed">{t('status.completed')}</Option>
                 </Select>
@@ -984,7 +959,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           </Row>
 
           <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-            <Col xs={24} sm={12}>
+            <Col xs={24} sm={8}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
                   {t('wbs.responsible')}:
@@ -997,10 +972,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 />
               </div>
             </Col>
-            <Col xs={24} sm={12}>
+            <Col xs={24} sm={8}>
               <div>
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
-                  <LinkOutlined style={{ marginRight: 4 }} />
                   {t('wbs.dependencies')}:
                 </label>
                 <Select
@@ -1009,10 +983,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   onChange={setEditedDependencies}
                   style={{ width: '100%' }}
                   placeholder={t('wbs.selectDependencies')}
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    String(option?.children || '').toLowerCase().includes(input.toLowerCase())
-                  }
+                  allowClear
                 >
                   {getAllAvailableTasks.map(task => (
                     <Option key={task.id} value={task.id}>
@@ -1025,6 +996,50 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 </Select>
               </div>
             </Col>
+            {node.level === 2 && (
+              <Col xs={24} sm={8}>
+                <div>
+                  <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
+                    {t('wbs.trl')}:
+                  </label>
+                  <Select
+                    value={editedTrl}
+                    onChange={(value) => setEditedTrl(value || undefined)}
+                    style={{ width: '100%' }}
+                    placeholder={t('wbs.trlPlaceholder')}
+                    allowClear
+                  >
+                    <Option value={1}>
+                      <Tag color="#722ed1">TRL-1</Tag> Pesquisa Básica
+                    </Option>
+                    <Option value={2}>
+                      <Tag color="#722ed1">TRL-2</Tag> Conceitos Teóricos
+                    </Option>
+                    <Option value={3}>
+                      <Tag color="#1890ff">TRL-3</Tag> Prova de Conceito
+                    </Option>
+                    <Option value={4}>
+                      <Tag color="#1890ff">TRL-4</Tag> Validação Lab
+                    </Option>
+                    <Option value={5}>
+                      <Tag color="#1890ff">TRL-5</Tag> Componentes Integrados
+                    </Option>
+                    <Option value={6}>
+                      <Tag color="#52c41a">TRL-6</Tag> Demo Sistema
+                    </Option>
+                    <Option value={7}>
+                      <Tag color="#52c41a">TRL-7</Tag> Protótipo Operacional
+                    </Option>
+                    <Option value={8}>
+                      <Tag color="#faad14">TRL-8</Tag> Sistema Qualificado
+                    </Option>
+                    <Option value={9}>
+                      <Tag color="#f5222d">TRL-9</Tag> Sistema Final
+                    </Option>
+                  </Select>
+                </div>
+              </Col>
+            )}
           </Row>
 
           <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
@@ -1069,6 +1084,14 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     </Tag>
                   </div>
                 </Col>
+                {node.level === 2 && (
+                  <Col xs={24} sm={8}>
+                    <div>
+                      <span style={{ fontWeight: 'bold' }}>{t('wbs.trl')}: </span>
+                      <span>{node.trl ? `TRL-${node.trl}` : t('wbs.notDefined')}</span>
+                    </div>
+                  </Col>
+                )}
               </Row>
 
               <Row gutter={[16, 16]} style={{ marginTop: 8 }}>

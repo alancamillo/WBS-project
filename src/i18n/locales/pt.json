@@ -11,7 +11,64 @@
     "table": "Tabela",
     "budget": "Orçamento",
     "risks": "Riscos",
-    "meritFigures": "Méritos"
+    "meritFigures": "Méritos",
+    "trl": "Visualização TRL"
+  },
+  "trlView": {
+    "title": "Visão Geral dos Níveis de Maturidade Tecnológica (TRL)",
+    "noPhasesFound": "Nenhuma fase com informações de TRL encontrada.",
+    "undefinedTrl": "TRL Indefinido",
+    "trlLevel": "TRL {{level}}",
+    "phases": "fases",
+    "phase": "fase",
+    "expandAll": "Expandir Tudo",
+    "collapseAll": "Colapsar Tudo",
+    "viewPhases": "Ver {{count}} fase(s)",
+    "statistics": {
+      "totalPhases": "Total de Fases",
+      "phasesWithTrl": "Fases com TRL",
+      "averageTrl": "TRL Médio",
+      "completionRate": "Taxa de Conclusão",
+      "phasesWithoutTrl": "fases ainda não têm TRL definido"
+    },
+    "info": {
+      "level1": {
+        "title": "Pesquisa Básica",
+        "description": "Princípios fundamentais observados e reportados"
+      },
+      "level2": {
+        "title": "Conceitos Teóricos",
+        "description": "Conceitos de tecnologia e/ou aplicação formulados"
+      },
+      "level3": {
+        "title": "Prova de Conceito",
+        "description": "Função crítica e/ou prova de conceito analítica"
+      },
+      "level4": {
+        "title": "Validação Laboratorial",
+        "description": "Componentes/subsistemas validados em laboratório"
+      },
+      "level5": {
+        "title": "Integração de Componentes",
+        "description": "Componentes integrados e validados em ambiente simulado"
+      },
+      "level6": {
+        "title": "Demonstração de Sistema",
+        "description": "Demonstração em ambiente operacional relevante"
+      },
+      "level7": {
+        "title": "Protótipo Operacional",
+        "description": "Protótipo demonstrado em ambiente operacional"
+      },
+      "level8": {
+        "title": "Sistema Qualificado",
+        "description": "Sistema qualificado e testado"
+      },
+      "level9": {
+        "title": "Sistema Operacional",
+        "description": "Sistema operacional comprovado em ambiente final"
+      }
+    }
   },
   "buttons": {
     "export": "Exportar",
@@ -91,8 +148,11 @@
     "inheritedFrom": "Data herdada de",
     "deleteConfirmation": "Tem certeza que deseja excluir este item?",
     "leaveEmptyToInherit": "Deixe vazio para herdar dos filhos",
-    "selectDate": "Selecione uma data"
+    "selectDate": "Selecione uma data",
+    "trl": "TRL",
+    "trlPlaceholder": "Digite o TRL (1-9)"
   },
+  "wbsAutoSave": "Sua estrutura WBS é automaticamente salva no navegador. Todas as modificações, incluindo adição/edição de fases e atividades, permanecerão disponíveis mesmo depois de navegar entre as telas ou recarregar a página.",
   "treeView": {
     "othersGroup": "Outras ({{count}} fases)",
     "othersGroupDescription": "Fases agrupadas para simplificar a visualização",
@@ -113,7 +173,7 @@
     }
   },
   "status": {
-    "notStarted": "Não Iniciado",
+    "not-started": "Não Iniciado",
     "inProgress": "Em Andamento",
     "completed": "Concluído",
     "onHold": "Em Espera",
@@ -643,7 +703,7 @@
     "status": {
       "completed": "Concluído",
       "inProgress": "Em Progresso",
-      "notStarted": "Não Iniciado",
+      "not-started": "Não Iniciado",
       "undefined": "Indefinido"
     },
     "stats": {

@@ -198,7 +198,7 @@ const TableView: React.FC<TableViewProps> = ({
     switch (status) {
       case 'completed': return t('tableView.status.completed');
       case 'in-progress': return t('tableView.status.inProgress');
-      case 'not-started': return t('tableView.status.notStarted');
+              case 'not-started': return t('status.not-started');
       default: return t('tableView.status.undefined');
     }
   };
