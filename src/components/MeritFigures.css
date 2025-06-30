@@ -1,0 +1,299 @@
+.merit-figures-container {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.merit-figures-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.merit-figures-header h2 {
+  margin: 0;
+  color: #1890ff;
+}
+
+.merit-figures-header .ant-btn {
+  height: 40px;
+  padding: 0 24px;
+  font-weight: 500;
+}
+
+/* Cards de métricas */
+.merit-figures-container .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.merit-figures-container .ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Estatísticas */
+.merit-figures-container .ant-statistic-title {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.merit-figures-container .ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Progress bars */
+.merit-figures-container .ant-progress {
+  margin-bottom: 8px;
+}
+
+.merit-figures-container .ant-progress-text {
+  font-weight: 600;
+}
+
+/* Tabela */
+.merit-figures-container .ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.merit-figures-container .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
+
+.merit-figures-container .ant-table-tbody > tr:hover > td {
+  background-color: #f0f8ff;
+}
+
+/* Tags de status */
+.merit-figures-container .ant-tag {
+  border-radius: 4px;
+  font-weight: 500;
+  padding: 2px 8px;
+}
+
+/* Badges */
+.merit-figures-container .ant-badge-count {
+  font-weight: 600;
+  border-radius: 10px;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+/* Lista de figuras críticas */
+.merit-figures-container .ant-list-item {
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: white;
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.merit-figures-container .ant-list-item:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.merit-figures-container .ant-list-item-meta-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.merit-figures-container .ant-list-item-meta-description {
+  color: #8c8c8c;
+  font-size: 12px;
+}
+
+/* Avatars */
+.merit-figures-container .ant-avatar {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tabs */
+.merit-figures-container .ant-tabs-tab {
+  font-weight: 500;
+  padding: 12px 16px;
+}
+
+.merit-figures-container .ant-tabs-tab-active {
+  color: #1890ff;
+}
+
+.merit-figures-container .ant-tabs-ink-bar {
+  background-color: #1890ff;
+  height: 3px;
+}
+
+/* Modais */
+.merit-figures-container .ant-modal-header {
+  border-bottom: 2px solid #f0f0f0;
+  padding: 20px 24px;
+}
+
+.merit-figures-container .ant-modal-title {
+  font-weight: 600;
+  color: #262626;
+}
+
+.merit-figures-container .ant-modal-body {
+  padding: 24px;
+}
+
+.merit-figures-container .ant-modal-footer {
+  border-top: 2px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+/* Formulários */
+.merit-figures-container .ant-form-item-label > label {
+  font-weight: 500;
+  color: #262626;
+}
+
+.merit-figures-container .ant-input,
+.merit-figures-container .ant-select-selector,
+.merit-figures-container .ant-input-number {
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.merit-figures-container .ant-input:focus,
+.merit-figures-container .ant-select-focused .ant-select-selector,
+.merit-figures-container .ant-input-number-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Botões */
+.merit-figures-container .ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.merit-figures-container .ant-btn-primary {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+}
+
+.merit-figures-container .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(24, 144, 255, 0.4);
+}
+
+.merit-figures-container .ant-btn-text {
+  color: #8c8c8c;
+}
+
+.merit-figures-container .ant-btn-text:hover {
+  color: #1890ff;
+  background-color: #f0f8ff;
+}
+
+/* Alertas */
+.merit-figures-container .ant-alert {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .merit-figures-container {
+    padding: 16px;
+  }
+  
+  .merit-figures-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .merit-figures-container .ant-col {
+    margin-bottom: 16px;
+  }
+  
+  .merit-figures-container .ant-table {
+    font-size: 12px;
+  }
+  
+  .merit-figures-container .ant-table-thead > tr > th,
+  .merit-figures-container .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.merit-figures-container .ant-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Estados especiais */
+.merit-figures-container .critical-figure {
+  border-left: 4px solid #f5222d;
+  background-color: #fff2f0;
+}
+
+.merit-figures-container .at-risk-figure {
+  border-left: 4px solid #fa8c16;
+  background-color: #fff7e6;
+}
+
+.merit-figures-container .on-track-figure {
+  border-left: 4px solid #52c41a;
+  background-color: #f6ffed;
+}
+
+/* Tooltips */
+.merit-figures-container .ant-tooltip-inner {
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Scrollbars personalizados */
+.merit-figures-container ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.merit-figures-container ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.merit-figures-container ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.merit-figures-container ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+} 

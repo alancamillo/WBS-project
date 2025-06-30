@@ -6,11 +6,12 @@
   "navigation": {
     "list": "列表",
     "tree": "树形",
-    "flow": "流程",
+    "flow": "流程图",
     "gantt": "甘特图",
     "table": "表格",
     "budget": "预算",
-    "risks": "风险"
+    "risks": "风险",
+    "meritFigures": "绩效指标"
   },
   "buttons": {
     "export": "导出",
@@ -673,6 +674,132 @@
       "cancel": "取消",
       "selectAll": "全选",
       "selectNone": "清除选择"
+    }
+  },
+  "meritFigures": {
+    "title": "绩效指标",
+    "subtitle": "项目绩效指标",
+    "addNew": "添加绩效指标",
+    "tabs": {
+      "overview": "概览",
+      "analysis": "分析"
+    },
+    "categories": {
+      "cost": "成本",
+      "time": "时间",
+      "quality": "质量",
+      "scope": "范围",
+      "risk": "风险",
+      "resource": "资源",
+      "custom": "自定义"
+    },
+    "direction": {
+      "increase": "增加",
+      "decrease": "减少",
+      "maintain": "维持"
+    },
+    "status": {
+      "on-track": "按计划",
+      "at-risk": "有风险",
+      "off-track": "偏离计划",
+      "completed": "已完成"
+    },
+    "impactType": {
+      "positive": "积极",
+      "negative": "消极",
+      "neutral": "中性"
+    },
+    "metrics": {
+      "total": "指标总数",
+      "onTrack": "按计划",
+      "atRisk": "有风险",
+      "offTrack": "偏离计划",
+      "averageProgress": "平均进度",
+      "figures": "个指标"
+    },
+    "table": {
+      "title": "绩效指标",
+      "name": "名称",
+      "currentValue": "当前值",
+      "values": "数值",
+      "target": "目标",
+      "progress": "进度",
+      "phaseImpacts": "阶段影响",
+      "weight": "权重",
+      "actions": "操作",
+      "items": "个指标"
+    },
+    "actions": {
+      "view": "查看影响",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "form": {
+      "name": "指标名称",
+      "namePlaceholder": "例：成本效率",
+      "nameRequired": "请输入指标名称",
+      "description": "描述",
+      "descriptionPlaceholder": "描述此指标测量的内容...",
+      "descriptionRequired": "请输入描述",
+      "category": "类别",
+      "categoryPlaceholder": "选择类别",
+      "categoryRequired": "请选择类别",
+      "unit": "单位",
+      "unitRequired": "请输入单位",
+      "baselineValue": "基准值",
+      "baselineRequired": "请输入基准值",
+      "currentValue": "当前值",
+      "currentRequired": "请输入当前值",
+      "targetValue": "目标值",
+      "targetRequired": "请输入目标值",
+      "direction": "方向",
+      "directionPlaceholder": "选择期望方向",
+      "directionRequired": "请选择方向",
+      "weight": "权重 (1-10)",
+      "weightRequired": "请输入权重"
+    },
+    "impactModal": {
+      "title": "阶段影响 - {name}",
+      "description": "配置每个项目阶段如何影响此指标。使用正值表示有利影响，负值表示不利影响。",
+      "impactPercentage": "影响",
+      "impactType": "影响类型",
+      "weight": "阶段权重",
+      "description": "影响描述",
+      "descriptionPlaceholder": "描述此阶段如何影响指标..."
+    },
+    "criticalFigures": "关键指标",
+    "modal": {
+      "addTitle": "添加绩效指标",
+      "editTitle": "编辑绩效指标"
+    },
+    "analysis": {
+      "title": "指标分析",
+      "description": "项目绩效指标的详细分析",
+      "noData": "未注册指标",
+      "noDataDescription": "添加绩效指标以开始分析",
+      "byCategory": "按类别",
+      "topPerformers": "表现最佳",
+      "progress": "进度",
+      "figures": "个指标",
+      "phaseContributions": "阶段贡献",
+      "totalImpact": "总影响",
+      "chartTitle": "所选指标的变化",
+      "selectIndicators": "选择要显示在图表中的指标",
+      "selectIndicatorsToView": "选择指标以查看图表",
+      "day": "天",
+      "week": "周",
+      "month": "月",
+      "year": "年"
+    },
+    "delete": {
+      "confirm": "您确定要删除此指标吗？"
+    },
+    "messages": {
+      "added": "指标添加成功！",
+      "updated": "指标更新成功！",
+      "deleted": "指标删除成功！",
+      "impactsUpdated": "阶段影响更新成功！",
+      "saveError": "保存指标时出错"
     }
   }
 } 

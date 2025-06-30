@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Typography, Button, Space, Card, Statistic, Row, Col, Modal, Badge, message, Popconfirm, Dropdown, Menu } from 'antd';
-import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileExcelOutlined, ProjectOutlined, ApartmentOutlined, UnorderedListOutlined, BulbOutlined, UploadOutlined, BarChartOutlined, TableOutlined, PieChartOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined, EllipsisOutlined, TrophyOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import TreeNodeComponent from './components/TreeNode';
 import FlowTreeView from './components/FlowTreeView';
@@ -9,6 +9,7 @@ import GanttChart from './components/GanttChart';
 import TableView from './components/TableView';
 import BudgetAllocationView from './components/BudgetAllocationView';
 import RiskManagement from './components/RiskManagement';
+import MeritFigures from './components/MeritFigures';
 import LanguageSelector from './components/LanguageSelector';
 import SettingsModal from './components/SettingsModal';
 import { TreeNode, ExportOptions } from './types/index';
@@ -102,7 +103,7 @@ function App() {
   const [rootNode, setRootNode] = useState<TreeNode>(() => loadWBSFromStorage());
   const [groupingState, setGroupingState] = useState(() => loadGroupingFromStorage());
 
-  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks' | 'meritFigures'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
@@ -376,6 +377,13 @@ function App() {
                 >
                   {t('navigation.budget')}
                 </Button>
+                <Button
+                  icon={<TrophyOutlined />}
+                  onClick={() => setViewMode('meritFigures')}
+                  type={viewMode === 'meritFigures' ? 'primary' : 'default'}
+                >
+                  {t('navigation.meritFigures')}
+                </Button>
               </Button.Group>
               <Dropdown
                 overlay={
@@ -452,6 +460,8 @@ function App() {
             <FlowTreeView rootNode={rootNode} groupingState={groupingState} />
           ) : viewMode === 'gantt' ? (
             <GanttChart rootNode={rootNode} />
+          ) : viewMode === 'meritFigures' ? (
+            <MeritFigures rootNode={rootNode} />
           ) : (
             <TreeNodeComponent
               node={rootNode}

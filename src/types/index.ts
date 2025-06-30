@@ -122,4 +122,64 @@ export interface RiskFilterOptions {
   impact?: Risk['impact'][];
   owner?: string;
   associatedNodeId?: string;
+}
+
+// Tipos para Figuras de Mérito (Indicadores de Performance)
+export interface MeritFigure {
+  id: string;
+  name: string;
+  description: string;
+  category: 'cost' | 'time' | 'quality' | 'scope' | 'risk' | 'resource' | 'custom';
+  unit: string; // %, $, days, hours, etc.
+  targetValue: number;
+  currentValue: number;
+  baselineValue: number; // Valor inicial/referência
+  weight: number; // Peso/importância do indicador (1-10)
+  direction: 'increase' | 'decrease' | 'maintain'; // Se queremos aumentar, diminuir ou manter
+  status: 'on-track' | 'at-risk' | 'off-track' | 'completed';
+  createdAt: Date;
+  updatedAt: Date;
+  // Vinculação com WBS
+  associatedNodeIds?: string[]; // IDs dos nós da WBS relacionados
+  // Impacto das fases do projeto
+  phaseImpacts?: PhaseImpact[];
+}
+
+export interface PhaseImpact {
+  nodeId: string;
+  nodeName: string;
+  // impactPercentage: number; // Obsoleto: agora usamos valorAgregado
+  valorAgregado: number; // Valor real que a fase agrega ao indicador
+  impactDescription: string;
+  impactType: 'positive' | 'negative' | 'neutral';
+  weight: number; // Peso da fase neste indicador (1-10)
+}
+
+export interface MeritFigureMetrics {
+  totalFigures: number;
+  figuresByCategory: Record<MeritFigure['category'], number>;
+  figuresByStatus: Record<MeritFigure['status'], number>;
+  averageProgress: number;
+  onTrackFigures: number;
+  atRiskFigures: number;
+  offTrackFigures: number;
+  completedFigures: number;
+  topPerformingFigures: MeritFigure[];
+  criticalFigures: MeritFigure[];
+}
+
+export interface MeritFigureFilterOptions {
+  category?: MeritFigure['category'][];
+  status?: MeritFigure['status'][];
+  associatedNodeId?: string;
+  direction?: MeritFigure['direction'][];
+}
+
+export interface MeritFigureCalculation {
+  figureId: string;
+  calculatedValue: number;
+  progressPercentage: number;
+  variance: number;
+  trend: 'improving' | 'declining' | 'stable';
+  lastUpdate: Date;
 } 
