@@ -69,6 +69,31 @@ export class ImportService {
   /**
    * Importa projeto unificado de arquivo JSON
    */
+  static async importFromURL(url: string): Promise<UnifiedImportResult> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch from URL: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+      const file = new File([blob], "wbs.json", { type: "application/json" });
+      return await this.importUnifiedFromJSON(file);
+    } catch (error) {
+      return {
+        success: false,
+        errors: [{
+          message: `Error importing from URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          severity: 'error',
+          section: 'general'
+        }],
+        warnings: []
+      };
+    }
+  }
+
+  /**
+   * Importa projeto unificado de arquivo JSON
+   */
   static async importUnifiedFromJSON(file: File): Promise<UnifiedImportResult> {
     try {
       const text = await file.text();
