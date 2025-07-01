@@ -136,6 +136,31 @@ function App() {
     }
   }, [rootNode]);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const wbsUrl = urlParams.get('url');
+
+    if (wbsUrl) {
+      const importWBSFromURL = async () => {
+        message.loading({ content: t('messages.loading.importingFromUrl'), key: 'import' });
+        const result = await ImportService.importFromURL(wbsUrl);
+
+        if (result.success && result.data) {
+          ImportService.applyUnifiedData(result.data);
+          setRootNode(result.data.wbsStructure);
+          if (result.data.groupingState) {
+            setGroupingState(result.data.groupingState);
+          }
+          message.success({ content: t('messages.success.wbsImported'), key: 'import', duration: 2 });
+        } else {
+          message.error({ content: t('messages.error.importFailed', { error: result.errors.map(e => e.message).join(', ') }), key: 'import', duration: 5 });
+        }
+      };
+
+      importWBSFromURL();
+    }
+  }, [t]);
+
   const handleRootUpdate = (updatedNode: TreeNode) => {
     setRootNode(updatedNode);
     // A persistência acontece automaticamente via useEffect
