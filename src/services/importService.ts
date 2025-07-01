@@ -1,61 +1,130 @@
 import * as XLSX from 'xlsx';
-import { TreeNode } from '../types';
-import { v4 as uuidv4 } from 'uuid';
+import { 
+  TreeNode, 
+  UnifiedProjectData, 
+  UnifiedImportResult, 
+  ImportError, 
+  ImportWarning, 
+  ImportSummary,
+  ImportValidationError,
+  Risk,
+  MeritFigure
+} from '../types';
 import { CostCalculator } from '../utils/costCalculator';
+import { v4 as uuidv4 } from 'uuid';
 
-export interface ImportValidationError {
-  line?: number;
-  field?: string;
-  message: string;
-  severity: 'error' | 'warning';
-}
+// Versões suportadas do formato de dados
+const SUPPORTED_VERSIONS = ['1.0.0', '2.0.0'];
+const CURRENT_VERSION = '2.0.0';
 
+// Interface legada para compatibilidade
 export interface ImportResult {
   success: boolean;
   data?: TreeNode;
-  errors: ImportValidationError[];
-  warnings: ImportValidationError[];
-  summary?: {
-    totalNodes: number;
-    level1Nodes: number;
-    level2Nodes: number;
-    level3Nodes: number;
-    totalCost: number;
-  };
+  risks?: Risk[];
+  meritFigures?: MeritFigure[];
+  errors: ImportError[];
+  warnings: ImportWarning[];
+  summary?: any;
 }
 
 export class ImportService {
   /**
-   * Importa WBS de arquivo JSON
+   * Método unificado para importar arquivos de diferentes formatos
+   * Detecta automaticamente o tipo de arquivo e chama o método apropriado
    */
-  static async importFromJSON(file: File): Promise<ImportResult> {
+  static async importFile(file: File): Promise<ImportResult> {
+    const fileExtension = file.name.toLowerCase().split('.').pop();
+    
+    try {
+      switch (fileExtension) {
+        case 'json':
+          return await this.importFromJSON(file);
+        
+        case 'xlsx':
+        case 'xls':
+          // Para futuras implementações de Excel
+          throw new Error('Importação de Excel ainda não implementada');
+        
+        case 'csv':
+          // Para futuras implementações de CSV
+          throw new Error('Importação de CSV ainda não implementada');
+        
+        default:
+          // Tentar como JSON por padrão
+          return await this.importFromJSON(file);
+      }
+    } catch (error) {
+      return {
+        success: false,
+        errors: [{
+          message: `Erro ao importar arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+          severity: 'error'
+        }],
+        warnings: []
+      };
+    }
+  }
+
+  /**
+   * Importa projeto unificado de arquivo JSON
+   */
+  static async importUnifiedFromJSON(file: File): Promise<UnifiedImportResult> {
     try {
       const text = await file.text();
-      const data = JSON.parse(text);
+      const rawData = JSON.parse(text);
       
-      // Valida e converte os dados
-      const validationResult = this.validateAndConvertData(data);
+      // Detectar formato e versão
+      const formatInfo = this.detectFormatVersion(rawData);
       
-      if (!validationResult.success) {
-        return validationResult;
+      if (!formatInfo.isSupported) {
+        return {
+          success: false,
+          errors: [{
+            message: `Versão do formato não suportada: ${formatInfo.version}. Versões suportadas: ${SUPPORTED_VERSIONS.join(', ')}`,
+            severity: 'error',
+            section: 'general'
+          }],
+          warnings: []
+        };
       }
 
-      // Recalcula custos totais
-      const rootNode = CostCalculator.updateAllTotalCosts(validationResult.data!);
-      
+      // Processar dados baseado na versão
+      let unifiedData: UnifiedProjectData;
+      const errors: ImportError[] = [];
+      const warnings: ImportWarning[] = [];
+
+      if (formatInfo.version === '2.0.0' && rawData.projectInfo) {
+        // Formato novo unificado
+        unifiedData = await this.processUnifiedFormat(rawData, errors, warnings);
+      } else {
+        // Formato legado ou estrutura simples
+        unifiedData = await this.migrateLegacyFormat(rawData, errors, warnings);
+      }
+
+      // Validar dados importados
+      const validationResult = this.validateUnifiedData(unifiedData);
+      errors.push(...validationResult.errors);
+      warnings.push(...validationResult.warnings);
+
+      // Gerar resumo
+      const summary = this.generateUnifiedSummary(unifiedData);
+
       return {
-        success: true,
-        data: rootNode,
-        errors: [],
-        warnings: validationResult.warnings,
-        summary: this.generateSummary(rootNode)
+        success: errors.filter(e => e.severity === 'error').length === 0,
+        data: unifiedData,
+        errors,
+        warnings,
+        summary
       };
+
     } catch (error) {
       return {
         success: false,
         errors: [{
           message: `Erro ao processar arquivo JSON: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
-          severity: 'error'
+          severity: 'error',
+          section: 'general'
         }],
         warnings: []
       };
@@ -63,591 +132,553 @@ export class ImportService {
   }
 
   /**
-   * Importa WBS de arquivo Excel
+   * Detecta versão e formato dos dados
    */
-  static async importFromExcel(file: File): Promise<ImportResult> {
-    try {
-      const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer);
-      
-      // Tenta encontrar a aba principal
-      const sheetName = workbook.SheetNames.find(name => 
-        name.toLowerCase().includes('estrutura') || 
-        name.toLowerCase().includes('wbs') ||
-        name.toLowerCase().includes('tree')
-      ) || workbook.SheetNames[0];
-      
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-      
-      // Converte dados do Excel para TreeNode
-      const conversionResult = this.convertExcelToTreeNode(jsonData);
-      
-      if (!conversionResult.success) {
-        return conversionResult;
-      }
-
-      const rootNode = CostCalculator.updateAllTotalCosts(conversionResult.data!);
-      
+  private static detectFormatVersion(data: any): { 
+    version: string; 
+    isSupported: boolean; 
+    format: 'unified' | 'legacy' | 'simple' 
+  } {
+    // Formato unificado novo
+    if (data.projectInfo && data.projectInfo.version) {
       return {
-        success: true,
-        data: rootNode,
-        errors: [],
-        warnings: conversionResult.warnings,
-        summary: this.generateSummary(rootNode)
-      };
-    } catch (error) {
-      return {
-        success: false,
-        errors: [{
-          message: `Erro ao processar arquivo Excel: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
-          severity: 'error'
-        }],
-        warnings: []
-      };
-    }
-  }
-
-  /**
-   * Importa WBS de arquivo CSV
-   */
-  static async importFromCSV(file: File): Promise<ImportResult> {
-    try {
-      const text = await file.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
-      if (lines.length < 2) {
-        return {
-          success: false,
-          errors: [{
-            message: 'Arquivo CSV deve conter pelo menos um cabeçalho e uma linha de dados',
-            severity: 'error'
-          }],
-          warnings: []
-        };
-      }
-
-      // Parse CSV manual (básico)
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      const rows = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-        const row: any = {};
-        headers.forEach((header, index) => {
-          row[header] = values[index] || '';
-        });
-        return row;
-      });
-
-      // Converte para TreeNode
-      const conversionResult = this.convertExcelToTreeNode(rows);
-      
-      if (!conversionResult.success) {
-        return conversionResult;
-      }
-
-      const rootNode = CostCalculator.updateAllTotalCosts(conversionResult.data!);
-      
-      return {
-        success: true,
-        data: rootNode,
-        errors: [],
-        warnings: conversionResult.warnings,
-        summary: this.generateSummary(rootNode)
-      };
-    } catch (error) {
-      return {
-        success: false,
-        errors: [{
-          message: `Erro ao processar arquivo CSV: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
-          severity: 'error'
-        }],
-        warnings: []
-      };
-    }
-  }
-
-  /**
-   * Converte dados tabulares (Excel/CSV) para TreeNode
-   */
-  private static convertExcelToTreeNode(data: any[]): ImportResult {
-    const errors: ImportValidationError[] = [];
-    const warnings: ImportValidationError[] = [];
-    
-    if (!data || data.length === 0) {
-      return {
-        success: false,
-        errors: [{ message: 'Nenhum dado encontrado no arquivo', severity: 'error' }],
-        warnings: []
+        version: data.projectInfo.version,
+        isSupported: SUPPORTED_VERSIONS.includes(data.projectInfo.version),
+        format: 'unified'
       };
     }
 
-    // Mapeia colunas possíveis
-    const columnMappings = this.detectColumnMappings(data[0]);
-    
-    if (!columnMappings.name) {
+    // Formato legado (apenas estrutura WBS com risks/meritFigures opcionais)
+    if (data.projectStructure || (data.id && data.children && Array.isArray(data.children))) {
       return {
-        success: false,
-        errors: [{ message: 'Coluna de nome não encontrada. Colunas esperadas: Nome, Name, Atividade, Task', severity: 'error' }],
-        warnings: []
+        version: '1.0.0',
+        isSupported: true,
+        format: 'legacy'
       };
     }
 
-    // Agrupa por nível hierárquico
-    const nodesByLevel: { [key: number]: any[] } = { 1: [], 2: [], 3: [] };
-    const nodesMap = new Map<string, TreeNode>();
-
-    data.forEach((row, index) => {
-      const level = this.detectLevel(row, columnMappings);
-      const name = String(row[columnMappings.name] || '').trim();
-      const cost = this.parseCost(row[columnMappings.cost]);
-      
-      if (!name) {
-        warnings.push({
-          line: index + 2,
-          field: 'name',
-          message: `Nome vazio na linha ${index + 2}`,
-          severity: 'warning'
-        });
-        return;
-      }
-
-      if (level < 1 || level > 3) {
-        warnings.push({
-          line: index + 2,
-          field: 'level',
-          message: `Nível inválido (${level}) na linha ${index + 2}. Usando nível 1.`,
-          severity: 'warning'
-        });
-      }
-
-      const startDate = this.parseDate(row[columnMappings.startDate]);
-      const endDate = this.parseDate(row[columnMappings.endDate]);
-      const duration = this.parseDuration(row[columnMappings.duration]);
-      const dependencies = this.parseDependencies(row[columnMappings.dependencies]);
-
-      const node: TreeNode = {
-        id: uuidv4(),
-        name: name.trim(),
-        cost: isNaN(cost) ? 0 : cost,
-        level: Math.max(1, Math.min(3, level)) as 1 | 2 | 3,
-        children: [],
-        totalCost: 0,
-        description: row[columnMappings.description] ? String(row[columnMappings.description]).trim() : undefined,
-        responsible: row[columnMappings.responsible] ? String(row[columnMappings.responsible]).trim() : undefined,
-        startDate,
-        endDate,
-        durationDays: duration,
-        dependencies: dependencies.length > 0 ? dependencies : undefined
-      };
-
-      nodesByLevel[node.level].push({ node, originalIndex: index });
-      nodesMap.set(node.id, node);
-    });
-
-    // Constrói hierarquia
-    const rootNode = this.buildHierarchy(nodesByLevel, nodesMap);
-    
-    if (!rootNode) {
-      return {
-        success: false,
-        errors: [{ message: 'Não foi possível criar estrutura hierárquica. Verifique se há pelo menos um item de nível 1.', severity: 'error' }],
-        warnings
-      };
-    }
-
+    // Formato simples (apenas TreeNode)
     return {
-      success: true,
-      data: rootNode,
-      errors,
-      warnings
+      version: '1.0.0',
+      isSupported: true,
+      format: 'simple'
     };
   }
 
   /**
-   * Detecta mapeamento de colunas
+   * Processa formato unificado novo (v2.0.0)
    */
-  private static detectColumnMappings(firstRow: any): any {
-    const keys = Object.keys(firstRow);
-    const mappings: any = {};
-
-    // Nome
-    mappings.name = keys.find(key => 
-      /^(nome|name|atividade|task|item|descrição|title)$/i.test(key.trim())
-    );
-
-    // Custo
-    mappings.cost = keys.find(key => 
-      /^(custo|cost|valor|value|price|preço|budget|orçamento)$/i.test(key.trim())
-    );
-
-    // Nível
-    mappings.level = keys.find(key => 
-      /^(nível|nivel|level|lvl|hierarquia)$/i.test(key.trim())
-    );
-
-    // Outros campos opcionais
-    mappings.description = keys.find(key => 
-      /^(descrição|description|desc|detalhes|details)$/i.test(key.trim())
-    );
-
-    mappings.responsible = keys.find(key => 
-      /^(responsável|responsible|resp|owner|dono)$/i.test(key.trim())
-    );
-
-    mappings.startDate = keys.find(key => 
-      /^(data.?início|start.?date|início|start|begin)$/i.test(key.trim())
-    );
-
-    mappings.endDate = keys.find(key => 
-      /^(data.?fim|end.?date|fim|end|finish)$/i.test(key.trim())
-    );
-
-    mappings.duration = keys.find(key => 
-      /^(duração|duration|dias|days|tempo)$/i.test(key.trim())
-    );
-
-    mappings.dependencies = keys.find(key => 
-      /^(dependências|dependencies|deps|predecessor)$/i.test(key.trim())
-    );
-
-    return mappings;
-  }
-
-  /**
-   * Detecta o nível hierárquico
-   */
-  private static detectLevel(row: any, mappings: any): number {
-    // Se tem coluna de nível explícita
-    if (mappings.level && row[mappings.level]) {
-      const level = parseInt(String(row[mappings.level]));
-      if (!isNaN(level)) return level;
+  private static async processUnifiedFormat(
+    data: any, 
+    errors: ImportError[], 
+    warnings: ImportWarning[]
+  ): Promise<UnifiedProjectData> {
+    
+    // Validar estrutura obrigatória
+    if (!data.wbsStructure) {
+      errors.push({
+        message: 'Estrutura WBS obrigatória não encontrada',
+        severity: 'error',
+        section: 'wbs'
+      });
     }
 
-    // Detecta por indentação ou prefixos no nome
-    const name = String(row[mappings.name] || '').trim();
-    
-    // Conta espaços/tabs no início
-    const leadingSpaces = name.match(/^(\s*)/)?.[1]?.length || 0;
-    if (leadingSpaces >= 8) return 3;
-    if (leadingSpaces >= 4) return 2;
-    
-    // Detecta por prefixos (1., 1.1., 1.1.1., etc.)
-    if (/^\d+\.\d+\.\d+/.test(name)) return 3;
-    if (/^\d+\.\d+/.test(name)) return 2;
-    if (/^\d+\./.test(name)) return 1;
-    
-    // Detecta por letras (A., a., I., i., etc.)
-    if (/^[a-z]\./i.test(name)) return 3;
-    if (/^[IVX]+\./i.test(name)) return 2;
-
-    // Default: nível 1
-    return 1;
-  }
-
-  /**
-   * Parseia valores de custo
-   */
-  private static parseCost(value: any): number {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    
-    const cleanValue = String(value)
-      .replace(/[^\d,.-]/g, '') // Remove caracteres não numéricos
-      .replace(',', '.'); // Substitui vírgula por ponto
-    
-    return parseFloat(cleanValue) || 0;
-  }
-
-  /**
-   * Parseia datas
-   */
-  private static parseDate(value: any): Date | undefined {
-    if (!value) return undefined;
-    if (value instanceof Date) return value;
-    
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? undefined : date;
-  }
-
-  /**
-   * Parseia duração em dias
-   */
-  private static parseDuration(value: any): number {
-    if (!value) return 0;
-    if (typeof value === 'number') return Math.max(0, value);
-    
-    const cleanValue = String(value).trim().toLowerCase();
-    
-    // Tenta extrair número do valor
-    const numMatch = cleanValue.match(/(\d+(?:\.\d+)?)/);
-    if (!numMatch) return 0;
-    
-    const num = parseFloat(numMatch[1]);
-    
-    // Detecta unidades e converte para dias
-    if (cleanValue.includes('semana') || cleanValue.includes('week')) {
-      return num * 7;
-    } else if (cleanValue.includes('mês') || cleanValue.includes('month')) {
-      return num * 30;
-    } else if (cleanValue.includes('ano') || cleanValue.includes('year')) {
-      return num * 365;
+    // Processar WBS
+    const wbsResult = data.wbsStructure ? this.validateAndConvertWbsData(data.wbsStructure) : null;
+    if (wbsResult && !wbsResult.success) {
+      errors.push(...(wbsResult.errors || []));
+      warnings.push(...(wbsResult.warnings || []));
     }
-    
-    // Default: assume dias
-    return Math.max(0, num);
+
+    // Processar riscos
+    const risks = this.processRisksData(data.risks || [], errors, warnings);
+
+    // Processar figuras de mérito
+    const meritFigures = this.processMeritFiguresData(data.meritFigures || [], errors, warnings);
+
+    // Processar estado de agrupamento
+    const groupingState = data.groupingState || {
+      groupedPhaseIds: [],
+      groupedExpanded: false
+    };
+
+    // Montar dados unificados
+    const unifiedData: UnifiedProjectData = {
+      projectInfo: {
+        ...data.projectInfo,
+        exportDate: new Date(data.projectInfo.exportDate),
+        projectStartDate: data.projectInfo.projectStartDate ? new Date(data.projectInfo.projectStartDate) : undefined,
+        projectEndDate: data.projectInfo.projectEndDate ? new Date(data.projectInfo.projectEndDate) : undefined,
+      },
+      wbsStructure: wbsResult?.data || this.createEmptyProject(),
+      risks,
+      meritFigures,
+      groupingState,
+      projectSettings: data.projectSettings || {},
+      statistics: data.statistics || undefined
+    };
+
+    return unifiedData;
   }
 
   /**
-   * Parseia dependências (lista de IDs ou nomes separados por vírgula/ponto-e-vírgula)
+   * Migra formato legado para novo formato
    */
-  private static parseDependencies(value: any): string[] {
-    if (!value) return [];
-    if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+  private static async migrateLegacyFormat(
+    data: any, 
+    errors: ImportError[], 
+    warnings: ImportWarning[]
+  ): Promise<UnifiedProjectData> {
     
-    const cleanValue = String(value).trim();
-    if (!cleanValue) return [];
-    
-    // Separa por vírgula, ponto-e-vírgula ou quebra de linha
-    return cleanValue
-      .split(/[,;\n|]/)
-      .map(dep => dep.trim())
-      .filter(Boolean);
-  }
+    warnings.push({
+      message: 'Detectado formato legado. Realizando migração automática para nova versão.',
+      section: 'general'
+    });
 
-  /**
-   * Constrói hierarquia a partir dos nós agrupados
-   */
-  private static buildHierarchy(nodesByLevel: { [key: number]: any[] }, nodesMap: Map<string, TreeNode>): TreeNode | null {
-    // Precisa ter pelo menos um nó de nível 1
-    if (nodesByLevel[1].length === 0) return null;
+    let wbsData: TreeNode;
+    let risks: Risk[] = [];
+    let meritFigures: MeritFigure[] = [];
 
-    // Se há apenas um nó de nível 1, usa como raiz
-    let rootNode: TreeNode;
-    if (nodesByLevel[1].length === 1) {
-      rootNode = nodesByLevel[1][0].node;
+    // Detectar estrutura WBS
+    if (data.projectStructure) {
+      wbsData = data.projectStructure;
+      risks = data.risks || [];
+      meritFigures = data.meritFigures || [];
     } else {
-      // Cria um nó raiz artificial
-      rootNode = {
-        id: uuidv4(),
-        name: 'Projeto Importado',
-        cost: 0,
-        level: 1,
-        children: nodesByLevel[1].map(item => item.node),
-        totalCost: 0
-      };
+      wbsData = data;
     }
 
-    // Garante que todos os nós tenham children como array
-    const ensureChildrenArray = (node: TreeNode) => {
-      if (!Array.isArray(node.children)) {
-        node.children = [];
+    // Validar e converter WBS
+    const wbsResult = this.validateAndConvertWbsData(wbsData);
+    if (!wbsResult.success) {
+      errors.push(...(wbsResult.errors || []));
+      warnings.push(...(wbsResult.warnings || []));
+    }
+
+    // Processar dados auxiliares
+    const processedRisks = this.processRisksData(risks, errors, warnings);
+    const processedMeritFigures = this.processMeritFiguresData(meritFigures, errors, warnings);
+
+    // Criar dados unificados com informações padrão
+    const rootNode = wbsResult.data || this.createEmptyProject();
+    const projectDates = this.calculateProjectDates(rootNode);
+
+    const unifiedData: UnifiedProjectData = {
+      projectInfo: {
+        id: rootNode.id,
+        name: rootNode.name,
+        description: rootNode.description,
+        version: CURRENT_VERSION,
+        exportDate: new Date(),
+        totalNodes: this.countNodes(rootNode),
+        totalCost: rootNode.totalCost,
+        projectDuration: projectDates.duration,
+        projectStartDate: projectDates.startDate,
+        projectEndDate: projectDates.endDate,
+      },
+      wbsStructure: rootNode,
+      risks: processedRisks,
+      meritFigures: processedMeritFigures,
+      groupingState: {
+        groupedPhaseIds: [],
+        groupedExpanded: false
+      },
+      projectSettings: {
+        currency: 'BRL',
+        language: 'pt'
       }
     };
 
-    // Associa nós de nível 2 aos de nível 1
-    nodesByLevel[2].forEach(item => {
-      const node = item.node;
-      ensureChildrenArray(node);
-      // Estratégia simples: associa ao primeiro nível 1 disponível
-      // Em implementação mais sofisticada, poderia usar proximidade de índices
-      const parent = nodesByLevel[1][0]?.node || rootNode;
-      ensureChildrenArray(parent);
-      parent.children.push(node);
-      node.parentId = parent.id;
-    });
-
-    // Associa nós de nível 3 aos de nível 2
-    nodesByLevel[3].forEach(item => {
-      const node = item.node;
-      ensureChildrenArray(node);
-      // Associa ao primeiro nível 2 disponível
-      const parent = nodesByLevel[2][0]?.node || nodesByLevel[1][0]?.node || rootNode;
-      ensureChildrenArray(parent);
-      parent.children.push(node);
-      node.parentId = parent.id;
-    });
-
-    // Garante que o rootNode tenha children
-    ensureChildrenArray(rootNode);
-
-    return rootNode;
+    return unifiedData;
   }
 
   /**
-   * Valida e converte dados de JSON
+   * Processa dados de riscos
    */
-  private static validateAndConvertData(data: any): ImportResult {
-    const errors: ImportValidationError[] = [];
-    const warnings: ImportValidationError[] = [];
-
-    if (!data || typeof data !== 'object') {
-      return {
-        success: false,
-        errors: [{ message: 'Dados inválidos: esperado um objeto JSON', severity: 'error' }],
-        warnings: []
-      };
+  private static processRisksData(
+    risksData: any[], 
+    errors: ImportError[], 
+    warnings: ImportWarning[]
+  ): Risk[] {
+    if (!Array.isArray(risksData)) {
+      warnings.push({
+        message: 'Dados de riscos não são um array válido. Ignorando.',
+        section: 'risks'
+      });
+      return [];
     }
 
-    // Converte para TreeNode se necessário
-    const convertedNode = this.ensureTreeNodeStructure(data, errors, warnings);
+    return risksData
+      .map((risk, index) => {
+        try {
+          return {
+            ...risk,
+            id: risk.id || uuidv4(),
+            createdAt: risk.createdAt ? new Date(risk.createdAt) : new Date(),
+            updatedAt: risk.updatedAt ? new Date(risk.updatedAt) : new Date(),
+            dueDate: risk.dueDate ? new Date(risk.dueDate) : undefined,
+          };
+        } catch (error) {
+          warnings.push({
+            message: `Erro ao processar risco na posição ${index}: ${error}`,
+            section: 'risks'
+          });
+          return null;
+        }
+      })
+      .filter(Boolean) as Risk[];
+  }
+
+  /**
+   * Processa dados de figuras de mérito
+   */
+  private static processMeritFiguresData(
+    meritData: any[], 
+    errors: ImportError[], 
+    warnings: ImportWarning[]
+  ): MeritFigure[] {
+    if (!Array.isArray(meritData)) {
+      warnings.push({
+        message: 'Dados de figuras de mérito não são um array válido. Ignorando.',
+        section: 'meritFigures'
+      });
+      return [];
+    }
+
+    return meritData
+      .map((figure, index) => {
+        try {
+          return {
+            ...figure,
+            id: figure.id || uuidv4(),
+            createdAt: figure.createdAt ? new Date(figure.createdAt) : new Date(),
+            updatedAt: figure.updatedAt ? new Date(figure.updatedAt) : new Date(),
+            phaseImpacts: figure.phaseImpacts || []
+          };
+        } catch (error) {
+          warnings.push({
+            message: `Erro ao processar figura de mérito na posição ${index}: ${error}`,
+            section: 'meritFigures'
+          });
+          return null;
+        }
+      })
+      .filter(Boolean) as MeritFigure[];
+  }
+
+  /**
+   * Valida dados unificados
+   */
+  private static validateUnifiedData(data: UnifiedProjectData): {
+    errors: ImportError[];
+    warnings: ImportWarning[];
+  } {
+    const errors: ImportError[] = [];
+    const warnings: ImportWarning[] = [];
+
+    // Validar informações do projeto
+    if (!data.projectInfo.name || data.projectInfo.name.trim() === '') {
+      errors.push({
+        message: 'Nome do projeto é obrigatório',
+        severity: 'error',
+        section: 'general'
+      });
+    }
+
+    // Validar estrutura WBS
+    if (!data.wbsStructure) {
+      errors.push({
+        message: 'Estrutura WBS é obrigatória',
+        severity: 'error',
+        section: 'wbs'
+      });
+    }
+
+    // Validar vinculações entre dados
+    if (data.meritFigures.length > 0 && data.wbsStructure) {
+      const nodeIds = this.getAllNodeIds(data.wbsStructure);
+      data.meritFigures.forEach((figure, index) => {
+        figure.phaseImpacts?.forEach(impact => {
+          if (!nodeIds.includes(impact.nodeId)) {
+            warnings.push({
+              message: `Figura de mérito "${figure.name}" referencia nó inexistente: ${impact.nodeId}`,
+              section: 'meritFigures'
+            });
+          }
+        });
+      });
+    }
+
+    return { errors, warnings };
+  }
+
+  /**
+   * Gera resumo unificado da importação
+   */
+  private static generateUnifiedSummary(data: UnifiedProjectData): ImportSummary {
+    const wbsStats = this.countNodesByLevel(data.wbsStructure);
+    const riskStats = this.countRisksByStatus(data.risks);
+    const meritStats = this.countMeritFiguresByCategory(data.meritFigures);
+
+    return {
+      wbs: {
+        totalNodes: wbsStats.total,
+        nodesByLevel: wbsStats.byLevel
+      },
+      risks: {
+        totalRisks: data.risks.length,
+        risksByStatus: riskStats
+      },
+      meritFigures: {
+        totalFigures: data.meritFigures.length,
+        figuresByCategory: meritStats
+      },
+      compatibility: {
+        formatVersion: data.projectInfo.version,
+        isCompatible: SUPPORTED_VERSIONS.includes(data.projectInfo.version),
+        migrationRequired: data.projectInfo.version !== CURRENT_VERSION
+      }
+    };
+  }
+
+  /**
+   * Aplica dados unificados importados ao sistema
+   */
+  static applyUnifiedData(data: UnifiedProjectData): void {
+    try {
+      // Salvar estrutura WBS
+      localStorage.setItem('wbs-project-structure', JSON.stringify(data.wbsStructure));
+
+      // Salvar riscos
+      if (data.risks.length > 0) {
+        localStorage.setItem('wbs-project-risks', JSON.stringify(data.risks));
+      }
+
+      // Salvar figuras de mérito
+      if (data.meritFigures.length > 0) {
+        localStorage.setItem('wbs-merit-figures', JSON.stringify(data.meritFigures));
+      }
+
+      // Salvar estado de agrupamento
+      if (data.groupingState) {
+        localStorage.setItem('wbs-grouping-state', JSON.stringify(data.groupingState));
+      }
+
+      // Salvar configurações do projeto
+      if (data.projectSettings) {
+        if (data.projectSettings.currency) {
+          localStorage.setItem('wbs-currency', data.projectSettings.currency);
+        }
+        if (data.projectSettings.language) {
+          localStorage.setItem('i18nextLng', data.projectSettings.language);
+        }
+      }
+
+    } catch (error) {
+      console.error('Erro ao aplicar dados importados:', error);
+      throw new Error('Falha ao salvar dados importados no localStorage');
+    }
+  }
+
+  // ============== MÉTODOS DE COMPATIBILIDADE LEGADA ==============
+
+  /**
+   * Método legado para importação de JSON (mantido para compatibilidade)
+   */
+  static async importFromJSON(file: File): Promise<ImportResult> {
+    const unifiedResult = await this.importUnifiedFromJSON(file);
     
-    if (!convertedNode) {
+    return {
+      success: unifiedResult.success,
+      data: unifiedResult.data?.wbsStructure,
+      risks: unifiedResult.data?.risks,
+      meritFigures: unifiedResult.data?.meritFigures,
+      errors: unifiedResult.errors,
+      warnings: unifiedResult.warnings,
+      summary: unifiedResult.summary
+    };
+  }
+
+  // ============== MÉTODOS AUXILIARES ==============
+
+  /**
+   * Valida e converte dados da WBS
+   */
+  private static validateAndConvertWbsData(rawData: any): {
+    success: boolean;
+    data?: TreeNode;
+    errors?: ImportError[];
+    warnings?: ImportWarning[];
+  } {
+    const errors: ImportError[] = [];
+    const warnings: ImportWarning[] = [];
+
+    try {
+      // Conversão de datas
+      const convertedData = this.convertDatesRecursively(rawData);
+      
+      // Validações básicas
+      if (!convertedData.id) {
+        errors.push({
+          message: 'ID do nó raiz é obrigatório',
+          severity: 'error',
+          section: 'wbs'
+        });
+      }
+
+      if (!convertedData.name) {
+        errors.push({
+          message: 'Nome do nó raiz é obrigatório',
+          severity: 'error',
+          section: 'wbs'
+        });
+      }
+
+      // Recalcular custos totais
+      const processedData = CostCalculator.updateAllTotalCosts(convertedData);
+
+      return {
+        success: errors.length === 0,
+        data: processedData,
+        errors,
+        warnings
+      };
+
+    } catch (error) {
       return {
         success: false,
-        errors: errors.length > 0 ? errors : [{ message: 'Não foi possível converter os dados', severity: 'error' }],
+        errors: [{
+          message: `Erro na validação da WBS: ${error}`,
+          severity: 'error',
+          section: 'wbs'
+        }],
         warnings
       };
     }
+  }
 
+  /**
+   * Converte strings de data para objetos Date recursivamente
+   */
+  private static convertDatesRecursively(node: any): TreeNode {
     return {
-      success: true,
-      data: convertedNode,
-      errors,
-      warnings
+      ...node,
+      startDate: node.startDate ? new Date(node.startDate) : undefined,
+      endDate: node.endDate ? new Date(node.endDate) : undefined,
+      children: node.children ? node.children.map((child: any) => this.convertDatesRecursively(child)) : []
     };
   }
 
   /**
-   * Garante que o objeto tenha estrutura de TreeNode
+   * Cria projeto vazio
    */
-  private static ensureTreeNodeStructure(data: any, errors: ImportValidationError[], warnings: ImportValidationError[]): TreeNode | null {
-    if (!data || typeof data !== 'object') {
-      errors.push({ message: 'Dados inválidos: esperado um objeto', severity: 'error' });
-      return null;
-    }
-
-    if (!data.name) {
-      errors.push({ message: 'Campo "name" é obrigatório', severity: 'error' });
-      return null;
-    }
-
-    // Garante propriedades obrigatórias
-    const node: TreeNode = {
-      id: data.id || uuidv4(),
-      name: String(data.name).trim(),
-      cost: typeof data.cost === 'number' ? data.cost : (parseFloat(data.cost) || 0),
-      level: [1, 2, 3].includes(data.level) ? data.level : 1,
+  private static createEmptyProject(): TreeNode {
+    return {
+      id: uuidv4(),
+      name: 'Projeto Importado',
+      cost: 0,
+      level: 1,
       children: [],
-      totalCost: 0,
-      parentId: data.parentId,
-      description: data.description ? String(data.description).trim() : undefined,
-      responsible: data.responsible ? String(data.responsible).trim() : undefined,
-      startDate: data.startDate ? new Date(data.startDate) : undefined,
-      endDate: data.endDate ? new Date(data.endDate) : undefined,
-      status: data.status && ['not-started', 'in-progress', 'completed'].includes(data.status) ? data.status : undefined
+      totalCost: 0
     };
-
-    // Valida datas
-    if (node.startDate && isNaN(node.startDate.getTime())) {
-      warnings.push({
-        message: `Data de início inválida no nó "${node.name}"`,
-        severity: 'warning'
-      });
-      node.startDate = undefined;
-    }
-
-    if (node.endDate && isNaN(node.endDate.getTime())) {
-      warnings.push({
-        message: `Data de fim inválida no nó "${node.name}"`,
-        severity: 'warning'
-      });
-      node.endDate = undefined;
-    }
-
-    // Processa filhos recursivamente
-    if (data.children && Array.isArray(data.children)) {
-      data.children.forEach((child: any, index: number) => {
-        const childNode = this.ensureTreeNodeStructure(child, errors, warnings);
-        if (childNode) {
-          childNode.parentId = node.id;
-          node.children.push(childNode);
-        } else {
-          warnings.push({
-            message: `Filho ${index + 1} do nó "${node.name}" não pôde ser processado`,
-            severity: 'warning'
-          });
-        }
-      });
-    }
-
-    // Garante que children seja sempre um array
-    if (!Array.isArray(node.children)) {
-      node.children = [];
-    }
-
-    return node;
   }
 
   /**
-   * Gera resumo da importação
+   * Calcula datas do projeto
    */
-  private static generateSummary(rootNode: TreeNode): ImportResult['summary'] {
-    let totalNodes = 0;
-    let level1Nodes = 0;
-    let level2Nodes = 0;
-    let level3Nodes = 0;
+  private static calculateProjectDates(rootNode: TreeNode) {
+    let earliestStart: Date | undefined;
+    let latestEnd: Date | undefined;
+    
+    const traverse = (node: TreeNode) => {
+      if (node.startDate) {
+        if (!earliestStart || node.startDate < earliestStart) {
+          earliestStart = node.startDate;
+        }
+      }
+      
+      if (node.endDate) {
+        if (!latestEnd || node.endDate > latestEnd) {
+          latestEnd = node.endDate;
+        }
+      }
+      
+      node.children.forEach(traverse);
+    };
+    
+    traverse(rootNode);
+    
+    const duration = (earliestStart && latestEnd) 
+      ? Math.ceil((latestEnd.getTime() - earliestStart.getTime()) / (1000 * 60 * 60 * 24))
+      : undefined;
+    
+    return {
+      startDate: earliestStart,
+      endDate: latestEnd,
+      duration,
+    };
+  }
+
+  /**
+   * Conta total de nós
+   */
+  private static countNodes(rootNode: TreeNode): number {
+    let count = 1;
+    rootNode.children.forEach(child => {
+      count += this.countNodes(child);
+    });
+    return count;
+  }
+
+  /**
+   * Obtém todos os IDs de nós
+   */
+  private static getAllNodeIds(rootNode: TreeNode): string[] {
+    const ids = [rootNode.id];
+    rootNode.children.forEach(child => {
+      ids.push(...this.getAllNodeIds(child));
+    });
+    return ids;
+  }
+
+  /**
+   * Conta nós por nível
+   */
+  private static countNodesByLevel(rootNode: TreeNode): {
+    total: number;
+    byLevel: Record<number, number>;
+  } {
+    const byLevel: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
+    let total = 0;
 
     const traverse = (node: TreeNode) => {
-      totalNodes++;
-      if (node.level === 1) level1Nodes++;
-      else if (node.level === 2) level2Nodes++;
-      else if (node.level === 3) level3Nodes++;
-
+      total++;
+      byLevel[node.level]++;
       node.children.forEach(traverse);
     };
 
     traverse(rootNode);
 
-    return {
-      totalNodes,
-      level1Nodes,
-      level2Nodes,
-      level3Nodes,
-      totalCost: rootNode.totalCost
-    };
+    return { total, byLevel };
   }
 
   /**
-   * Detecta formato do arquivo
+   * Conta riscos por status
    */
-  static detectFileFormat(file: File): 'json' | 'excel' | 'csv' | 'unknown' {
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    
-    switch (extension) {
-      case 'json':
-        return 'json';
-      case 'xlsx':
-      case 'xls':
-        return 'excel';
-      case 'csv':
-        return 'csv';
-      default:
-        return 'unknown';
-    }
+  private static countRisksByStatus(risks: Risk[]): Record<string, number> {
+    return risks.reduce((acc, risk) => {
+      acc[risk.status] = (acc[risk.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
   }
 
   /**
-   * Importa arquivo automaticamente baseado no formato
+   * Conta figuras de mérito por categoria
    */
-  static async importFile(file: File): Promise<ImportResult> {
-    const format = this.detectFileFormat(file);
-    
-    switch (format) {
-      case 'json':
-        return this.importFromJSON(file);
-      case 'excel':
-        return this.importFromExcel(file);
-      case 'csv':
-        return this.importFromCSV(file);
-      default:
-        return {
-          success: false,
-          errors: [{
-            message: `Formato de arquivo não suportado: ${file.name}. Formatos aceitos: JSON, Excel (.xlsx/.xls), CSV`,
-            severity: 'error'
-          }],
-          warnings: []
-        };
-    }
+  private static countMeritFiguresByCategory(meritFigures: MeritFigure[]): Record<string, number> {
+    return meritFigures.reduce((acc, figure) => {
+      acc[figure.category] = (acc[figure.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
   }
 } 

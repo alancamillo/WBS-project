@@ -23,7 +23,7 @@ interface TreeNodeProps {
 }
 
 interface GroupingModalProps {
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
   onConfirm: (groupedPhaseIds: string[]) => void;
   phases: TreeNodeType[];
@@ -42,7 +42,7 @@ interface DateValidation {
 
 // Modal para seleção de fases para agrupar
 const GroupingModal: React.FC<GroupingModalProps> = ({
-  visible,
+  open,
   onCancel,
   onConfirm,
   phases,
@@ -74,7 +74,7 @@ const GroupingModal: React.FC<GroupingModalProps> = ({
   return (
     <Modal
       title={t('treeView.groupingModal.title')}
-      open={visible}
+      open={open}
       onCancel={onCancel}
       onOk={handleConfirm}
       okText={t('treeView.groupingModal.confirm')}
@@ -1235,69 +1235,71 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         <Collapse
           size="small"
           defaultActiveKey={node.level === 1 ? ['children'] : []}
-        >
-          <Collapse.Panel
-            key="children"
-            header={`${t('wbs.subitems')} (${node.children.length})`}
-          >
-            <div style={{ paddingLeft: 16 }}>
-              {processedNode.children.map(child => {
-                const isGroupedNode = child.id === 'grouped-others';
-                const shouldShowChildren = isGroupedNode ? groupingState.groupedExpanded : true;
-                
-                return (
-                  <div key={child.id}>
-                    <TreeNodeComponent
-                      node={child}
-                      onUpdate={handleChildUpdate}
-                      onDelete={handleChildDelete}
-                      maxLevel={maxLevel}
-                      rootNode={rootNode}
-                    />
+          items={[
+            {
+              key: 'children',
+              label: `${t('wbs.subitems')} (${node.children.length})`,
+              children: (
+                <div style={{ paddingLeft: 16 }}>
+                  {processedNode.children.map(child => {
+                    const isGroupedNode = child.id === 'grouped-others';
+                    const shouldShowChildren = isGroupedNode ? groupingState.groupedExpanded : true;
                     
-                    {/* Botão expandir/recolher para nó agrupado */}
-                    {isGroupedNode && child.children.length > 0 && (
-                      <div style={{ marginTop: 8, marginBottom: 16, textAlign: 'center' }}>
-                        <Button
-                          type="dashed"
-                          size="small"
-                          icon={groupingState.groupedExpanded ? <FolderOutlined /> : <FolderOutlined />}
-                          onClick={() => onGroupingUpdate && onGroupingUpdate({
-                            groupedPhaseIds: groupingState.groupedPhaseIds,
-                            groupedExpanded: !groupingState.groupedExpanded
-                          })}
-                        >
-                          {groupingState.groupedExpanded ? t('treeView.collapse') : t('treeView.expand')}
-                        </Button>
+                    return (
+                      <div key={child.id}>
+                        <TreeNodeComponent
+                          node={child}
+                          onUpdate={handleChildUpdate}
+                          onDelete={handleChildDelete}
+                          maxLevel={maxLevel}
+                          rootNode={rootNode}
+                        />
+                        
+                        {/* Botão expandir/recolher para nó agrupado */}
+                        {isGroupedNode && child.children.length > 0 && (
+                          <div style={{ marginTop: 8, marginBottom: 16, textAlign: 'center' }}>
+                            <Button
+                              type="dashed"
+                              size="small"
+                              icon={groupingState.groupedExpanded ? <FolderOutlined /> : <FolderOutlined />}
+                              onClick={() => onGroupingUpdate && onGroupingUpdate({
+                                groupedPhaseIds: groupingState.groupedPhaseIds,
+                                groupedExpanded: !groupingState.groupedExpanded
+                              })}
+                            >
+                              {groupingState.groupedExpanded ? t('treeView.collapse') : t('treeView.expand')}
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {/* Filhos do nó agrupado */}
+                        {isGroupedNode && shouldShowChildren && child.children.length > 0 && (
+                          <div style={{ paddingLeft: 16, marginTop: 8 }}>
+                            {child.children.map(grandChild => (
+                              <TreeNodeComponent
+                                key={grandChild.id}
+                                node={grandChild}
+                                onUpdate={handleChildUpdate}
+                                onDelete={handleChildDelete}
+                                maxLevel={maxLevel}
+                                rootNode={rootNode}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                    
-                    {/* Filhos do nó agrupado */}
-                    {isGroupedNode && shouldShowChildren && child.children.length > 0 && (
-                      <div style={{ paddingLeft: 16, marginTop: 8 }}>
-                        {child.children.map(grandChild => (
-                          <TreeNodeComponent
-                            key={grandChild.id}
-                            node={grandChild}
-                            onUpdate={handleChildUpdate}
-                            onDelete={handleChildDelete}
-                            maxLevel={maxLevel}
-                            rootNode={rootNode}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Collapse.Panel>
-        </Collapse>
+                    );
+                  })}
+                </div>
+              )
+            }
+          ]}
+        />
       )}
 
       {/* Modal de agrupamento */}
       <GroupingModal
-        visible={groupingModalVisible}
+        open={groupingModalVisible}
         onCancel={() => setGroupingModalVisible(false)}
         onConfirm={handleGroupingConfirm}
         phases={phases}

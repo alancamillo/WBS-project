@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   Upload,
@@ -25,19 +25,19 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
-import { ImportService, ImportResult, ImportValidationError } from '../services/importService';
-import { TreeNode } from '../types';
+import { ImportService, ImportResult } from '../services/importService';
+import { TreeNode, ImportWarning } from '../types';
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 
 interface ImportWBSProps {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
-  onImport: (rootNode: TreeNode) => void;
+  onImport: (result: ImportResult) => void;
 }
 
-const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => {
+const ImportWBS: React.FC<ImportWBSProps> = ({ open, onClose, onImport }) => {
   const { t } = useTranslation();
   const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [loading, setLoading] = useState(false);
@@ -71,8 +71,8 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
   };
 
   const handleConfirmImport = () => {
-    if (importResult?.success && importResult.data) {
-      onImport(importResult.data);
+    if (importResult?.success) {
+      onImport(importResult);
       setCurrentStep('complete');
       setTimeout(() => {
         handleClose();
@@ -130,11 +130,10 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
             <List
               size="small"
               dataSource={importResult.errors}
-              renderItem={(error: ImportValidationError) => (
+              renderItem={(error: ImportWarning) => (
                 <List.Item>
                   <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginRight: 8 }} />
-                  {error.line && `${t('importWBS.line')} ${error.line}: `}
-                  {error.message}
+                                      {error.message}
                 </List.Item>
               )}
             />
@@ -313,10 +312,9 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
               <List
                 size="small"
                 dataSource={warnings.slice(0, 5)}
-                renderItem={(warning: ImportValidationError) => (
+                renderItem={(warning: ImportWarning) => (
                   <List.Item>
                     <WarningOutlined style={{ color: '#faad14', marginRight: 8 }} />
-                    {warning.line && `${t('importWBS.line')} ${warning.line}: `}
                     {warning.message}
                   </List.Item>
                 )}
@@ -374,11 +372,11 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ visible, onClose, onImport }) => 
   return (
     <Modal
       title={t('importWBS.modalTitle')}
-      visible={visible}
+      open={open}
       onCancel={handleClose}
       footer={null}
       width={currentStep === 'preview' ? 1200 : 800}
-      destroyOnClose
+      destroyOnHidden
     >
       {currentStep === 'upload' && renderUploadStep()}
       {currentStep === 'preview' && renderPreviewStep()}

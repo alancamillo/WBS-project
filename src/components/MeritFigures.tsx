@@ -164,7 +164,12 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
 
   // Carregar dados iniciais
   useEffect(() => {
-    setMeritFigures(loadMeritFigures());
+    const figures = loadMeritFigures();
+    setMeritFigures(figures);
+    // Selecionar automaticamente todas as figuras para mostrar o gráfico
+    if (figures.length > 0) {
+      setSelectedIndicators(figures.map(f => f.id));
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Atualizar cálculo de progresso
@@ -195,6 +200,13 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
       saveMeritFigures(meritFigures);
     }
   }, [meritFigures, saveMeritFigures]);
+
+  // Atualizar selectedIndicators quando figuras mudarem
+  useEffect(() => {
+    if (meritFigures.length > 0 && selectedIndicators.length === 0) {
+      setSelectedIndicators(meritFigures.map(f => f.id));
+    }
+  }, [meritFigures, selectedIndicators]);
 
   // Calcular métricas
   const metrics: MeritFigureMetrics = useMemo(() => {
@@ -305,6 +317,8 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
     setImpactModalVisible(false);
     setSelectedFigure(null);
   };
+
+  // Função removida - não estava sendo utilizada
 
   // Função utilitária para formatar datas conforme granularidade
   function formatDateByGranularity(date: Date, granularity: 'day' | 'week' | 'month' | 'year') {
@@ -673,6 +687,399 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
     }
   ];
 
+  const renderOverviewTab = () => (
+    <div>
+      {/* Métricas gerais */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title={t('meritFigures.metrics.total')}
+              value={metrics.totalFigures}
+              prefix={<TrophyOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title={t('meritFigures.metrics.onTrack')}
+              value={metrics.onTrackFigures}
+              valueStyle={{ color: '#52c41a' }}
+              prefix={<CheckCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title={t('meritFigures.metrics.atRisk')}
+              value={metrics.atRiskFigures}
+              valueStyle={{ color: '#fa8c16' }}
+              prefix={<ExclamationCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title={t('meritFigures.metrics.offTrack')}
+              value={metrics.offTrackFigures}
+              valueStyle={{ color: '#f5222d' }}
+              prefix={<CloseCircleOutlined />}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Progresso médio */}
+      <Card style={{ marginBottom: 24 }}>
+        <Title level={4}>{t('meritFigures.metrics.averageProgress')}</Title>
+        <Progress 
+          percent={Math.round(metrics.averageProgress)} 
+          status={metrics.averageProgress >= 80 ? 'success' : metrics.averageProgress >= 50 ? 'normal' : 'exception'}
+        />
+      </Card>
+
+      {/* Figuras críticas */}
+      {metrics.criticalFigures.length > 0 && (
+        <Card title={t('meritFigures.criticalFigures')} style={{ marginBottom: 24 }}>
+          <List
+            dataSource={metrics.criticalFigures}
+            renderItem={(figure) => (
+              <List.Item>
+                <List.Item.Meta
+                  avatar={
+                    <Avatar 
+                      style={{ 
+                        backgroundColor: figure.status === 'off-track' ? '#f5222d' : 
+                                       figure.status === 'at-risk' ? '#fa8c16' : '#52c41a' 
+                      }}
+                    >
+                      {figure.weight}
+                    </Avatar>
+                  }
+                  title={figure.name}
+                  description={
+                    <div>
+                      <div style={{ marginBottom: '4px' }}>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          {t('meritFigures.form.baselineValue')}: {figure.baselineValue} {figure.unit} | 
+                          {t('meritFigures.table.currentValue')}: <Text strong>{figure.currentValue} {figure.unit}</Text> | 
+                          {t('meritFigures.table.target')}: {figure.targetValue} {figure.unit}
+                        </Text>
+                      </div>
+                      <div>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>
+                          {figure.phaseImpacts?.length || 0} {t('meritFigures.table.phaseImpacts')} • 
+                          {t('meritFigures.direction.' + figure.direction)}
+                        </Text>
+                      </div>
+                    </div>
+                  }
+                />
+                <div style={{ textAlign: 'right' }}>
+                  <Progress 
+                    percent={Math.round(calculateProgress(figure))} 
+                    size="small"
+                    status={figure.status === 'completed' ? 'success' : undefined}
+                    style={{ marginBottom: '8px' }}
+                  />
+                  <Tag color={figure.status === 'off-track' ? 'red' : figure.status === 'at-risk' ? 'orange' : 'green'}>
+                    {t(`meritFigures.status.${figure.status}`)}
+                  </Tag>
+                </div>
+              </List.Item>
+            )}
+          />
+        </Card>
+      )}
+
+      {/* Tabela principal */}
+      <Card title={t('meritFigures.table.title')}>
+        {meritFigures.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <TrophyOutlined style={{ fontSize: '64px', color: '#d9d9d9', marginBottom: '16px' }} />
+            <Title level={4} style={{ color: '#8c8c8c' }}>
+              Nenhuma figura de mérito cadastrada
+            </Title>
+            <Paragraph style={{ color: '#8c8c8c', marginBottom: '24px' }}>
+              Comece adicionando indicadores de performance para acompanhar o progresso do seu projeto.
+            </Paragraph>
+            <Space>
+              <Button 
+                type="primary" 
+                icon={<PlusOutlined />} 
+                onClick={handleAddFigure}
+                size="large"
+              >
+                {t('meritFigures.addNew')}
+              </Button>
+            </Space>
+          </div>
+        ) : (
+          <Table
+            dataSource={meritFigures}
+            columns={columns}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => 
+                `${range[0]}-${range[1]} de ${total} ${t('meritFigures.table.items')}`
+            }}
+          />
+        )}
+      </Card>
+    </div>
+  );
+
+
+
+  const renderAnalysisTab = () => (
+    <div>
+      <Card title={t('meritFigures.analysis.title')}>
+        <Paragraph>
+          {t('meritFigures.analysis.description')}
+        </Paragraph>
+        
+        {meritFigures.length === 0 ? (
+          <Alert
+            message={t('meritFigures.analysis.noData')}
+            description={t('meritFigures.analysis.noDataDescription')}
+            type="info"
+            showIcon
+          />
+        ) : (
+          <div>
+            {/* Análise por categoria */}
+            <Title level={4}>{t('meritFigures.analysis.byCategory')}</Title>
+            <Row gutter={[16, 16]}>
+              {Object.entries(metrics.figuresByCategory).map(([category, count]) => (
+                <Col xs={24} sm={12} md={8} key={category}>
+                  <Card size="small">
+                    <Statistic
+                      title={t(`meritFigures.categories.${category}`)}
+                      value={count}
+                      suffix={t('meritFigures.analysis.figures')}
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            {/* Top performers */}
+            <Title level={4} style={{ marginTop: 24 }}>
+              {t('meritFigures.analysis.topPerformers')}
+            </Title>
+            <List
+              dataSource={metrics.topPerformingFigures}
+              renderItem={(figure, index) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar 
+                        style={{ backgroundColor: index === 0 ? '#ffd700' : 
+                                              index === 1 ? '#c0c0c0' : 
+                                              index === 2 ? '#cd7f32' : '#1890ff' }}
+                      >
+                        {index + 1}
+                      </Avatar>
+                    }
+                    title={figure.name}
+                    description={
+                      <div>
+                        <div style={{ marginBottom: '4px' }}>
+                          <Text type="secondary" style={{ fontSize: '12px' }}>
+                            {figure.baselineValue} → <Text strong>{figure.currentValue}</Text> → {figure.targetValue} {figure.unit}
+                          </Text>
+                        </div>
+                        <div>
+                          <Text type="secondary" style={{ fontSize: '11px' }}>
+                            {Math.round(calculateProgress(figure))}% {t('meritFigures.analysis.progress')} • 
+                            {figure.phaseImpacts?.length || 0} {t('meritFigures.table.phaseImpacts')}
+                          </Text>
+                        </div>
+                      </div>
+                    }
+                  />
+                  <div style={{ textAlign: 'right' }}>
+                    <Progress 
+                      percent={Math.round(calculateProgress(figure))} 
+                      size="small"
+                      status={figure.status === 'completed' ? 'success' : undefined}
+                      style={{ marginBottom: '8px' }}
+                    />
+                    <Tag color={figure.status === 'off-track' ? 'red' : figure.status === 'at-risk' ? 'orange' : 'green'}>
+                      {t(`meritFigures.status.${figure.status}`)}
+                    </Tag>
+                  </div>
+                </List.Item>
+              )}
+            />
+
+            {/* Análise de contribuição das fases */}
+            <Title level={4} style={{ marginTop: 24 }}>
+              {t('meritFigures.analysis.phaseContributions')}
+            </Title>
+            <Row gutter={[16, 16]}>
+              {meritFigures.filter(f => f.phaseImpacts && f.phaseImpacts.length > 0).map(figure => {
+                const totalAgregado = figure.phaseImpacts?.reduce((sum, impact) => {
+                  const phaseNode = findNodeById(rootNode, impact.nodeId);
+                  return phaseNode && phaseNode.status === 'completed' ? sum + (impact.valorAgregado || 0) : sum;
+                }, 0) || 0;
+                return (
+                  <Col xs={24} md={12} key={figure.id}>
+                    <Card size="small" title={figure.name}>
+                      <div style={{ marginBottom: '12px' }}>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          {figure.baselineValue} → <Text strong>{figure.currentValue}</Text> → {figure.targetValue} {figure.unit}
+                        </Text>
+                      </div>
+                      
+                      {/* Gráfico de contribuição das fases */}
+                      <div style={{ marginBottom: '12px' }}>
+                        {figure.phaseImpacts?.map((impact, index) => {
+                          const phase = getProjectPhases().find(p => p.id === impact.nodeId);
+                          const barWidth = Math.abs(impact.valorAgregado) * 2; // Escala para visualização
+                          const isPositive = (
+                            (figure.direction === 'increase' && impact.valorAgregado > 0) ||
+                            (figure.direction === 'decrease' && impact.valorAgregado < 0)
+                          );
+                          return (
+                            <div key={index} style={{ marginBottom: '8px' }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: '4px'
+                              }}>
+                                <Text style={{ fontSize: '12px', width: '120px' }}>{phase?.name || 'Fase'}</Text>
+                                <div style={{ 
+                                  width: '100px', 
+                                  height: '8px', 
+                                  backgroundColor: '#f0f0f0',
+                                  borderRadius: '4px',
+                                  overflow: 'hidden'
+                                }}>
+                                  <div style={{
+                                    width: `${barWidth}%`,
+                                    height: '100%',
+                                    backgroundColor: isPositive ? '#52c41a' : '#f5222d',
+                                    borderRadius: '4px',
+                                    transition: 'width 0.3s ease'
+                                  }} />
+                                </div>
+                                <Tag color={isPositive ? 'green' : 'red'} style={{ fontSize: '10px', marginLeft: '8px' }}>
+                                  {impact.valorAgregado > 0 ? '+' : ''}{impact.valorAgregado} {figure.unit}
+                                </Tag>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Resumo do impacto total */}
+                      <div style={{ 
+                        padding: '8px', 
+                        backgroundColor: '#fafafa', 
+                        borderRadius: '4px',
+                        border: '1px solid #d9d9d9'
+                      }}>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>
+                          {t('meritFigures.analysis.totalImpact')}: {totalAgregado} {figure.unit}
+                        </Text>
+                      </div>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          </div>
+        )}
+      </Card>
+
+      {/* Controles e gráfico */}
+      <Card title={t('meritFigures.analysis.chartTitle')} style={{ marginBottom: 24, background: '#fff', boxShadow: '0 2px 8px #f0f1f2' }}>
+        <div style={{ marginBottom: 16, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <Select
+            mode="multiple"
+            allowClear
+            style={{ minWidth: 220 }}
+            placeholder={t('meritFigures.analysis.selectIndicators')}
+            value={selectedIndicators}
+            onChange={setSelectedIndicators}
+            options={meritFigures.map(f => ({ label: f.name, value: f.id }))}
+          />
+          <Select
+            style={{ minWidth: 120 }}
+            value={timeGranularity}
+            onChange={setTimeGranularity}
+            options={[
+              { label: t('meritFigures.analysis.day'), value: 'day' },
+              { label: t('meritFigures.analysis.week'), value: 'week' },
+              { label: t('meritFigures.analysis.month'), value: 'month' },
+              { label: t('meritFigures.analysis.year'), value: 'year' }
+            ]}
+          />
+        </div>
+        {selectedIndicators.length > 0 ? (
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={chartData} margin={{ top: 16, right: 32, left: 40, bottom: 16 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis 
+                domain={['dataMin - (dataMax - dataMin) * 0.1', 'dataMax + (dataMax - dataMin) * 0.1']}
+                tickFormatter={(value) => Number(value).toFixed(1)}
+              />
+              <RechartsTooltip content={CustomTooltip} />
+              <Legend />
+              {selectedIndicators.map((indicatorId, index) => {
+                const figure = meritFigures.find(f => f.id === indicatorId);
+                if (!figure) return null;
+                
+                const colors = ['#1890ff', '#52c41a', '#fa8c16', '#f5222d', '#722ed1', '#13c2c2'];
+                const color = colors[index % colors.length];
+                
+                return (
+                  <Line
+                    key={figure.id}
+                    type="monotone"
+                    dataKey={figure.name}
+                    stroke={color}
+                    strokeWidth={3}
+                    dot={props => { 
+                      const { key, ...rest } = props; 
+                      return <CustomDot key={key} {...rest} fill={color} />; 
+                    }}
+                    activeDot={{ r: 6, fill: color }}
+                    connectNulls={false}
+                  />
+                );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div style={{ 
+            height: 320, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            border: '1px dashed #d9d9d9',
+            borderRadius: '6px',
+            color: '#8c8c8c'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <TrophyOutlined style={{ fontSize: '48px', marginBottom: '16px' }} />
+              <div>{t('meritFigures.analysis.selectIndicatorsToView')}</div>
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+
   return (
     <div className="merit-figures-container">
       <div className="merit-figures-header">
@@ -690,368 +1097,11 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
 
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
         <TabPane tab={t('meritFigures.tabs.overview')} key="overview">
-          {/* Métricas gerais */}
-          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-            <Col xs={24} sm={12} md={6}>
-              <Card>
-                <Statistic
-                  title={t('meritFigures.metrics.total')}
-                  value={metrics.totalFigures}
-                  prefix={<TrophyOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card>
-                <Statistic
-                  title={t('meritFigures.metrics.onTrack')}
-                  value={metrics.onTrackFigures}
-                  valueStyle={{ color: '#52c41a' }}
-                  prefix={<CheckCircleOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card>
-                <Statistic
-                  title={t('meritFigures.metrics.atRisk')}
-                  value={metrics.atRiskFigures}
-                  valueStyle={{ color: '#fa8c16' }}
-                  prefix={<ExclamationCircleOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card>
-                <Statistic
-                  title={t('meritFigures.metrics.offTrack')}
-                  value={metrics.offTrackFigures}
-                  valueStyle={{ color: '#f5222d' }}
-                  prefix={<CloseCircleOutlined />}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Progresso médio */}
-          <Card style={{ marginBottom: 24 }}>
-            <Title level={4}>{t('meritFigures.metrics.averageProgress')}</Title>
-            <Progress 
-              percent={Math.round(metrics.averageProgress)} 
-              status={metrics.averageProgress >= 80 ? 'success' : metrics.averageProgress >= 50 ? 'normal' : 'exception'}
-            />
-          </Card>
-
-          {/* Figuras críticas */}
-          {metrics.criticalFigures.length > 0 && (
-            <Card title={t('meritFigures.criticalFigures')} style={{ marginBottom: 24 }}>
-              <List
-                dataSource={metrics.criticalFigures}
-                renderItem={(figure) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar 
-                          style={{ 
-                            backgroundColor: figure.status === 'off-track' ? '#f5222d' : 
-                                           figure.status === 'at-risk' ? '#fa8c16' : '#52c41a' 
-                          }}
-                        >
-                          {figure.weight}
-                        </Avatar>
-                      }
-                      title={figure.name}
-                      description={
-                        <div>
-                          <div style={{ marginBottom: '4px' }}>
-                            <Text type="secondary" style={{ fontSize: '12px' }}>
-                              {t('meritFigures.form.baselineValue')}: {figure.baselineValue} {figure.unit} | 
-                              {t('meritFigures.table.currentValue')}: <Text strong>{figure.currentValue} {figure.unit}</Text> | 
-                              {t('meritFigures.table.target')}: {figure.targetValue} {figure.unit}
-                            </Text>
-                          </div>
-                          <div>
-                            <Text type="secondary" style={{ fontSize: '11px' }}>
-                              {figure.phaseImpacts?.length || 0} {t('meritFigures.table.phaseImpacts')} • 
-                              {t('meritFigures.direction.' + figure.direction)}
-                            </Text>
-                          </div>
-                        </div>
-                      }
-                    />
-                    <div style={{ textAlign: 'right' }}>
-                      <Progress 
-                        percent={Math.round(calculateProgress(figure))} 
-                        size="small"
-                        status={figure.status === 'completed' ? 'success' : undefined}
-                        style={{ marginBottom: '8px' }}
-                      />
-                      <Tag color={figure.status === 'off-track' ? 'red' : figure.status === 'at-risk' ? 'orange' : 'green'}>
-                        {t(`meritFigures.status.${figure.status}`)}
-                      </Tag>
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Card>
-          )}
-
-          {/* Tabela principal */}
-          <Card title={t('meritFigures.table.title')}>
-            <Table
-              dataSource={meritFigures}
-              columns={columns}
-              rowKey="id"
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) => 
-                  `${range[0]}-${range[1]} de ${total} ${t('meritFigures.table.items')}`
-              }}
-            />
-          </Card>
+          {renderOverviewTab()}
         </TabPane>
 
         <TabPane tab={t('meritFigures.tabs.analysis')} key="analysis">
-          <Card title={t('meritFigures.analysis.title')}>
-            <Paragraph>
-              {t('meritFigures.analysis.description')}
-            </Paragraph>
-            
-            {meritFigures.length === 0 ? (
-              <Alert
-                message={t('meritFigures.analysis.noData')}
-                description={t('meritFigures.analysis.noDataDescription')}
-                type="info"
-                showIcon
-              />
-            ) : (
-              <div>
-                {/* Análise por categoria */}
-                <Title level={4}>{t('meritFigures.analysis.byCategory')}</Title>
-                <Row gutter={[16, 16]}>
-                  {Object.entries(metrics.figuresByCategory).map(([category, count]) => (
-                    <Col xs={24} sm={12} md={8} key={category}>
-                      <Card size="small">
-                        <Statistic
-                          title={t(`meritFigures.categories.${category}`)}
-                          value={count}
-                          suffix={t('meritFigures.analysis.figures')}
-                        />
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-
-                {/* Top performers */}
-                <Title level={4} style={{ marginTop: 24 }}>
-                  {t('meritFigures.analysis.topPerformers')}
-                </Title>
-                <List
-                  dataSource={metrics.topPerformingFigures}
-                  renderItem={(figure, index) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={
-                          <Avatar 
-                            style={{ backgroundColor: index === 0 ? '#ffd700' : 
-                                                   index === 1 ? '#c0c0c0' : 
-                                                   index === 2 ? '#cd7f32' : '#1890ff' }}
-                          >
-                            {index + 1}
-                          </Avatar>
-                        }
-                        title={figure.name}
-                        description={
-                          <div>
-                            <div style={{ marginBottom: '4px' }}>
-                              <Text type="secondary" style={{ fontSize: '12px' }}>
-                                {figure.baselineValue} → <Text strong>{figure.currentValue}</Text> → {figure.targetValue} {figure.unit}
-                              </Text>
-                            </div>
-                            <div>
-                              <Text type="secondary" style={{ fontSize: '11px' }}>
-                                {Math.round(calculateProgress(figure))}% {t('meritFigures.analysis.progress')} • 
-                                {figure.phaseImpacts?.length || 0} {t('meritFigures.table.phaseImpacts')}
-                              </Text>
-                            </div>
-                          </div>
-                        }
-                      />
-                      <div style={{ textAlign: 'right' }}>
-                        <Progress 
-                          percent={Math.round(calculateProgress(figure))} 
-                          size="small"
-                          status={figure.status === 'completed' ? 'success' : undefined}
-                          style={{ marginBottom: '8px' }}
-                        />
-                        <Tag color={figure.status === 'off-track' ? 'red' : figure.status === 'at-risk' ? 'orange' : 'green'}>
-                          {t(`meritFigures.status.${figure.status}`)}
-                        </Tag>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-
-                {/* Análise de contribuição das fases */}
-                <Title level={4} style={{ marginTop: 24 }}>
-                  {t('meritFigures.analysis.phaseContributions')}
-                </Title>
-                <Row gutter={[16, 16]}>
-                  {meritFigures.filter(f => f.phaseImpacts && f.phaseImpacts.length > 0).map(figure => {
-                    const totalAgregado = figure.phaseImpacts?.reduce((sum, impact) => {
-                      const phaseNode = findNodeById(rootNode, impact.nodeId);
-                      return phaseNode && phaseNode.status === 'completed' ? sum + (impact.valorAgregado || 0) : sum;
-                    }, 0) || 0;
-                    return (
-                      <Col xs={24} md={12} key={figure.id}>
-                        <Card size="small" title={figure.name}>
-                          <div style={{ marginBottom: '12px' }}>
-                            <Text type="secondary" style={{ fontSize: '12px' }}>
-                              {figure.baselineValue} → <Text strong>{figure.currentValue}</Text> → {figure.targetValue} {figure.unit}
-                            </Text>
-                          </div>
-                          
-                          {/* Gráfico de contribuição das fases */}
-                          <div style={{ marginBottom: '12px' }}>
-                            {figure.phaseImpacts?.map((impact, index) => {
-                              const phase = getProjectPhases().find(p => p.id === impact.nodeId);
-                              const barWidth = Math.abs(impact.valorAgregado) * 2; // Escala para visualização
-                              const isPositive = (
-                                (figure.direction === 'increase' && impact.valorAgregado > 0) ||
-                                (figure.direction === 'decrease' && impact.valorAgregado < 0)
-                              );
-                              return (
-                                <div key={index} style={{ marginBottom: '8px' }}>
-                                  <div style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    alignItems: 'center',
-                                    marginBottom: '4px'
-                                  }}>
-                                    <Text style={{ fontSize: '12px', width: '120px' }}>{phase?.name || 'Fase'}</Text>
-                                    <div style={{ 
-                                      width: '100px', 
-                                      height: '8px', 
-                                      backgroundColor: '#f0f0f0',
-                                      borderRadius: '4px',
-                                      overflow: 'hidden'
-                                    }}>
-                                      <div style={{
-                                        width: `${barWidth}%`,
-                                        height: '100%',
-                                        backgroundColor: isPositive ? '#52c41a' : '#f5222d',
-                                        borderRadius: '4px',
-                                        transition: 'width 0.3s ease'
-                                      }} />
-                                    </div>
-                                    <Tag color={isPositive ? 'green' : 'red'} style={{ fontSize: '10px', marginLeft: '8px' }}>
-                                      {impact.valorAgregado > 0 ? '+' : ''}{impact.valorAgregado} {figure.unit}
-                                    </Tag>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          
-                          {/* Resumo do impacto total */}
-                          <div style={{ 
-                            padding: '8px', 
-                            backgroundColor: '#fafafa', 
-                            borderRadius: '4px',
-                            border: '1px solid #d9d9d9'
-                          }}>
-                            <Text type="secondary" style={{ fontSize: '11px' }}>
-                              {t('meritFigures.analysis.totalImpact')}: {totalAgregado} {figure.unit}
-                            </Text>
-                          </div>
-                        </Card>
-                      </Col>
-                    );
-                  })}
-                </Row>
-              </div>
-            )}
-          </Card>
-
-          {/* Controles e gráfico */}
-          <Card title={t('meritFigures.analysis.chartTitle')} style={{ marginBottom: 24, background: '#fff', boxShadow: '0 2px 8px #f0f1f2' }}>
-            <div style={{ marginBottom: 16, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <Select
-                mode="multiple"
-                allowClear
-                style={{ minWidth: 220 }}
-                placeholder={t('meritFigures.analysis.selectIndicators')}
-                value={selectedIndicators}
-                onChange={setSelectedIndicators}
-                options={meritFigures.map(f => ({ label: f.name, value: f.id }))}
-              />
-              <Select
-                style={{ minWidth: 120 }}
-                value={timeGranularity}
-                onChange={setTimeGranularity}
-                options={[
-                  { label: t('meritFigures.analysis.day'), value: 'day' },
-                  { label: t('meritFigures.analysis.week'), value: 'week' },
-                  { label: t('meritFigures.analysis.month'), value: 'month' },
-                  { label: t('meritFigures.analysis.year'), value: 'year' }
-                ]}
-              />
-            </div>
-            {selectedIndicators.length > 0 ? (
-              <ResponsiveContainer width="100%" height={320}>
-                <LineChart data={chartData} margin={{ top: 16, right: 32, left: 40, bottom: 16 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis 
-                    domain={['dataMin - (dataMax - dataMin) * 0.1', 'dataMax + (dataMax - dataMin) * 0.1']}
-                    tickFormatter={(value) => Number(value).toFixed(1)}
-                  />
-                  <RechartsTooltip content={CustomTooltip} />
-                  <Legend />
-                  {selectedIndicators.map((indicatorId, index) => {
-                    const figure = meritFigures.find(f => f.id === indicatorId);
-                    if (!figure) return null;
-                    
-                    const colors = ['#1890ff', '#52c41a', '#fa8c16', '#f5222d', '#722ed1', '#13c2c2'];
-                    const color = colors[index % colors.length];
-                    
-                    return (
-                      <Line
-                        key={figure.id}
-                        type="monotone"
-                        dataKey={figure.name}
-                        stroke={color}
-                        strokeWidth={3}
-                        dot={props => { 
-                          const { key, ...rest } = props; 
-                          return <CustomDot key={key} {...rest} fill={color} />; 
-                        }}
-                        activeDot={{ r: 6, fill: color }}
-                        connectNulls={false}
-                      />
-                    );
-                  })}
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div style={{ 
-                height: 320, 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                border: '1px dashed #d9d9d9',
-                borderRadius: '6px',
-                color: '#8c8c8c'
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <TrophyOutlined style={{ fontSize: '48px', marginBottom: '16px' }} />
-                  <div>{t('meritFigures.analysis.selectIndicatorsToView')}</div>
-                </div>
-              </div>
-            )}
-          </Card>
+          {renderAnalysisTab()}
         </TabPane>
       </Tabs>
 

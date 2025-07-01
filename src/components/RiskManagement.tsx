@@ -50,7 +50,8 @@ import './RiskManagement.css';
 const { Option } = Select;
 const { TextArea } = Input;
 const { Text } = Typography;
-const { TabPane } = Tabs;
+// Using items format now instead of TabPane
+// Removed Panel destructuring - not used in this component
 
 interface RiskManagementProps {
   rootNode: TreeNode;
@@ -836,66 +837,68 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
         </Row>
 
         {/* Abas para Tabela e Matriz */}
-        <Tabs defaultActiveKey="table">
-          <TabPane 
-            tab={
-              <span>
-                <TableOutlined />
-                {t('riskManagement.tabs.risksList')}
-              </span>
-            } 
-            key="table"
-          >
-            <Table
-              columns={columns}
-              dataSource={filteredRisks}
-              rowKey="id"
-              scroll={{ x: 1200 }}
-              pagination={{
-                current: currentPage,
-                pageSize: pageSize,
-                total: filteredRisks.length,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                pageSizeOptions: ['5', '10', '20', '50'],
-                showTotal: (total, range) => 
-                  `${range[0]}-${range[1]} ${t('riskManagement.table.pagination')} ${total} ${t('riskManagement.table.risks')}`,
-                onChange: (page, size) => {
-                  setCurrentPage(page);
-                  if (size !== pageSize) {
-                    setPageSize(size);
-                    setCurrentPage(1); // Reset to first page when changing page size
-                  }
-                },
-                onShowSizeChange: (current, size) => {
-                  setPageSize(size);
-                  setCurrentPage(1); // Reset to first page when changing page size
-                },
-              }}
-              locale={{
-                emptyText: (
-                  <Empty
-                    description={t('riskManagement.table.noRisksFound')}
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  />
-                ),
-              }}
-              size="middle"
-            />
-          </TabPane>
-          
-          <TabPane 
-            tab={
-              <span>
-                <BarChartOutlined />
-                {t('riskManagement.tabs.riskMatrix')}
-              </span>
-            } 
-            key="matrix"
-          >
-            <RiskMatrix risks={filteredRisks} />
-          </TabPane>
-        </Tabs>
+        <Tabs 
+          defaultActiveKey="table"
+          items={[
+            {
+              key: 'table',
+              label: (
+                <span>
+                  <TableOutlined />
+                  {t('riskManagement.tabs.risksList')}
+                </span>
+              ),
+              children: (
+                <Table
+                  columns={columns}
+                  dataSource={filteredRisks}
+                  rowKey="id"
+                  scroll={{ x: 1200 }}
+                  pagination={{
+                    current: currentPage,
+                    pageSize: pageSize,
+                    total: filteredRisks.length,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                    pageSizeOptions: ['5', '10', '20', '50'],
+                    showTotal: (total, range) => 
+                      `${range[0]}-${range[1]} ${t('riskManagement.table.pagination')} ${total} ${t('riskManagement.table.risks')}`,
+                    onChange: (page, size) => {
+                      setCurrentPage(page);
+                      if (size !== pageSize) {
+                        setPageSize(size);
+                        setCurrentPage(1); // Reset to first page when changing page size
+                      }
+                    },
+                    onShowSizeChange: (current, size) => {
+                      setPageSize(size);
+                      setCurrentPage(1); // Reset to first page when changing page size
+                    },
+                  }}
+                  locale={{
+                    emptyText: (
+                      <Empty
+                        description={t('riskManagement.table.noRisksFound')}
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      />
+                    ),
+                  }}
+                  size="middle"
+                />
+              )
+            },
+            {
+              key: 'matrix',
+              label: (
+                <span>
+                  <BarChartOutlined />
+                  {t('riskManagement.tabs.riskMatrix')}
+                </span>
+              ),
+              children: <RiskMatrix risks={filteredRisks} />
+            }
+          ]}
+        />
       </Card>
 
       {/* Modal de Criação/Edição */}

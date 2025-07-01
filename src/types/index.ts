@@ -185,3 +185,142 @@ export interface MeritFigureCalculation {
   lastUpdate: Date;
 }
 
+// Modelo Unificado de Projeto para Export/Import
+export interface UnifiedProjectData {
+  // Metadados do projeto
+  projectInfo: {
+    id: string;
+    name: string;
+    description?: string;
+    version: string; // Versão do formato de dados
+    exportDate: Date;
+    appVersion?: string; // Versão da aplicação que gerou o export
+    totalNodes?: number;
+    totalCost?: number;
+    projectDuration?: number; // em dias
+    projectStartDate?: Date;
+    projectEndDate?: Date;
+  };
+  
+  // Estrutura WBS (incluindo TRL nos nós)
+  wbsStructure: TreeNode;
+  
+  // Dados de Riscos
+  risks: Risk[];
+  
+  // Figuras de Mérito  
+  meritFigures: MeritFigure[];
+  
+  // Estado de Agrupamento das Fases
+  groupingState?: {
+    groupedPhaseIds: string[];
+    groupedExpanded: boolean;
+    lastUpdated?: Date;
+  };
+  
+  // Configurações do Projeto
+  projectSettings?: {
+    currency?: string;
+    language?: string;
+    timezone?: string;
+    customFields?: Record<string, any>;
+  };
+  
+  // Estatísticas Calculadas (para referência)
+  statistics?: {
+    wbs: {
+      totalNodes: number;
+      nodesByLevel: Record<number, number>;
+      completedNodes: number;
+      inProgressNodes: number;
+      notStartedNodes: number;
+    };
+    risks: RiskMetrics;
+    meritFigures: MeritFigureMetrics;
+    trl: {
+      phasesByTrl: Record<number, number>;
+      averageTrl: number;
+      phasesWithoutTrl: number;
+    };
+  };
+}
+
+// Interface para resultado de importação aprimorado
+export interface UnifiedImportResult {
+  success: boolean;
+  data?: UnifiedProjectData;
+  errors: ImportError[];
+  warnings: ImportWarning[];
+  summary?: ImportSummary;
+}
+
+export interface ImportError {
+  message: string;
+  severity: 'error' | 'warning' | 'info';
+  section?: 'wbs' | 'risks' | 'meritFigures' | 'general';
+  details?: any;
+}
+
+export interface ImportWarning {
+  message: string;
+  section?: 'wbs' | 'risks' | 'meritFigures' | 'general';
+  details?: any;
+}
+
+export interface ImportSummary {
+  wbs: {
+    totalNodes: number;
+    nodesByLevel: Record<number, number>;
+  };
+  risks: {
+    totalRisks: number;
+    risksByStatus: Record<string, number>;
+  };
+  meritFigures: {
+    totalFigures: number;
+    figuresByCategory: Record<string, number>;
+  };
+  compatibility: {
+    formatVersion: string;
+    isCompatible: boolean;
+    migrationRequired: boolean;
+  };
+}
+
+// Interface para compatibilidade com componente ImportWBS
+export interface ImportValidationError {
+  message: string;
+  severity: 'error' | 'warning' | 'info';
+  line?: number;
+  details?: any;
+}
+
+// Interface para opções de export aprimorado
+export interface UnifiedExportOptions {
+  format: 'json' | 'excel' | 'pdf';
+  
+  // Seções para incluir
+  includeWbs: boolean;
+  includeRisks: boolean;
+  includeMeritFigures: boolean;
+  includeGroupingState: boolean;
+  includeStatistics: boolean;
+  includeSettings: boolean;
+  
+  // Opções específicas
+  includeMetadata: boolean;
+  includeCostBreakdown: boolean;
+  includeGanttData: boolean;
+  compressOutput: boolean;
+  
+  // Filtros
+  levelsToExport?: (1 | 2 | 3)[];
+  riskStatusFilter?: Risk['status'][];
+  meritFigureCategoryFilter?: MeritFigure['category'][];
+  
+  // Configurações de formatação
+  dateFormat?: string;
+  currencyFormat?: string;
+  numberFormat?: string;
+}
+

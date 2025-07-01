@@ -174,7 +174,8 @@
   },
   "status": {
     "not-started": "Não Iniciado",
-    "inProgress": "Em Andamento",
+    "in-progress": "Em Progresso",
+    "inProgress": "Em Progresso",
     "completed": "Concluído",
     "onHold": "Em Espera",
     "cancelled": "Cancelado"
@@ -860,6 +861,11 @@
       "deleted": "Indicador excluído com sucesso!",
       "impactsUpdated": "Impactos das fases atualizados com sucesso!",
       "saveError": "Erro ao salvar indicadores"
+    },
+    "example": {
+      "name": "Eficiência de Custos",
+      "description": "Mede a relação entre custos do projeto e valor entregue",
+      "unit": "%"
     }
   }
 } 

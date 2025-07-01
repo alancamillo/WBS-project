@@ -5,7 +5,7 @@ import { TreeNode as TreeNodeType } from '../types';
 
 import { ExpandOutlined, CompressOutlined, ExperimentOutlined, InfoCircleOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
-const { Panel } = Collapse;
+// Removed Panel destructuring - using items format now
 const { Text } = Typography;
 
 interface TrlViewProps {
@@ -279,49 +279,51 @@ const TrlView: React.FC<TrlViewProps> = ({ rootNode }) => {
                           setActiveKeys(activeKeys.filter(k => k !== trl.toString()));
                         }
                       }}
-                    >
-                      <Panel 
-                        header={
-                          <Text style={{ fontSize: '12px' }}>
-                            {t('trlView.viewPhases', { count: phasesInTrl.length })}
-                          </Text>
-                        } 
-                        key="phases"
-                        style={{ border: 'none' }}
-                      >
-                        <List
-                          size="small"
-                          dataSource={phasesInTrl}
-                          renderItem={phase => (
-                            <List.Item style={{ padding: '4px 0', borderBottom: 'none' }}>
-                              <div style={{ width: '100%' }}>
-                                <div style={{ marginBottom: 4 }}>
-                                  <Text strong style={{ fontSize: '12px' }}>
-                                    {phase.name}
-                                  </Text>
-                                </div>
-                                <Space size="small" wrap>
-                                  {phase.responsible && (
-                                    <Tag color="blue" style={{ fontSize: '11px' }}>
-                                      {phase.responsible}
-                                    </Tag>
-                                  )}
-                                  <Tag 
-                                    color={
-                                      phase.status === 'completed' ? 'green' :
-                                      phase.status === 'in-progress' ? 'orange' : 'default'
-                                    }
-                                    style={{ fontSize: '11px' }}
-                                  >
-                                    {t(`status.${phase.status || 'not-started'}`)}
-                                  </Tag>
-                                </Space>
-                              </div>
-                            </List.Item>
-                          )}
-                        />
-                      </Panel>
-                    </Collapse>
+                      items={[
+                        {
+                          key: 'phases',
+                          label: (
+                            <Text style={{ fontSize: '12px' }}>
+                              {t('trlView.viewPhases', { count: phasesInTrl.length })}
+                            </Text>
+                          ),
+                          style: { border: 'none' },
+                          children: (
+                            <List
+                              size="small"
+                              dataSource={phasesInTrl}
+                              renderItem={phase => (
+                                <List.Item style={{ padding: '4px 0', borderBottom: 'none' }}>
+                                  <div style={{ width: '100%' }}>
+                                    <div style={{ marginBottom: 4 }}>
+                                      <Text strong style={{ fontSize: '12px' }}>
+                                        {phase.name}
+                                      </Text>
+                                    </div>
+                                    <Space size="small" wrap>
+                                      {phase.responsible && (
+                                        <Tag color="blue" style={{ fontSize: '11px' }}>
+                                          {phase.responsible}
+                                        </Tag>
+                                      )}
+                                      <Tag 
+                                        color={
+                                          phase.status === 'completed' ? 'green' :
+                                          phase.status === 'in-progress' ? 'orange' : 'default'
+                                        }
+                                        style={{ fontSize: '11px' }}
+                                      >
+                                        {t(`status.${phase.status || 'not-started'}`)}
+                                      </Tag>
+                                    </Space>
+                                  </div>
+                                </List.Item>
+                              )}
+                            />
+                          )
+                        }
+                      ]}
+                    />
                   </div>
                 </Card>
               </Col>

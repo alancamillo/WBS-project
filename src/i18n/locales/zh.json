@@ -155,6 +155,7 @@
   "wbsAutoSave": "您的WBS结构会自动保存在浏览器中。所有修改，包括添加/编辑阶段和活动，即使在屏幕之间导航或重新加载页面后仍将可用。",
   "status": {
     "not-started": "未开始",
+    "in-progress": "进行中",
     "inProgress": "进行中",
     "completed": "已完成",
     "onHold": "暂停",
