@@ -68,12 +68,15 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedIndicators, setSelectedIndicators] = useState<string[]>([]);
   const [timeGranularity, setTimeGranularity] = useState<'day' | 'week' | 'month' | 'year'>('month');
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Carregar figuras de mérito do localStorage
   const loadMeritFigures = (): MeritFigure[] => {
     try {
       const stored = localStorage.getItem(MERIT_FIGURES_STORAGE_KEY);
-      if (stored) {
+      
+      // Se há dados no localStorage, usá-los (mesmo que seja array vazio)
+      if (stored !== null) {
         const parsedFigures = JSON.parse(stored);
         return parsedFigures.map((figure: any) => ({
           ...figure,
@@ -84,9 +87,11 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
       }
     } catch (error) {
       console.error('Erro ao carregar figuras de mérito:', error);
+      // Em caso de erro, retornar array vazio ao invés de criar exemplo
+      return [];
     }
     
-    // Se não há dados, criar um exemplo para demonstração
+    // Só criar exemplo se é primeira vez (não há chave no localStorage)
     const phases = getProjectPhases();
     if (phases.length >= 2) {
       const exampleFigure: MeritFigure = {
@@ -170,6 +175,7 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
     if (figures.length > 0) {
       setSelectedIndicators(figures.map(f => f.id));
     }
+    setIsInitialLoad(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Atualizar cálculo de progresso
@@ -196,17 +202,18 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
 
   // Salvar automaticamente quando mudar
   useEffect(() => {
-    if (meritFigures.length > 0) {
+    // Só salvar após o carregamento inicial, sempre salvar (mesmo array vazio)
+    if (!isInitialLoad) {
       saveMeritFigures(meritFigures);
     }
-  }, [meritFigures, saveMeritFigures]);
+  }, [meritFigures, saveMeritFigures, isInitialLoad]);
 
   // Atualizar selectedIndicators quando figuras mudarem
   useEffect(() => {
-    if (meritFigures.length > 0 && selectedIndicators.length === 0) {
+    if (!isInitialLoad && meritFigures.length > 0 && selectedIndicators.length === 0) {
       setSelectedIndicators(meritFigures.map(f => f.id));
     }
-  }, [meritFigures, selectedIndicators]);
+  }, [meritFigures, selectedIndicators, isInitialLoad]);
 
   // Calcular métricas
   const metrics: MeritFigureMetrics = useMemo(() => {
