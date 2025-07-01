@@ -255,8 +255,18 @@ function App() {
     };
     
     setRootNode(emptyProject);
+    setGroupingState({ groupedPhaseIds: [], groupedExpanded: false });
+
+    // Limpar todos os dados do projeto do localStorage
     localStorage.removeItem(WBS_STORAGE_KEY);
+    localStorage.removeItem('wbs-project-risks');
+    localStorage.removeItem('wbs-merit-figures');
+    localStorage.removeItem(GROUPING_STORAGE_KEY);
+    
     message.success(t('messages.success.wbsCleared'));
+
+    // Forçar recarga para garantir um estado limpo em todos os componentes
+    setTimeout(() => window.location.reload(), 500);
   };
 
   const handleImportWBS = (result: ImportResult) => {
