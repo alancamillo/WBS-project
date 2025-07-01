@@ -150,21 +150,7 @@ function App() {
     ExportService.exportToExcel(rootNode, 'estrutura-wbs.xlsx', options);
   };
 
-  const handleExportJSON = () => {
-    // Usar novo sistema unificado de export
-    ExportService.exportUnifiedJSON(rootNode, 'projeto-completo.json', {
-      format: 'json',
-      includeWbs: true,
-      includeRisks: true,
-      includeMeritFigures: true,
-      includeGroupingState: true,
-      includeStatistics: true,
-      includeSettings: true,
-      includeMetadata: true,
-      includeCostBreakdown: true,
-      compressOutput: false
-    });
-  };
+
 
   /**
    * Export unificado completo com todas as opções
@@ -562,15 +548,9 @@ function App() {
                       onClick: handleExportExcel
                     },
                     {
-                      key: 'exportJSON',
-                      icon: <DownloadOutlined />,
-                      label: `${t('buttons.export')} ${t('export.jsonComplete')}`,
-                      onClick: handleExportJSON
-                    },
-                    {
                       key: 'exportUnified',
                       icon: <ProjectOutlined />,
-                      label: t('export.unifiedExport'),
+                      label: t('export.exportWbs'),
                       onClick: handleExportUnified
                     },
                     {
