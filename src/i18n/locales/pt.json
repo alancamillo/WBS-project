@@ -324,18 +324,18 @@
     "subitems": "Subitens:"
   },
   "gantt": {
-    "title": "Gantt Chart",
+    "title": "Diagrama de Gantt",
     "exportJson": "Exportar JSON",
     "exportCsv": "Exportar CSV",
     "totalTasks": "Total de Tarefas",
     "completionRate": "Taxa de Conclusão",
-    "totalCost": "Custo Total", 
+    "totalCost": "Custo Total",
     "durationDays": "Duração (dias)",
     "viewSettings": "Configurações de Visualização",
-    "levelsToShow": "Níveis para Exibir:",
-    "selectLevels": "Selecione os níveis",
+    "levelsToShow": "Níveis a Mostrar:",
+    "selectLevels": "Selecionar níveis",
     "level1Project": "Nível 1 - Projeto",
-    "level2Phase": "Nível 2 - Fase", 
+    "level2Phase": "Nível 2 - Fase",
     "level3Activity": "Nível 3 - Atividade",
     "viewMode": "Modo de Visualização:",
     "quarterDay": "Quarto de Dia",
@@ -357,7 +357,24 @@
     "progress": "Progresso:",
     "responsible": "Responsável:",
     "cost": "Custo:",
-    "noTasksFound": "Nenhuma tarefa encontrada para os níveis selecionados"
+    "noTasksFound": "Nenhuma tarefa encontrada para os níveis selecionados",
+    "csvHeaders": {
+      "id": "ID",
+      "name": "Nome",
+      "start": "Início",
+      "end": "Fim",
+      "durationDays": "Duração (dias)",
+      "progressPercent": "Progresso (%)",
+      "level": "Nível",
+      "responsible": "Responsável",
+      "status": "Status",
+      "dependencies": "Dependências"
+    },
+    "recommendations": {
+      "overdueTasks": "tarefa(s) em atraso precisam de atenção imediata",
+      "tasksWithoutResponsible": "tarefa(s) sem responsável definido",
+      "longTasks": "tarefa(s) com duração superior a 30 dias - considere subdividir"
+    }
   },
   "charts": {
     "costBreakdown": "Distribuição de Custos",
@@ -396,7 +413,15 @@
     "includeGantt": "Incluir Cronograma Gantt",
     "includeRisks": "Incluir Riscos",
     "fileName": "Nome do Arquivo",
-    "exportButton": "Exportar Dados"
+    "exportButton": "Exportar Dados",
+    "unifiedExport": "Export Unificado (v2.0)",
+    "jsonComplete": "JSON Completo",
+    "unifiedExportComplete": "Export Unificado Concluído! 🎉",
+    "wbsStructureComplete": "✓ Estrutura WBS completa",
+    "allRisks": "✓ Todos os riscos",
+    "allMeritFigures": "✓ Todas as figuras de mérito",
+    "groupingState": "✓ Estado de agrupamento",
+    "settingsAndStatistics": "✓ Configurações e estatísticas"
   },
   "language": {
     "title": "Idioma",
@@ -867,5 +892,15 @@
       "description": "Mede a relação entre custos do projeto e valor entregue",
       "unit": "%"
     }
+  },
+  "unifiedImport": {
+    "nodesImported": "nós importados",
+    "risksImported": "riscos importados", 
+    "meritFiguresImported": "indicadores importados",
+    "migrationPerformed": "✓ Migração automática realizada",
+    "importError": "Erro na importação:",
+    "warnings": "Avisos:",
+    "fileProcessError": "Erro ao processar arquivo:",
+    "unknownError": "Erro desconhecido"
   }
 } 

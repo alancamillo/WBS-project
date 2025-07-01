@@ -338,7 +338,24 @@
     "progress": "Progreso:",
     "responsible": "Responsable:",
     "cost": "Costo:",
-    "noTasksFound": "No se encontraron tareas para los niveles seleccionados"
+    "noTasksFound": "No se encontraron tareas para los niveles seleccionados",
+    "csvHeaders": {
+      "id": "ID",
+      "name": "Nombre",
+      "start": "Inicio",
+      "end": "Fin",
+      "durationDays": "Duración (días)",
+      "progressPercent": "Progreso (%)",
+      "level": "Nivel",
+      "responsible": "Responsable",
+      "status": "Estado",
+      "dependencies": "Dependencias"
+    },
+    "recommendations": {
+      "overdueTasks": "tarea(s) vencida(s) necesitan atención inmediata",
+      "tasksWithoutResponsible": "tarea(s) sin responsable asignado",
+      "longTasks": "tarea(s) con duración superior a 30 días - considere subdividir"
+    }
   },
   "charts": {
     "costBreakdown": "Desglose de Costos",
@@ -377,7 +394,15 @@
     "includeGantt": "Incluir Cronograma Gantt",
     "includeRisks": "Incluir Riesgos",
     "fileName": "Nombre del Archivo",
-    "exportButton": "Exportar Datos"
+    "exportButton": "Exportar Datos",
+    "unifiedExport": "Exportación Unificada (v2.0)",
+    "jsonComplete": "JSON Completo",
+    "unifiedExportComplete": "¡Exportación Unificada Completada! 🎉",
+    "wbsStructureComplete": "✓ Estructura EDT completa",
+    "allRisks": "✓ Todos los riesgos",
+    "allMeritFigures": "✓ Todas las figuras de mérito",
+    "groupingState": "✓ Estado de agrupación",
+    "settingsAndStatistics": "✓ Configuraciones y estadísticas"
   },
   "language": {
     "title": "Idioma",
@@ -866,5 +891,15 @@
       "description": "Mide la relación entre costos del proyecto y valor entregado",
       "unit": "%"
     }
+  },
+  "unifiedImport": {
+    "nodesImported": "nodos importados",
+    "risksImported": "riesgos importados", 
+    "meritFiguresImported": "indicadores importados",
+    "migrationPerformed": "✓ Migración automática realizada",
+    "importError": "Error de importación:",
+    "warnings": "Advertencias:",
+    "fileProcessError": "Error al procesar archivo:",
+    "unknownError": "Error desconocido"
   }
 } 

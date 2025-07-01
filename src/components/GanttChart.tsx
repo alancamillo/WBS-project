@@ -90,8 +90,8 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
   // Análise do projeto
   const projectAnalysis = useMemo(() => {
-    return GanttService.generateProjectAnalysis(ganttTasks);
-  }, [ganttTasks]);
+    return GanttService.generateProjectAnalysis(ganttTasks, t);
+  }, [ganttTasks, t]);
 
   const handleViewOptionsChange = (key: keyof GanttViewOptions, value: any) => {
     setViewOptions(prev => ({
@@ -105,7 +105,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
   };
 
   const handleExportGantt = (format: 'json' | 'csv') => {
-    const exportData = GanttService.exportGanttData(ganttTasks, format);
+    const exportData = GanttService.exportGanttData(ganttTasks, format, t);
     
     const blob = new Blob(
       [typeof exportData === 'string' ? exportData : JSON.stringify(exportData, null, 2)],

@@ -356,7 +356,24 @@
     "progress": "Progress:",
     "responsible": "Responsible:",
     "cost": "Cost:",
-    "noTasksFound": "No tasks found for selected levels"
+    "noTasksFound": "No tasks found for selected levels",
+    "csvHeaders": {
+      "id": "ID",
+      "name": "Name",
+      "start": "Start",
+      "end": "End",
+      "durationDays": "Duration (days)",
+      "progressPercent": "Progress (%)",
+      "level": "Level",
+      "responsible": "Responsible",
+      "status": "Status",
+      "dependencies": "Dependencies"
+    },
+    "recommendations": {
+      "overdueTasks": "overdue task(s) need immediate attention",
+      "tasksWithoutResponsible": "task(s) without assigned responsible",
+      "longTasks": "task(s) with duration over 30 days - consider subdividing"
+    }
   },
   "charts": {
     "costBreakdown": "Cost Breakdown",
@@ -395,7 +412,15 @@
     "includeGantt": "Include Gantt Schedule",
     "includeRisks": "Include Risks",
     "fileName": "File Name",
-    "exportButton": "Export Data"
+    "exportButton": "Export Data",
+    "unifiedExport": "Unified Export (v2.0)",
+    "jsonComplete": "Complete JSON",
+    "unifiedExportComplete": "Unified Export Completed! 🎉",
+    "wbsStructureComplete": "✓ Complete WBS structure",
+    "allRisks": "✓ All risks",
+    "allMeritFigures": "✓ All merit figures",
+    "groupingState": "✓ Grouping state",
+    "settingsAndStatistics": "✓ Settings and statistics"
   },
   "language": {
     "title": "Language",
@@ -866,5 +891,15 @@
       "unit": "%"
     }
   },
-  "wbsAutoSave": "Your WBS structure is automatically saved in the browser. All modifications, including adding/editing phases and activities, will remain available even after navigating between screens or reloading the page."
+  "wbsAutoSave": "Your WBS structure is automatically saved in the browser. All modifications, including adding/editing phases and activities, will remain available even after navigating between screens or reloading the page.",
+  "unifiedImport": {
+    "nodesImported": "nodes imported",
+    "risksImported": "risks imported", 
+    "meritFiguresImported": "indicators imported",
+    "migrationPerformed": "✓ Automatic migration performed",
+    "importError": "Import error:",
+    "warnings": "Warnings:",
+    "fileProcessError": "Error processing file:",
+    "unknownError": "Unknown error"
+  }
 } 

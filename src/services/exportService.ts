@@ -477,7 +477,7 @@ export class ExportService {
     meritFigures: MeritFigure[] = [],
     filename: string = 'wbs-project-data.json'
   ) {
-    console.warn('exportToJSON está deprecated. Use exportUnifiedJSON para melhor funcionalidade.');
+    console.warn('exportToJSON is deprecated. Use exportUnifiedJSON for better functionality.');
     return this.exportUnifiedJSON(rootNode, filename);
   }
 

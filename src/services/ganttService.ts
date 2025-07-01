@@ -269,7 +269,7 @@ export class GanttService {
   /**
    * Exporta dados para diferentes formatos de visualização
    */
-  static exportGanttData(tasks: GanttTask[], format: 'json' | 'csv' | 'mpp'): any {
+  static exportGanttData(tasks: GanttTask[], format: 'json' | 'csv' | 'mpp', t?: (key: string) => string): any {
     switch (format) {
       case 'json':
         return {
@@ -283,7 +283,18 @@ export class GanttService {
         };
       
       case 'csv':
-        const headers = [
+        const headers = t ? [
+          t('gantt.csvHeaders.id'),
+          t('gantt.csvHeaders.name'),
+          t('gantt.csvHeaders.start'),
+          t('gantt.csvHeaders.end'),
+          t('gantt.csvHeaders.durationDays'),
+          t('gantt.csvHeaders.progressPercent'),
+          t('gantt.csvHeaders.level'),
+          t('gantt.csvHeaders.responsible'),
+          t('gantt.csvHeaders.status'),
+          t('gantt.csvHeaders.dependencies')
+        ] : [
           'ID', 'Nome', 'Início', 'Fim', 'Duração (dias)', 
           'Progresso (%)', 'Nível', 'Responsável', 'Status', 'Dependências'
         ];
@@ -311,7 +322,7 @@ export class GanttService {
   /**
    * Gera relatório de análise do projeto
    */
-  static generateProjectAnalysis(tasks: GanttTask[]): any {
+  static generateProjectAnalysis(tasks: GanttTask[], t?: (key: string) => string): any {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'completed').length;
     const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
@@ -349,7 +360,7 @@ export class GanttService {
         start: t.start,
         end: t.end
       })),
-      recommendations: this.generateRecommendations(tasks),
+      recommendations: this.generateRecommendations(tasks, t),
       generatedAt: new Date().toISOString()
     };
   }
@@ -357,7 +368,7 @@ export class GanttService {
   /**
    * Gera recomendações baseadas na análise
    */
-  private static generateRecommendations(tasks: GanttTask[]): string[] {
+  private static generateRecommendations(tasks: GanttTask[], t?: (key: string) => string): string[] {
     const recommendations: string[] = [];
     
     const overdueTasks = tasks.filter(t => 
@@ -365,16 +376,18 @@ export class GanttService {
     );
     
     if (overdueTasks.length > 0) {
-      recommendations.push(
-        `${overdueTasks.length} tarefa(s) em atraso precisam de atenção imediata`
-      );
+      const message = t 
+        ? `${overdueTasks.length} ${t('gantt.recommendations.overdueTasks')}`
+        : `${overdueTasks.length} tarefa(s) em atraso precisam de atenção imediata`;
+      recommendations.push(message);
     }
 
     const tasksWithoutResponsible = tasks.filter(t => !t.responsible);
     if (tasksWithoutResponsible.length > 0) {
-      recommendations.push(
-        `${tasksWithoutResponsible.length} tarefa(s) sem responsável definido`
-      );
+      const message = t 
+        ? `${tasksWithoutResponsible.length} ${t('gantt.recommendations.tasksWithoutResponsible')}`
+        : `${tasksWithoutResponsible.length} tarefa(s) sem responsável definido`;
+      recommendations.push(message);
     }
 
     const longTasks = tasks.filter(t => {
@@ -383,9 +396,10 @@ export class GanttService {
     });
     
     if (longTasks.length > 0) {
-      recommendations.push(
-        `${longTasks.length} tarefa(s) com duração superior a 30 dias - considere subdividir`
-      );
+      const message = t 
+        ? `${longTasks.length} ${t('gantt.recommendations.longTasks')}`
+        : `${longTasks.length} tarefa(s) com duração superior a 30 dias - considere subdividir`;
+      recommendations.push(message);
     }
 
     return recommendations;

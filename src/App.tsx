@@ -187,12 +187,12 @@ function App() {
     message.success({
       content: (
         <div>
-          <div><strong>Export Unificado Concluído! 🎉</strong></div>
-          <div>✓ Estrutura WBS completa</div>
-          <div>✓ Todos os riscos</div>
-          <div>✓ Todas as figuras de mérito</div>
-          <div>✓ Estado de agrupamento</div>
-          <div>✓ Configurações e estatísticas</div>
+          <div><strong>{t('export.unifiedExportComplete')}</strong></div>
+          <div>{t('export.wbsStructureComplete')}</div>
+          <div>{t('export.allRisks')}</div>
+          <div>{t('export.allMeritFigures')}</div>
+          <div>{t('export.groupingState')}</div>
+          <div>{t('export.settingsAndStatistics')}</div>
         </div>
       ),
       duration: 5
@@ -295,11 +295,11 @@ function App() {
             content: (
               <div>
                 <div><strong>{t('messages.success.wbsImported')}</strong></div>
-                <div>WBS: {summary.wbs.totalNodes} nós importados</div>
-                <div>Riscos: {summary.risks.totalRisks} riscos importados</div>
-                <div>Figuras de Mérito: {summary.meritFigures.totalFigures} indicadores importados</div>
+                <div>WBS: {summary.wbs.totalNodes} {t('unifiedImport.nodesImported')}</div>
+                <div>{t('navigation.risks')}: {summary.risks.totalRisks} {t('unifiedImport.risksImported')}</div>
+                <div>{t('navigation.meritFigures')}: {summary.meritFigures.totalFigures} {t('unifiedImport.meritFiguresImported')}</div>
                 {summary.compatibility.migrationRequired && (
-                  <div style={{ color: '#faad14' }}>✓ Migração automática realizada</div>
+                  <div style={{ color: '#faad14' }}>{t('unifiedImport.migrationPerformed')}</div>
                 )}
               </div>
             ),
@@ -318,16 +318,16 @@ function App() {
           .map(e => e.message)
           .join('; ');
         
-        message.error(`Erro na importação: ${errorMessages}`);
+        message.error(`${t('unifiedImport.importError')} ${errorMessages}`);
         
         // Mostrar warnings se houver
         const warnings = unifiedResult.warnings;
         if (warnings.length > 0) {
-          message.warning(`Avisos: ${warnings.map(w => w.message).join('; ')}`);
+          message.warning(`${t('unifiedImport.warnings')} ${warnings.map(w => w.message).join('; ')}`);
         }
       }
     } catch (error) {
-      message.error(`Erro ao processar arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      message.error(`${t('unifiedImport.fileProcessError')} ${error instanceof Error ? error.message : t('unifiedImport.unknownError')}`);
     }
   };
 
@@ -564,13 +564,13 @@ function App() {
                     {
                       key: 'exportJSON',
                       icon: <DownloadOutlined />,
-                      label: `${t('buttons.export')} JSON Completo`,
+                      label: `${t('buttons.export')} ${t('export.jsonComplete')}`,
                       onClick: handleExportJSON
                     },
                     {
                       key: 'exportUnified',
                       icon: <ProjectOutlined />,
-                      label: 'Export Unificado (v2.0)',
+                      label: t('export.unifiedExport'),
                       onClick: handleExportUnified
                     },
                     {
