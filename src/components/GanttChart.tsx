@@ -21,13 +21,12 @@ import {
   DownloadOutlined, 
   InfoCircleOutlined,
   CalendarOutlined,
-  TeamOutlined,
   DollarCircleOutlined,
   ClockCircleOutlined
 } from '@ant-design/icons';
 import { Gantt, Task, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
-import { TreeNode, GanttViewOptions, GanttTask } from '../types';
+import { TreeNode, GanttViewOptions } from '../types';
 import { GanttService } from '../services/ganttService';
 
 const { Title, Text } = Typography;
@@ -91,8 +90,8 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
   // Análise do projeto
   const projectAnalysis = useMemo(() => {
-    return GanttService.generateProjectAnalysis(ganttTasks);
-  }, [ganttTasks]);
+    return GanttService.generateProjectAnalysis(ganttTasks, t);
+  }, [ganttTasks, t]);
 
   const handleViewOptionsChange = (key: keyof GanttViewOptions, value: any) => {
     setViewOptions(prev => ({
@@ -106,7 +105,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
   };
 
   const handleExportGantt = (format: 'json' | 'csv') => {
-    const exportData = GanttService.exportGanttData(ganttTasks, format);
+    const exportData = GanttService.exportGanttData(ganttTasks, format, t);
     
     const blob = new Blob(
       [typeof exportData === 'string' ? exportData : JSON.stringify(exportData, null, 2)],
@@ -132,14 +131,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
     }
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'completed': return 'success';
-      case 'in-progress': return 'processing';
-      case 'not-started': return 'default';
-      default: return 'default';
-    }
-  };
+
 
   return (
     <div style={{ padding: '24px' }}>

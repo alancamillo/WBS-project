@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Row, Col, Select, DatePicker, Space, Typography, Table, Tag, Switch, Button } from 'antd';
+import { Card, Row, Col, Select, DatePicker, Space, Typography, Table, Switch, Button } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
@@ -15,11 +15,9 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar
+  ResponsiveContainer
 } from 'recharts';
-import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, eachMonthOfInterval, eachQuarterOfInterval, eachYearOfInterval, isWithinInterval } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, eachMonthOfInterval, eachQuarterOfInterval, eachYearOfInterval } from 'date-fns';
 import { ptBR, enUS, es, zhCN } from 'date-fns/locale';
 import { TreeNode } from '../types';
 import { PieChartOutlined, FolderOutlined, FileOutlined } from '@ant-design/icons';

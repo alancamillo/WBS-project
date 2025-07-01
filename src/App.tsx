@@ -13,7 +13,8 @@ import MeritFigures from './components/MeritFigures';
 import TrlView from './components/TrlView';
 import LanguageSelector from './components/LanguageSelector';
 import SettingsModal from './components/SettingsModal';
-import { TreeNode, ExportOptions } from './types/index';
+import { TreeNode, ExportOptions, UnifiedExportOptions } from './types/index';
+import { ImportResult, ImportService } from './services/importService';
 import { CostCalculator } from './utils/costCalculator';
 import { ExportService } from './services/exportService';
 import { createSampleProject } from './data/sampleData';
@@ -150,7 +151,52 @@ function App() {
   };
 
   const handleExportJSON = () => {
-    ExportService.exportToJSON(rootNode, 'estrutura-wbs.json');
+    // Usar novo sistema unificado de export
+    ExportService.exportUnifiedJSON(rootNode, 'projeto-completo.json', {
+      format: 'json',
+      includeWbs: true,
+      includeRisks: true,
+      includeMeritFigures: true,
+      includeGroupingState: true,
+      includeStatistics: true,
+      includeSettings: true,
+      includeMetadata: true,
+      includeCostBreakdown: true,
+      compressOutput: false
+    });
+  };
+
+  /**
+   * Export unificado completo com todas as opções
+   */
+  const handleExportUnified = () => {
+    ExportService.exportUnifiedJSON(rootNode, 'projeto-completo-unificado.json', {
+      format: 'json',
+      includeWbs: true,
+      includeRisks: true,
+      includeMeritFigures: true,
+      includeGroupingState: true,
+      includeStatistics: true,
+      includeSettings: true,
+      includeMetadata: true,
+      includeCostBreakdown: true,
+      includeGanttData: false,
+      compressOutput: false
+    });
+    
+    message.success({
+      content: (
+        <div>
+          <div><strong>{t('export.unifiedExportComplete')}</strong></div>
+          <div>{t('export.wbsStructureComplete')}</div>
+          <div>{t('export.allRisks')}</div>
+          <div>{t('export.allMeritFigures')}</div>
+          <div>{t('export.groupingState')}</div>
+          <div>{t('export.settingsAndStatistics')}</div>
+        </div>
+      ),
+      duration: 5
+    });
   };
 
   const handleLoadSampleData = () => {
@@ -202,10 +248,87 @@ function App() {
     message.success(t('messages.success.wbsCleared'));
   };
 
-  const handleImportWBS = (importedNode: TreeNode) => {
-    setRootNode(importedNode);
+  const handleImportWBS = (result: ImportResult) => {
+    if (result.data) {
+      setRootNode(result.data);
+    }
+
+    if (result.risks) {
+      localStorage.setItem('wbs-project-risks', JSON.stringify(result.risks));
+    }
+
+    if (result.meritFigures) {
+      localStorage.setItem('wbs-merit-figures', JSON.stringify(result.meritFigures));
+    }
+
     setImportModalVisible(false);
     message.success(t('messages.success.wbsImported'));
+    // Forçar a recarga da página para garantir que todos os componentes leiam os novos dados do localStorage
+    window.location.reload();
+  };
+
+  /**
+   * Método para importação usando o novo sistema unificado
+   */
+  const handleImportWBSUnified = async (file: File) => {
+    try {
+      const unifiedResult = await ImportService.importUnifiedFromJSON(file);
+      
+      if (unifiedResult.success && unifiedResult.data) {
+        // Aplicar dados usando o novo método
+        ImportService.applyUnifiedData(unifiedResult.data);
+        
+        // Atualizar estado local com WBS
+        setRootNode(unifiedResult.data.wbsStructure);
+        
+        // Atualizar estado de agrupamento se presente
+        if (unifiedResult.data.groupingState) {
+          setGroupingState(unifiedResult.data.groupingState);
+        }
+        
+        setImportModalVisible(false);
+        
+        // Mostrar resumo da importação
+        const summary = unifiedResult.summary;
+        if (summary) {
+          message.success({
+            content: (
+              <div>
+                <div><strong>{t('messages.success.wbsImported')}</strong></div>
+                <div>WBS: {summary.wbs.totalNodes} {t('unifiedImport.nodesImported')}</div>
+                <div>{t('navigation.risks')}: {summary.risks.totalRisks} {t('unifiedImport.risksImported')}</div>
+                <div>{t('navigation.meritFigures')}: {summary.meritFigures.totalFigures} {t('unifiedImport.meritFiguresImported')}</div>
+                {summary.compatibility.migrationRequired && (
+                  <div style={{ color: '#faad14' }}>{t('unifiedImport.migrationPerformed')}</div>
+                )}
+              </div>
+            ),
+            duration: 6
+          });
+        } else {
+          message.success(t('messages.success.wbsImported'));
+        }
+        
+        // Forçar recarga para garantir sincronização
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        // Mostrar erros
+        const errorMessages = unifiedResult.errors
+          .filter(e => e.severity === 'error')
+          .map(e => e.message)
+          .join('; ');
+        
+        message.error(`${t('unifiedImport.importError')} ${errorMessages}`);
+        
+        // Mostrar warnings se houver
+        const warnings = unifiedResult.warnings;
+        if (warnings.length > 0) {
+          message.warning(`${t('unifiedImport.warnings')} ${warnings.map(w => w.message).join('; ')}`);
+        }
+      }
+    } catch (error) {
+      message.error(`${t('unifiedImport.fileProcessError')} ${error instanceof Error ? error.message : t('unifiedImport.unknownError')}`);
+    }
   };
 
   // Funções para gerenciar agrupamento
@@ -342,7 +465,7 @@ function App() {
           }
           extra={
             <Space>
-              <Button.Group>
+              <Space.Compact>
                 <Button
                   icon={<UnorderedListOutlined />}
                   onClick={() => setViewMode('list')}
@@ -379,6 +502,13 @@ function App() {
                   {t('navigation.budget')}
                 </Button>
                 <Button
+                  icon={<ExclamationCircleOutlined />}
+                  onClick={() => setViewMode('risks')}
+                  type={viewMode === 'risks' ? 'primary' : 'default'}
+                >
+                  {t('navigation.risks')}
+                </Button>
+                <Button
                   icon={<TrophyOutlined />}
                   onClick={() => setViewMode('meritFigures')}
                   type={viewMode === 'meritFigures' ? 'primary' : 'default'}
@@ -392,39 +522,65 @@ function App() {
                 >
                   {t('navigation.trl')}
                 </Button>
-              </Button.Group>
+              </Space.Compact>
               <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item key="loadSample" icon={<BulbOutlined />} onClick={handleLoadSampleData}>
-                      {t('buttons.loadSampleData')}
-                    </Menu.Item>
-                    <Menu.Item key="clearWBS" icon={<DeleteOutlined />} disabled={rootNode.children.length === 0}>
-                      <Popconfirm
-                        title={t('modals.clearWBS.title')}
-                        description={t('modals.clearWBS.question')}
-                        onConfirm={handleClearWBS}
-                        okText={t('buttons.yes')}
-                        cancelText={t('buttons.cancel')}
-                        okButtonProps={{ danger: true }}
-                      >
-                        <span>{t('buttons.clearWBS')}</span>
-                      </Popconfirm>
-                    </Menu.Item>
-                    <Menu.Item key="importWBS" icon={<UploadOutlined />} onClick={() => setImportModalVisible(true)}>
-                      {t('buttons.importExcel')}
-                    </Menu.Item>
-                    <Menu.Item key="exportExcel" icon={<FileExcelOutlined />} onClick={handleExportExcel}>
-                      {t('buttons.export')} Excel
-                    </Menu.Item>
-                    <Menu.Item key="exportJSON" icon={<DownloadOutlined />} onClick={handleExportJSON}>
-                      {t('buttons.export')} JSON
-                    </Menu.Item>
-                    <Menu.Item key="settings" icon={<SettingOutlined />} onClick={() => setSettingsModalVisible(true)}>
-                      {t('settings.title')}
-                    </Menu.Item>
-                  </Menu>
-                }
+                menu={{
+                  items: [
+                    {
+                      key: 'loadSample',
+                      icon: <BulbOutlined />,
+                      label: t('buttons.loadSampleData'),
+                      onClick: handleLoadSampleData
+                    },
+                    {
+                      key: 'clearWBS',
+                      icon: <DeleteOutlined />,
+                      disabled: rootNode.children.length === 0,
+                      label: (
+                        <Popconfirm
+                          title={t('modals.clearWBS.title')}
+                          description={t('modals.clearWBS.question')}
+                          onConfirm={handleClearWBS}
+                          okText={t('buttons.yes')}
+                          cancelText={t('buttons.cancel')}
+                          okButtonProps={{ danger: true }}
+                        >
+                          <span>{t('buttons.clearWBS')}</span>
+                        </Popconfirm>
+                      )
+                    },
+                    {
+                      key: 'importWBS',
+                      icon: <UploadOutlined />,
+                      label: t('buttons.importExcel'),
+                      onClick: () => setImportModalVisible(true)
+                    },
+                    {
+                      key: 'exportExcel',
+                      icon: <FileExcelOutlined />,
+                      label: `${t('buttons.export')} Excel`,
+                      onClick: handleExportExcel
+                    },
+                    {
+                      key: 'exportJSON',
+                      icon: <DownloadOutlined />,
+                      label: `${t('buttons.export')} ${t('export.jsonComplete')}`,
+                      onClick: handleExportJSON
+                    },
+                    {
+                      key: 'exportUnified',
+                      icon: <ProjectOutlined />,
+                      label: t('export.unifiedExport'),
+                      onClick: handleExportUnified
+                    },
+                    {
+                      key: 'settings',
+                      icon: <SettingOutlined />,
+                      label: t('settings.title'),
+                      onClick: () => setSettingsModalVisible(true)
+                    }
+                  ]
+                }}
                 trigger={['click']}
               >
                 <Button icon={<EllipsisOutlined />} />
@@ -484,13 +640,13 @@ function App() {
         </Card>
 
         <ImportWBS
-          visible={importModalVisible}
+          open={importModalVisible}
           onClose={() => setImportModalVisible(false)}
           onImport={handleImportWBS}
         />
 
         <SettingsModal
-          visible={settingsModalVisible}
+          open={settingsModalVisible}
           onClose={() => setSettingsModalVisible(false)}
         />
       </Content>

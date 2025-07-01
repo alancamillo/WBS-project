@@ -155,6 +155,7 @@
   "wbsAutoSave": "您的WBS结构会自动保存在浏览器中。所有修改，包括添加/编辑阶段和活动，即使在屏幕之间导航或重新加载页面后仍将可用。",
   "status": {
     "not-started": "未开始",
+    "in-progress": "进行中",
     "inProgress": "进行中",
     "completed": "已完成",
     "onHold": "暂停",
@@ -312,8 +313,8 @@
     "totalCost": "总成本",
     "durationDays": "持续时间（天）",
     "viewSettings": "视图设置",
-    "levelsToShow": "显示层级：",
-    "selectLevels": "选择层级",
+    "levelsToShow": "显示级别：",
+    "selectLevels": "选择级别",
     "level1Project": "第1级 - 项目",
     "level2Phase": "第2级 - 阶段",
     "level3Activity": "第3级 - 活动",
@@ -325,10 +326,10 @@
     "month": "月",
     "advancedOptions": "高级选项：",
     "criticalPath": "关键路径",
-    "groupByLevel": "按层级分组",
+    "groupByLevel": "按级别分组",
     "showCosts": "显示成本",
     "criticalPathTooltip": "突出显示项目关键路径上的任务",
-    "groupByLevelTooltip": "按层级分组任务",
+    "groupByLevelTooltip": "按层次级别对任务进行分组",
     "showCostsTooltip": "在任务上显示成本信息",
     "systemRecommendations": "系统建议",
     "criticalPathDescription": "如果延迟，将直接影响项目最终截止日期的任务：",
@@ -337,7 +338,24 @@
     "progress": "进度：",
     "responsible": "负责人：",
     "cost": "成本：",
-    "noTasksFound": "未找到所选层级的任务"
+    "noTasksFound": "在所选级别中未找到任务",
+    "csvHeaders": {
+      "id": "ID",
+      "name": "名称",
+      "start": "开始",
+      "end": "结束",
+      "durationDays": "持续时间（天）",
+      "progressPercent": "进度（%）",
+      "level": "级别",
+      "responsible": "负责人",
+      "status": "状态",
+      "dependencies": "依赖项"
+    },
+    "recommendations": {
+      "overdueTasks": "个逾期任务需要立即关注",
+      "tasksWithoutResponsible": "个任务未分配负责人",
+      "longTasks": "个任务持续时间超过30天 - 考虑细分"
+    }
   },
   "charts": {
     "costBreakdown": "成本分解",
@@ -376,7 +394,15 @@
     "includeGantt": "包含甘特图计划",
     "includeRisks": "包含风险",
     "fileName": "文件名",
-    "exportButton": "导出数据"
+    "exportButton": "导出数据",
+    "unifiedExport": "统一导出 (v2.0)",
+    "jsonComplete": "完整JSON",
+    "unifiedExportComplete": "统一导出完成！🎉",
+    "wbsStructureComplete": "✓ 完整WBS结构",
+    "allRisks": "✓ 所有风险",
+    "allMeritFigures": "✓ 所有效益指标",
+    "groupingState": "✓ 分组状态",
+    "settingsAndStatistics": "✓ 设置和统计信息"
   },
   "language": {
     "title": "语言",
@@ -860,5 +886,15 @@
       "impactsUpdated": "阶段影响更新成功！",
       "saveError": "保存指标时出错"
     }
+  },
+  "unifiedImport": {
+    "nodesImported": "已导入节点",
+    "risksImported": "已导入风险", 
+    "meritFiguresImported": "已导入指标",
+    "migrationPerformed": "✓ 自动迁移已执行",
+    "importError": "导入错误：",
+    "warnings": "警告：",
+    "fileProcessError": "处理文件时出错：",
+    "unknownError": "未知错误"
   }
 } 
