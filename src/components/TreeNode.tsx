@@ -119,7 +119,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   node, 
   onUpdate, 
   onDelete, 
-  maxLevel = 3,
+  maxLevel = 4,
   rootNode,
   groupingState = { groupedPhaseIds: [], groupedExpanded: false },
   onGroupingUpdate,
