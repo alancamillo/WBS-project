@@ -21,10 +21,10 @@ export class ExportService {
   /**
    * Coleta todos os dados do localStorage e estrutura WBS
    */
-  static collectAllProjectData(rootNode: TreeNode): UnifiedProjectData {
+  static collectAllProjectData(rootNode: TreeNode, externalMeritFigures?: any[]): UnifiedProjectData {
     // Carregar dados do localStorage
     const risks = this.loadRisksFromStorage();
-    const meritFigures = this.loadMeritFiguresFromStorage();
+    const meritFigures = externalMeritFigures || this.loadMeritFiguresFromStorage();
     const groupingState = this.loadGroupingStateFromStorage();
     
     // Calcular estatísticas da WBS
@@ -392,7 +392,8 @@ export class ExportService {
   static exportUnifiedJSON(
     rootNode: TreeNode, 
     filename: string = 'projeto-completo.json',
-    options: Partial<UnifiedExportOptions> = {}
+    options: Partial<UnifiedExportOptions> = {},
+    externalMeritFigures?: any[]
   ) {
     const defaultOptions: UnifiedExportOptions = {
       format: 'json',
@@ -411,7 +412,7 @@ export class ExportService {
     const finalOptions = { ...defaultOptions, ...options };
     
     // Coletar todos os dados
-    const allData = this.collectAllProjectData(rootNode);
+    const allData = this.collectAllProjectData(rootNode, externalMeritFigures);
     
     // Aplicar filtros baseados nas opções
     const filteredData: Partial<UnifiedProjectData> = {};

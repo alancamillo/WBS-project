@@ -109,8 +109,25 @@ function App() {
     }
   };
 
+  // Função para carregar figuras de mérito do localStorage
+  const loadMeritFiguresFromStorage = (): any[] => {
+    try {
+      const stored = localStorage.getItem('wbs-merit-figures');
+      if (stored && stored !== 'undefined' && stored !== 'null') {
+        const parsedFigures = JSON.parse(stored);
+        if (Array.isArray(parsedFigures)) {
+          return parsedFigures;
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar figuras de mérito:', error);
+    }
+    return [];
+  };
+
   const [rootNode, setRootNode] = useState<TreeNode>(() => loadWBSFromStorage());
   const [groupingState, setGroupingState] = useState(() => loadGroupingFromStorage());
+  const [projectMeritFigures, setProjectMeritFigures] = useState<any[]>(() => loadMeritFiguresFromStorage());
 
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'flow' | 'gantt' | 'table' | 'budget' | 'risks' | 'meritFigures' | 'trl'>('list');
   const [importModalVisible, setImportModalVisible] = useState(false);
@@ -134,6 +151,15 @@ function App() {
     }
   }, [groupingState]);
 
+  // Salvar figuras de mérito no localStorage quando mudarem
+  useEffect(() => {
+    try {
+      localStorage.setItem('wbs-merit-figures', JSON.stringify(projectMeritFigures));
+    } catch (error) {
+      console.warn('Erro ao salvar figuras de mérito:', error);
+    }
+  }, [projectMeritFigures]);
+
   // REMOVIDO: useEffect que reprocessava dados após mudanças - agora é feito na atualização
 
   useEffect(() => {
@@ -153,6 +179,9 @@ function App() {
           setRootNode(wbsWithInheritance);
           if (result.data.groupingState) {
             setGroupingState(result.data.groupingState);
+          }
+          if (result.data.meritFigures) {
+            setProjectMeritFigures(result.data.meritFigures);
           }
           message.success({ content: t('messages.success.wbsImported'), key: 'import', duration: 2 });
         } else {
@@ -199,7 +228,7 @@ function App() {
       includeCostBreakdown: true,
       includeGanttData: false,
       compressOutput: false
-    });
+    }, projectMeritFigures);
     
     message.success({
       content: (
@@ -266,6 +295,7 @@ function App() {
     
     setRootNode(emptyProject);
     setGroupingState({ groupedPhaseIds: [], groupedExpanded: false });
+    setProjectMeritFigures([]);
 
     // Limpar todos os dados do projeto do localStorage
     localStorage.removeItem(WBS_STORAGE_KEY);
@@ -291,9 +321,10 @@ function App() {
       localStorage.setItem('wbs-project-risks', JSON.stringify(result.risks));
     }
 
-    if (result.meritFigures) {
-      localStorage.setItem('wbs-merit-figures', JSON.stringify(result.meritFigures));
-    }
+            if (result.meritFigures) {
+          localStorage.setItem('wbs-merit-figures', JSON.stringify(result.meritFigures));
+          setProjectMeritFigures(result.meritFigures);
+        }
 
     setImportModalVisible(false);
     message.success(t('messages.success.wbsImported'));
@@ -319,6 +350,11 @@ function App() {
         // Atualizar estado de agrupamento se presente
         if (unifiedResult.data.groupingState) {
           setGroupingState(unifiedResult.data.groupingState);
+        }
+
+        // Atualizar figuras de mérito se presente
+        if (unifiedResult.data.meritFigures) {
+          setProjectMeritFigures(unifiedResult.data.meritFigures);
         }
         
         setImportModalVisible(false);
@@ -652,7 +688,15 @@ function App() {
           ) : viewMode === 'gantt' ? (
             <GanttChart rootNode={rootNode} />
           ) : viewMode === 'meritFigures' ? (
-            <MeritFigures rootNode={rootNode} />
+            <MeritFigures 
+              rootNode={rootNode} 
+              meritFigures={projectMeritFigures}
+              onMeritFiguresChange={setProjectMeritFigures}
+              onUpdate={() => {
+                // Trigger re-save of project data when merit figures change
+                saveWBSToStorage(rootNode);
+              }}
+            />
           ) : viewMode === 'trl' ? (
             <TrlView rootNode={rootNode} />
           ) : (
