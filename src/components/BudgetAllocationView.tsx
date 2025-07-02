@@ -565,18 +565,14 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
 
-  // Função para calcular dados da tabela transposta com hierarquia completa sem duplicação
+  // Função para calcular dados da tabela transposta considerando níveis selecionados
   const tableData = useMemo(() => {
     const [projectStart, projectEnd] = dateRange || getProjectDateRange();
-    
-
-    
     const periods = generatePeriods(projectStart, projectEnd, periodType);
-    
     const result: any[] = [];
 
     // Função para calcular custo de um nó em um período específico
-    const calculateNodeCostInPeriod = (node: TreeNode, intervalStart: Date, intervalEnd: Date, useOwnCostOnly = false): number => {
+    const calculateNodeCostInPeriod = (node: TreeNode, intervalStart: Date, intervalEnd: Date, includeChildren = false): number => {
       if (!node.startDate || !node.endDate) {
         return 0;
       }
@@ -593,47 +589,52 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
       const intersectionDuration = intersectionEnd.getTime() - intersectionStart.getTime();
       const proportion = nodeDuration > 0 ? intersectionDuration / nodeDuration : 0;
       
-      // Para nós folha, usar custo próprio; para nós pai, usar totalCost se não especificado diferente
-      const costToUse = (useOwnCostOnly || node.children.length === 0 ? node.cost : node.totalCost) || 0;
-      const result = costToUse * proportion;
-      
+      // Se includeChildren for true, usar totalCost; senão usar custo próprio
+      const costToUse = includeChildren ? (node.totalCost || 0) : (node.cost || 0);
+      return costToUse * proportion;
+    };
 
-      
-      return result;
+    // Função para verificar se um nó deve ser incluído na tabela
+    const shouldIncludeNode = (node: TreeNode): boolean => {
+      return selectedLevels.includes(node.level);
+    };
+
+    // Função para verificar se algum filho direto está nos níveis selecionados
+    const hasChildrenInSelectedLevels = (node: TreeNode): boolean => {
+      return node.children.some(child => selectedLevels.includes(child.level));
     };
 
     // Função recursiva para processar nós e criar linhas da tabela
     const processNode = (node: TreeNode, parentPath = '') => {
       const currentPath = parentPath ? `${parentPath} > ${node.name}` : node.name;
       
-      // Criar linha para este nó
-      const rowData: any = {
-        key: node.id,
-        name: node.name,
-        level: node.level,
-        path: currentPath,
-        total: 0,
-        isLeaf: node.children.length === 0
-      };
+      // Verificar se este nó deve ser incluído
+      if (shouldIncludeNode(node)) {
+        // Verificar se devemos incluir custos dos filhos
+        const shouldIncludeChildrenCosts = !hasChildrenInSelectedLevels(node);
+        
+        const rowData: any = {
+          key: node.id,
+          name: node.name,
+          level: node.level,
+          path: currentPath,
+          total: 0,
+          isLeaf: node.children.length === 0
+        };
 
-      // Calcular valores para cada período
-      periods.forEach(periodDate => {
-        const [intervalStart, intervalEnd] = getPeriodInterval(periodDate, periodType);
-        const periodKey = formatPeriod(periodDate, periodType);
-        
-        let periodCost = 0;
-        
-        // SEMPRE usar apenas o custo próprio de cada nó para evitar duplicação
-        // O totalCost já será refletido pela soma de todos os nós individuais
-        periodCost = calculateNodeCostInPeriod(node, intervalStart, intervalEnd, true);
-        
+        // Calcular valores para cada período
+        periods.forEach(periodDate => {
+          const [intervalStart, intervalEnd] = getPeriodInterval(periodDate, periodType);
+          const periodKey = formatPeriod(periodDate, periodType);
+          
+          const periodCost = calculateNodeCostInPeriod(node, intervalStart, intervalEnd, shouldIncludeChildrenCosts);
+          
+          rowData[periodKey] = periodCost;
+          rowData.total += periodCost;
+        });
 
-        
-        rowData[periodKey] = periodCost;
-        rowData.total += periodCost;
-      });
-
-      result.push(rowData);
+        result.push(rowData);
+      }
 
       // Processar filhos recursivamente
       node.children.forEach(child => {
@@ -644,10 +645,8 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
     // Começar do nó raiz
     processNode(rootNode);
 
-
-
     return result;
-  }, [rootNode, periodType, dateRange, i18n.language, getProjectDateRange, formatPeriod]);
+  }, [rootNode, periodType, dateRange, selectedLevels, i18n.language, getProjectDateRange, formatPeriod]);
 
   // Colunas da tabela transposta
   const tableColumns: ColumnType<any>[] = useMemo(() => {
@@ -865,12 +864,10 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             const [projectStart, projectEnd] = dateRange || getProjectDateRange();
             const periods = generatePeriods(projectStart, projectEnd, periodType);
             
-            // Calcular totais de TODOS os nós (cada um representa apenas seu custo próprio)
-            const totalSum = rootNode.totalCost;
+            // Calcular totais baseado nos dados da tabela filtrada
+            const totalSum = data.reduce((sum, record) => sum + (record.total || 0), 0);
             
-
-            
-            // Calcula soma por período de TODOS os nós
+            // Calcula soma por período dos dados visíveis na tabela
             const periodSums: Record<string, number> = {};
             periods.forEach(periodDate => {
               const periodKey = formatPeriod(periodDate, periodType);
