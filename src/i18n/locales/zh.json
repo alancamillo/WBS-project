@@ -746,6 +746,9 @@
       "expandAll": "展开全部",
       "collapsePhases": "折叠阶段"
     },
+    "exportTable": "导出表格",
+    "tableExportSuccess": "WBS表格导出成功！",
+    "exportError": "导出错误",
     "tooltips": {
       "items": "项目",
       "workingDays": "{days} 工作日",

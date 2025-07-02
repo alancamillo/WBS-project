@@ -764,6 +764,9 @@
       "expandAll": "Expand All",
       "collapsePhases": "Collapse Phases"
     },
+    "exportTable": "Export Table",
+    "tableExportSuccess": "WBS table exported successfully!",
+    "exportError": "Export error",
     "tooltips": {
       "items": "items",
       "workingDays": "{days} working days",

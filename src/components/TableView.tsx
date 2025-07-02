@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Table, Tag, Button, Space, Typography, Tooltip, Progress } from 'antd';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
+import { Table, Tag, Button, Space, Typography, Tooltip, Progress, Dropdown, message } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import { Key } from 'antd/es/table/interface';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,10 @@ import {
   DownOutlined,
   RightOutlined,
   ExpandOutlined,
-  CompressOutlined
+  CompressOutlined,
+  FileImageOutlined,
+  CameraOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -38,6 +41,55 @@ const TableView: React.FC<TableViewProps> = ({
   const { formatCurrency } = useCurrencySettings();
   const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
   const [collapsedPhases, setCollapsedPhases] = useState<Set<string>>(new Set());
+
+  // Ref para captura da tabela para exportação
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Função para exportar tabela como imagem
+  const handleExportTableImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!tableRef.current) {
+      message.error(t('tableView.exportError') || 'Error: Table not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(tableRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `wbs-table-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('tableView.tableExportSuccess') || 'WBS table exported successfully');
+    } catch (error) {
+      console.error('Error exporting WBS table:', error);
+      message.error(t('tableView.exportError') || 'Error exporting WBS table');
+    }
+  };
+
+  // Items do dropdown para exportação da tabela
+  const tableExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportTableImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportTableImage('jpeg')
+    }
+  ];
 
   // Função para formatação de data baseada no idioma
   const formatDate = useCallback((date?: Date): string => {
@@ -560,18 +612,32 @@ const TableView: React.FC<TableViewProps> = ({
         </div>
         
         <div className="table-controls">
+          <Dropdown
+            menu={{ items: tableExportItems }}
+            placement="bottomRight"
+          >
+            <Button 
+              size="small"
+              icon={<FileImageOutlined />}
+            >
+              {t('tableView.exportTable')} <DownloadOutlined />
+            </Button>
+          </Dropdown>
+          
           <Button
             type="default"
             size="small"
             icon={collapsedPhases.size > 0 ? <ExpandOutlined /> : <CompressOutlined />}
             onClick={toggleAllPhases}
+            style={{ marginLeft: 8 }}
           >
             {collapsedPhases.size > 0 ? t('tableView.controls.expandAll') : t('tableView.controls.collapsePhases')}
           </Button>
         </div>
       </div>
       
-      <Table<FlattenedNode>
+      <div ref={tableRef}>
+        <Table<FlattenedNode>
         columns={columns}
         dataSource={flattenedData}
         pagination={{
@@ -598,8 +664,9 @@ const TableView: React.FC<TableViewProps> = ({
           expandRowByClick: false,
           showExpandColumn: false,
         }}
-              />
+        />
       </div>
+    </div>
   );
 };
 

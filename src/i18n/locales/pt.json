@@ -766,6 +766,9 @@
       "expandAll": "Expandir Todas",
       "collapsePhases": "Colapsar Fases"
     },
+    "exportTable": "Exportar Tabela",
+    "tableExportSuccess": "Tabela WBS exportada com sucesso!",
+    "exportError": "Erro ao exportar",
     "tooltips": {
       "items": "itens",
       "workingDays": "{days} dias corridos",
