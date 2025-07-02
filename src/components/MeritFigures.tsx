@@ -55,16 +55,23 @@ const { TabPane } = Tabs;
 interface MeritFiguresProps {
   rootNode: TreeNode;
   onUpdate?: () => void;
+  meritFigures?: MeritFigure[];
+  onMeritFiguresChange?: (figures: MeritFigure[]) => void;
 }
 
-const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
+const MeritFigures: React.FC<MeritFiguresProps> = ({ 
+  rootNode, 
+  onUpdate, 
+  meritFigures: externalMeritFigures, 
+  onMeritFiguresChange 
+}) => {
   const { t } = useTranslation();
   
   // Chave para localStorage das figuras de mérito
   const MERIT_FIGURES_STORAGE_KEY = 'wbs-merit-figures';
   
   // Estados
-  const [meritFigures, setMeritFigures] = useState<MeritFigure[]>([]);
+  const [internalMeritFigures, setInternalMeritFigures] = useState<MeritFigure[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingFigure, setEditingFigure] = useState<MeritFigure | null>(null);
   const [impactModalVisible, setImpactModalVisible] = useState(false);
@@ -76,6 +83,22 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
 
   // Ref para captura do gráfico para exportação
   const chartRef = useRef<HTMLDivElement>(null);
+
+  // Determinar qual conjunto de figuras usar
+  const meritFigures = externalMeritFigures !== undefined ? externalMeritFigures : internalMeritFigures;
+  
+  // Função para atualizar figuras (interna ou externa)
+  const setMeritFigures = useCallback((figures: MeritFigure[] | ((prev: MeritFigure[]) => MeritFigure[])) => {
+    const newFigures = typeof figures === 'function' ? figures(meritFigures) : figures;
+    
+    if (onMeritFiguresChange) {
+      // Modo controlado - usar callback externo
+      onMeritFiguresChange(newFigures);
+    } else {
+      // Modo interno - usar estado local
+      setInternalMeritFigures(newFigures);
+    }
+  }, [meritFigures, onMeritFiguresChange]);
 
   // Função para exportar gráfico como imagem
   const handleExportChartImage = async (format: 'png' | 'jpeg' = 'png') => {
@@ -222,14 +245,25 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
 
   // Carregar dados iniciais
   useEffect(() => {
+    // Se temos figuras externas, usar elas
+    if (externalMeritFigures !== undefined) {
+      // Selecionar automaticamente todas as figuras para mostrar o gráfico
+      if (externalMeritFigures.length > 0) {
+        setSelectedIndicators(externalMeritFigures.map(f => f.id));
+      }
+      setIsInitialLoad(false);
+      return;
+    }
+    
+    // Caso contrário, carregar do localStorage (modo interno)
     const figures = loadMeritFigures();
-    setMeritFigures(figures);
+    setInternalMeritFigures(figures);
     // Selecionar automaticamente todas as figuras para mostrar o gráfico
     if (figures.length > 0) {
       setSelectedIndicators(figures.map(f => f.id));
     }
     setIsInitialLoad(false);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [externalMeritFigures]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Atualizar cálculo de progresso
   const calculateProgress = useCallback((figure: MeritFigure): number => {
@@ -253,13 +287,13 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
     return 'off-track';
   };
 
-  // Salvar automaticamente quando mudar
+  // Salvar automaticamente quando mudar (apenas no modo interno)
   useEffect(() => {
-    // Só salvar após o carregamento inicial, sempre salvar (mesmo array vazio)
-    if (!isInitialLoad) {
-      saveMeritFigures(meritFigures);
+    // Só salvar após o carregamento inicial e apenas no modo interno
+    if (!isInitialLoad && externalMeritFigures === undefined) {
+      saveMeritFigures(internalMeritFigures);
     }
-  }, [meritFigures, saveMeritFigures, isInitialLoad]);
+  }, [internalMeritFigures, saveMeritFigures, isInitialLoad, externalMeritFigures]);
 
   // Atualizar selectedIndicators quando figuras mudarem
   useEffect(() => {

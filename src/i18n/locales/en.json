@@ -531,7 +531,12 @@
       "totalCost": "Total Cost",
       "children": "Children",
       "responsible": "Responsible"
-    }
+    },
+    "unifiedFormat": "Unified Format",
+    "legacyFormat": "Legacy Format",
+    "unifiedFormatDesc": "Complete project with WBS, risks and merit figures",
+    "legacyFormatDesc": "Traditional import format",
+    "showingFirstItems": "Showing first {count} of {total} items"
   },
   "riskManagement": {
     "title": "Risk Management",
