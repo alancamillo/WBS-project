@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Card, Row, Col, Select, DatePicker, Space, Typography, Table, Switch, Button } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import React, { useState, useMemo, useRef } from 'react';
+import { Card, Row, Col, Select, DatePicker, Space, Typography, Table, Switch, Button, Dropdown, message } from 'antd';
+import { ReloadOutlined, FileImageOutlined, CameraOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
 import dayjs from 'dayjs';
@@ -51,6 +51,149 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
   const [chartKey, setChartKey] = useState<number>(0); // Key para forçar re-render do gráfico
   const [pageSize, setPageSize] = useState<number>(10); // Tamanho da página
   const [currentPage, setCurrentPage] = useState<number>(1); // Página atual
+
+  // Refs para captura de elementos para exportação
+  const tableRef = useRef<HTMLDivElement>(null);
+  const areaChartRef = useRef<HTMLDivElement>(null);
+  const lineChartRef = useRef<HTMLDivElement>(null);
+
+  // Função para exportar tabela como imagem
+  const handleExportTableImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!tableRef.current) {
+      message.error(t('budgetAllocation.exportError') || 'Error: Table not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(tableRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `budget-allocation-table-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('budgetAllocation.tableExportSuccess') || 'Budget table exported successfully');
+    } catch (error) {
+      console.error('Error exporting budget table:', error);
+      message.error(t('budgetAllocation.exportError') || 'Error exporting budget table');
+    }
+  };
+
+  // Função para exportar gráfico de área como imagem
+  const handleExportAreaChartImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!areaChartRef.current) {
+      message.error(t('budgetAllocation.exportError') || 'Error: Area chart not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(areaChartRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `budget-allocation-area-chart-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('budgetAllocation.areaChartExportSuccess') || 'Area chart exported successfully');
+    } catch (error) {
+      console.error('Error exporting area chart:', error);
+      message.error(t('budgetAllocation.exportError') || 'Error exporting area chart');
+    }
+  };
+
+  // Função para exportar gráfico de linha como imagem
+  const handleExportLineChartImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!lineChartRef.current) {
+      message.error(t('budgetAllocation.exportError') || 'Error: Line chart not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(lineChartRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `budget-allocation-cumulative-chart-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('budgetAllocation.lineChartExportSuccess') || 'Cumulative chart exported successfully');
+    } catch (error) {
+      console.error('Error exporting cumulative chart:', error);
+      message.error(t('budgetAllocation.exportError') || 'Error exporting cumulative chart');
+    }
+  };
+
+  // Items do dropdown para exportação da tabela
+  const tableExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportTableImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportTableImage('jpeg')
+    }
+  ];
+
+  // Items do dropdown para exportação do gráfico de área
+  const areaChartExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportAreaChartImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportAreaChartImage('jpeg')
+    }
+  ];
+
+  // Items do dropdown para exportação do gráfico de linha
+  const lineChartExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportLineChartImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportLineChartImage('jpeg')
+    }
+  ];
 
   // Função para obter o locale do date-fns baseado no idioma atual
   const getDateFnsLocale = React.useCallback(() => {
@@ -676,8 +819,22 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
 
 
       {/* Tabela de Detalhes */}
-      <Card title={t('budgetAllocation.periodDetail')} style={{ marginBottom: 24 }}>
-        <Table
+      <Card 
+        title={t('budgetAllocation.periodDetail')} 
+        extra={
+          <Dropdown
+            menu={{ items: tableExportItems }}
+            placement="bottomRight"
+          >
+            <Button icon={<FileImageOutlined />}>
+              {t('budgetAllocation.exportTable')} <DownloadOutlined />
+            </Button>
+          </Dropdown>
+        }
+        style={{ marginBottom: 24 }}
+      >
+        <div ref={tableRef}>
+          <Table
           columns={tableColumns}
           dataSource={tableData}
           pagination={{
@@ -744,6 +901,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             );
           }}
         />
+        </div>
       </Card>
 
       {/* Gráficos */}
@@ -753,6 +911,18 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             title={`${t('budgetAllocation.areaChart')} - ${chartGroupMode === 'grouped' ? t('budgetAllocation.groupedByLevel') : t('budgetAllocation.separatedByPhase')}`}
             extra={
               <Space size={8} align="center">
+                <Dropdown
+                  menu={{ items: areaChartExportItems }}
+                  placement="bottomRight"
+                >
+                  <Button 
+                    size="small"
+                    icon={<FileImageOutlined />}
+                    style={{ padding: '4px 8px', fontSize: '11px' }}
+                  >
+                    {t('budgetAllocation.exportChart')} <DownloadOutlined />
+                  </Button>
+                </Dropdown>
                 <Button 
                   size="small" 
                   type="text" 
@@ -780,7 +950,8 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             }
             style={{ height: 400, position: 'relative' }}
           >
-            {hiddenSeries.size > 0 && (
+            <div ref={areaChartRef}>
+              {hiddenSeries.size > 0 && (
               <div style={{ 
                 position: 'absolute', 
                 top: 35, 
@@ -904,11 +1075,30 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 }
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title={t('budgetAllocation.cumulativeBudget')} style={{ height: 400 }}>
-            <ResponsiveContainer width="100%" height={300}>
+          <Card 
+            title={t('budgetAllocation.cumulativeBudget')} 
+            extra={
+              <Dropdown
+                menu={{ items: lineChartExportItems }}
+                placement="bottomRight"
+              >
+                <Button 
+                  size="small"
+                  icon={<FileImageOutlined />}
+                  style={{ padding: '4px 8px', fontSize: '11px' }}
+                >
+                  {t('budgetAllocation.exportChart')} <DownloadOutlined />
+                </Button>
+              </Dropdown>
+            }
+            style={{ height: 400 }}
+          >
+            <div ref={lineChartRef}>
+              <ResponsiveContainer width="100%" height={300}>
               <LineChart data={cumulativeData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="period" tick={{ fontSize: 12 }} />
@@ -927,6 +1117,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 />
               </LineChart>
             </ResponsiveContainer>
+            </div>
           </Card>
         </Col>
       </Row>

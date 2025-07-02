@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Card,
   Table,
@@ -22,7 +22,8 @@ import {
   message,
   Tabs,
   List,
-  Avatar
+  Avatar,
+  Dropdown
 } from 'antd';
 import {
   PlusOutlined,
@@ -35,7 +36,10 @@ import {
   CloseCircleOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
-  MinusOutlined
+  MinusOutlined,
+  FileImageOutlined,
+  CameraOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { MeritFigure, PhaseImpact, MeritFigureMetrics, TreeNode } from '../types';
@@ -69,6 +73,55 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
   const [selectedIndicators, setSelectedIndicators] = useState<string[]>([]);
   const [timeGranularity, setTimeGranularity] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Ref para captura do gráfico para exportação
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  // Função para exportar gráfico como imagem
+  const handleExportChartImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!chartRef.current) {
+      message.error(t('meritFigures.exportError') || 'Error: Chart not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(chartRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `merit-figures-chart-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('meritFigures.chartExportSuccess') || 'Merit figures chart exported successfully');
+    } catch (error) {
+      console.error('Error exporting merit figures chart:', error);
+      message.error(t('meritFigures.exportError') || 'Error exporting merit figures chart');
+    }
+  };
+
+  // Items do dropdown para exportação do gráfico
+  const chartExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportChartImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportChartImage('jpeg')
+    }
+  ];
 
   // Carregar figuras de mérito do localStorage
   const loadMeritFigures = (): MeritFigure[] => {
@@ -1008,7 +1061,26 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
       </Card>
 
       {/* Controles e gráfico */}
-      <Card title={t('meritFigures.analysis.chartTitle')} style={{ marginBottom: 24, background: '#fff', boxShadow: '0 2px 8px #f0f1f2' }}>
+      <Card 
+        title={t('meritFigures.analysis.chartTitle')} 
+        extra={
+          selectedIndicators.length > 0 && (
+            <Dropdown
+              menu={{ items: chartExportItems }}
+              placement="bottomRight"
+            >
+              <Button 
+                size="small"
+                icon={<FileImageOutlined />}
+                style={{ padding: '4px 8px', fontSize: '11px' }}
+              >
+                {t('meritFigures.exportChart')} <DownloadOutlined />
+              </Button>
+            </Dropdown>
+          )
+        }
+        style={{ marginBottom: 24, background: '#fff', boxShadow: '0 2px 8px #f0f1f2' }}
+      >
         <div style={{ marginBottom: 16, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <Select
             mode="multiple"
@@ -1032,7 +1104,8 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
           />
         </div>
         {selectedIndicators.length > 0 ? (
-          <ResponsiveContainer width="100%" height={320}>
+          <div ref={chartRef}>
+            <ResponsiveContainer width="100%" height={320}>
             <LineChart data={chartData} margin={{ top: 16, right: 32, left: 40, bottom: 16 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
@@ -1067,6 +1140,7 @@ const MeritFigures: React.FC<MeritFiguresProps> = ({ rootNode, onUpdate }) => {
               })}
             </LineChart>
           </ResponsiveContainer>
+          </div>
         ) : (
           <div style={{ 
             height: 320, 

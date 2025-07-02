@@ -315,7 +315,13 @@
     "cumulativeBudget": "Orçamento Cumulativo",
     "periodLabel": "Período:",
     "accumulated": "Acumulado",
-    "level": "Nível"
+    "level": "Nível",
+    "exportTable": "Exportar Tabela",
+    "exportChart": "Exportar Gráfico",
+    "tableExportSuccess": "Tabela de alocação exportada com sucesso!",
+    "areaChartExportSuccess": "Gráfico de áreas exportado com sucesso!",
+    "lineChartExportSuccess": "Gráfico cumulativo exportado com sucesso!",
+    "exportError": "Erro ao exportar"
   },
   "flowTree": {
     "project": "Projeto",
@@ -910,7 +916,10 @@
       "name": "Eficiência de Custos",
       "description": "Mede a relação entre custos do projeto e valor entregue",
       "unit": "%"
-    }
+    },
+    "exportChart": "Exportar Gráfico",
+    "chartExportSuccess": "Gráfico de figuras de mérito exportado com sucesso!",
+    "exportError": "Erro ao exportar"
   },
   "unifiedImport": {
     "nodesImported": "nós importados",

@@ -296,7 +296,13 @@
     "cumulativeBudget": "Presupuesto Acumulativo",
     "periodLabel": "Período:",
     "accumulated": "Acumulado",
-    "level": "Nivel"
+    "level": "Nivel",
+    "exportTable": "Exportar Tabla",
+    "exportChart": "Exportar Gráfico",
+    "tableExportSuccess": "¡Tabla de asignación exportada con éxito!",
+    "areaChartExportSuccess": "¡Gráfico de áreas exportado con éxito!",
+    "lineChartExportSuccess": "¡Gráfico acumulativo exportado con éxito!",
+    "exportError": "Error al exportar"
   },
   "flowTree": {
     "project": "Proyecto",
@@ -909,7 +915,10 @@
       "name": "Eficiencia de Costos",
       "description": "Mide la relación entre costos del proyecto y valor entregado",
       "unit": "%"
-    }
+    },
+    "exportChart": "Exportar Gráfico",
+    "chartExportSuccess": "¡Gráfico de figuras de mérito exportado con éxito!",
+    "exportError": "Error al exportar"
   },
   "unifiedImport": {
     "nodesImported": "nodos importados",

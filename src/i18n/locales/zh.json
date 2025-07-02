@@ -296,7 +296,13 @@
     "cumulativeBudget": "累计预算",
     "periodLabel": "周期：",
     "accumulated": "累计",
-    "level": "级别"
+    "level": "级别",
+    "exportTable": "导出表格",
+    "exportChart": "导出图表",
+    "tableExportSuccess": "预算分配表导出成功！",
+    "areaChartExportSuccess": "面积图导出成功！",
+    "lineChartExportSuccess": "累计图表导出成功！",
+    "exportError": "导出错误"
   },
   "flowTree": {
     "project": "项目",
@@ -904,7 +910,10 @@
       "deleted": "指标删除成功！",
       "impactsUpdated": "阶段影响更新成功！",
       "saveError": "保存指标时出错"
-    }
+    },
+    "exportChart": "导出图表",
+    "chartExportSuccess": "绩效指标图表导出成功！",
+    "exportError": "导出错误"
   },
   "unifiedImport": {
     "nodesImported": "已导入节点",

@@ -314,7 +314,13 @@
     "cumulativeBudget": "Cumulative Budget",
     "periodLabel": "Period:",
     "accumulated": "Accumulated",
-    "level": "Level"
+    "level": "Level",
+    "exportTable": "Export Table",
+    "exportChart": "Export Chart",
+    "tableExportSuccess": "Budget allocation table exported successfully!",
+    "areaChartExportSuccess": "Area chart exported successfully!",
+    "lineChartExportSuccess": "Cumulative chart exported successfully!",
+    "exportError": "Export error"
   },
   "flowTree": {
     "project": "Project",
@@ -908,7 +914,10 @@
       "name": "Cost Efficiency",
       "description": "Measures the relationship between project costs and delivered value",
       "unit": "%"
-    }
+    },
+    "exportChart": "Export Chart",
+    "chartExportSuccess": "Merit figures chart exported successfully!",
+    "exportError": "Export error"
   },
   "wbsAutoSave": "Your WBS structure is automatically saved in the browser. All modifications, including adding/editing phases and activities, will remain available even after navigating between screens or reloading the page.",
   "unifiedImport": {
