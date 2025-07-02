@@ -128,6 +128,8 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   const { t } = useTranslation();
   const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Estados para edição - inicializados com dados do node (serão atualizados via useEffect)
   const [editedName, setEditedName] = useState(node.name);
   const [editedCost, setEditedCost] = useState(node.cost || 0);
   const [editedDescription, setEditedDescription] = useState(node.description || '');
@@ -184,6 +186,8 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       children: [...visiblePhases, groupedNode, ...otherChildren]
     };
   }, [node, groupingState.groupedPhaseIds, phases, t]);
+
+
 
   const handleGroupingConfirm = (selectedPhaseIds: string[]) => {
     // Validar que todos os IDs selecionados correspondem a fases existentes
@@ -337,35 +341,6 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     return validateDependencyDates(editedStartDate, editedEndDate, editedDependencies);
   }, [editedStartDate, editedEndDate, editedDependencies, rootNode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Validação para dados atuais do nó
-  const currentDateValidation = useMemo(() => {
-    return validateDependencyDates(node.startDate, node.endDate, node.dependencies || []);
-  }, [node.startDate, node.endDate, node.dependencies, rootNode]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Função para coletar todas as tarefas da árvore (exceto a atual)
-  const getAllAvailableTasks = useMemo(() => {
-    if (!rootNode) return [];
-    
-    const tasks: { id: string; name: string; level: number }[] = [];
-    
-    const traverse = (currentNode: TreeNodeType, path: string = '') => {
-      const currentPath = path ? `${path} > ${currentNode.name}` : currentNode.name;
-      
-      if (currentNode.id !== node.id && !isDescendantOf(currentNode, node)) {
-        tasks.push({
-          id: currentNode.id,
-          name: currentPath,
-          level: currentNode.level
-        });
-      }
-      
-      currentNode.children.forEach(child => traverse(child, currentPath));
-    };
-    
-    traverse(rootNode);
-    return tasks;
-  }, [rootNode, node]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Obtém nomes das tarefas dependentes
   const getDependencyNames = (dependencyIds: string[]): string[] => {
     if (!rootNode) return [];
@@ -420,6 +395,53 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     return earliestStartDate;
   };
 
+  // Os dados já chegam com herança e custos processados do App.tsx
+  const displayNode = node;
+
+  // Validação para dados atuais do nó
+  const displayNodeDateValidation = useMemo(() => {
+    return validateDependencyDates(displayNode.startDate, displayNode.endDate, displayNode.dependencies || []);
+  }, [displayNode.startDate, displayNode.endDate, displayNode.dependencies, rootNode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Função para coletar todas as tarefas disponíveis para dependências
+  const getDisplayNodeAvailableTasks = useMemo(() => {
+    if (!rootNode) return [];
+    
+    const tasks: { id: string; name: string; level: number }[] = [];
+    
+    const traverse = (currentNode: TreeNodeType, path: string = '') => {
+      const currentPath = path ? `${path} > ${currentNode.name}` : currentNode.name;
+      
+      if (currentNode.id !== displayNode.id && !isDescendantOf(currentNode, displayNode)) {
+        tasks.push({
+          id: currentNode.id,
+          name: currentPath,
+          level: currentNode.level
+        });
+      }
+      
+      currentNode.children.forEach(child => traverse(child, currentPath));
+    };
+    
+    traverse(rootNode);
+    return tasks;
+  }, [rootNode, displayNode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Atualizar estados de edição quando displayNode mudar
+  useEffect(() => {
+    if (!isEditing) {
+      setEditedName(displayNode.name);
+      setEditedCost(displayNode.cost || 0);
+      setEditedDescription(displayNode.description || '');
+      setEditedResponsible(displayNode.responsible || '');
+      setEditedStatus(displayNode.status || 'not-started');
+      setEditedStartDate(displayNode.startDate);
+      setEditedEndDate(displayNode.endDate);
+      setEditedDependencies(displayNode.dependencies || []);
+      setEditedTrl(displayNode.trl);
+    }
+  }, [displayNode, isEditing]);
+
   const handleSave = () => {
     // Validar datas antes de salvar
     const validation = validateDependencyDates(editedStartDate, editedEndDate, editedDependencies);
@@ -442,6 +464,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       trl: node.level === 2 ? (editedTrl || undefined) : undefined
     };
 
+    // Atualização será processada (herança + custos) no App.tsx
     onUpdate(updatedNode);
     setIsEditing(false);
   };
@@ -459,73 +482,50 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   };
 
   const handleAddChild = () => {
-    if (node.level >= maxLevel) return;
+    if (displayNode.level >= maxLevel) return;
 
     const newChild: TreeNodeType = {
       id: uuidv4(),
-      name: `${t('wbs.item')} ${node.children.length + 1}`,
+      name: `${t('wbs.item')} ${displayNode.children.length + 1}`,
       cost: 0,
-      level: (node.level + 1) as 1 | 2 | 3,
-      parentId: node.id,
+      level: (displayNode.level + 1) as 1 | 2 | 3 | 4,
+      parentId: displayNode.id,
       children: [],
       totalCost: 0
     };
 
     const updatedNode = {
-      ...node,
-      children: [...node.children, newChild]
+      ...displayNode,
+      children: [...displayNode.children, newChild]
     };
 
+    // Atualização será processada (herança + custos) no App.tsx
     onUpdate(updatedNode);
   };
 
   const handleChildUpdate = (updatedChild: TreeNodeType) => {
-    const updatedChildren = node.children.map(child =>
+    const updatedChildren = displayNode.children.map(child =>
       child.id === updatedChild.id ? updatedChild : child
     );
 
-    // Recalcula as datas herdadas após atualização do filho
-    const tempNode = {
-      ...node,
+    const updatedNode = {
+      ...displayNode,
       children: updatedChildren
     };
 
-    let finalStartDate = node.startDate;
-    let finalEndDate = node.endDate;
-
-    // Herda data de início mais cedo
-    const inheritedStartDate = calculateInheritedStartDate(tempNode);
-    if (inheritedStartDate) {
-      if (!node.startDate || inheritedStartDate < node.startDate) {
-        finalStartDate = inheritedStartDate;
-      }
-    }
-
-    // Herda data de fim mais distante
-    const inheritedEndDate = calculateInheritedEndDate(tempNode);
-    if (inheritedEndDate) {
-      if (!node.endDate || inheritedEndDate > node.endDate) {
-        finalEndDate = inheritedEndDate;
-      }
-    }
-
-    const updatedNode = {
-      ...tempNode,
-      startDate: finalStartDate,
-      endDate: finalEndDate
-    };
-
+    // Atualização será processada (herança + custos) no App.tsx
     onUpdate(updatedNode);
   };
 
   const handleChildDelete = (childId: string) => {
-    const updatedChildren = node.children.filter(child => child.id !== childId);
+    const updatedChildren = displayNode.children.filter(child => child.id !== childId);
     
     const updatedNode = {
-      ...node,
+      ...displayNode,
       children: updatedChildren
     };
 
+    // Atualização será processada (herança + custos) no App.tsx
     onUpdate(updatedNode);
   };
 
@@ -534,6 +534,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       case 1: return '#1890ff';
       case 2: return '#52c41a';
       case 3: return '#faad14';
+      case 4: return '#f759ab';
       default: return '#d9d9d9';
     }
   };
@@ -628,9 +629,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       size="small"
       style={{ 
         marginBottom: 8,
-        borderLeft: `4px solid ${getLevelColor(node.level)}`,
-        backgroundColor: node.level === 1 ? '#f0f9ff' : node.level === 2 ? '#f6ffed' : '#fffbe6',
-        ...(node.id === 'grouped-others' && {
+        borderLeft: `4px solid ${getLevelColor(displayNode.level)}`,
+        backgroundColor: displayNode.level === 1 ? '#f0f9ff' : displayNode.level === 2 ? '#f6ffed' : displayNode.level === 3 ? '#fffbe6' : '#fff0f6',
+        ...(displayNode.id === 'grouped-others' && {
           borderStyle: 'dashed',
           borderWidth: '2px',
           backgroundColor: '#f9f0ff',
@@ -639,8 +640,8 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       }}
       title={
         <Space>
-          <Tag color={getLevelColor(node.level)} icon={node.id === 'grouped-others' ? <FolderOutlined /> : undefined}>
-            {node.id === 'grouped-others' ? t('treeView.groupedPhases') : `${t('wbs.level')} ${node.level}`}
+          <Tag color={getLevelColor(displayNode.level)} icon={displayNode.id === 'grouped-others' ? <FolderOutlined /> : undefined}>
+            {displayNode.id === 'grouped-others' ? t('treeView.groupedPhases') : `${t('wbs.level')} ${displayNode.level}`}
           </Tag>
           {isEditing ? (
             <Input
@@ -650,20 +651,20 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               style={{ width: 300 }}
             />
           ) : (
-            <span style={{ fontWeight: 'bold' }}>{node.name}</span>
+            <span style={{ fontWeight: 'bold' }}>{displayNode.name}</span>
           )}
-          {node.status && (
-            <Tag color={getStatusColor(node.status)}>
-              {getStatusText(node.status)}
+          {displayNode.status && (
+            <Tag color={getStatusColor(displayNode.status)}>
+              {getStatusText(displayNode.status)}
             </Tag>
           )}
-          {node.dependencies && node.dependencies.length > 0 && (
+          {displayNode.dependencies && displayNode.dependencies.length > 0 && (
             <Tag color="orange" icon={<LinkOutlined />}>
-              {node.dependencies.length} {t('wbs.dependencies').toLowerCase()}
+              {displayNode.dependencies.length} {t('wbs.dependencies').toLowerCase()}
             </Tag>
           )}
           {/* Alerta visual para conflitos de data */}
-          {!currentDateValidation.isValid && !isEditing && (
+          {!displayNodeDateValidation.isValid && !isEditing && (
             <Tag color="red" icon={<WarningOutlined />}>
               {t('wbs.schedulingConflict')}
             </Tag>
@@ -673,10 +674,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       extra={
         <Space>
           <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
-            {t('wbs.totalCost')}: {formatCurrency(node.totalCost)}
+            {t('wbs.totalCost')}: {formatCurrency(displayNode.totalCost)}
           </span>
           {/* Botão de agrupamento apenas para projetos (nível 1) */}
-          {node.level === 1 && phases.length > 0 && (
+          {displayNode.level === 1 && phases.length > 0 && (
             <Space>
               <Tooltip title={t('treeView.configureGrouping')}>
                 <Button
@@ -712,7 +713,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             </Space>
           )}
           {/* Botão de edição apenas para nós que não são agrupados */}
-          {node.id !== 'grouped-others' && (
+          {displayNode.id !== 'grouped-others' && (
             isEditing ? (
               <Button
                 type="primary"
@@ -730,10 +731,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
             )
           )}
           {/* Botão de exclusão apenas para nós que não são agrupados e não são nível 1 */}
-          {node.id !== 'grouped-others' && node.level > 1 && (
+          {displayNode.id !== 'grouped-others' && displayNode.level > 1 && (
             <Popconfirm
               title={t('wbs.deleteConfirmation')}
-              onConfirm={() => onDelete(node.id)}
+              onConfirm={() => onDelete(displayNode.id)}
               okText={t('buttons.yes')}
               cancelText={t('buttons.no')}
             >
@@ -748,7 +749,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       }
     >
       {/* Alerta de conflito de datas no modo de visualização */}
-      {!currentDateValidation.isValid && !isEditing && (
+      {!displayNodeDateValidation.isValid && !isEditing && (
         <Alert
           type="error"
           showIcon
@@ -756,11 +757,11 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           message={t('wbs.schedulingConflict')}
           description={
             <div>
-              <p>{currentDateValidation.message}</p>
+              <p>{displayNodeDateValidation.message}</p>
               <div style={{ marginTop: 8 }}>
                 <strong>{t('wbs.conflictingDependencies')}:</strong>
                 <ul style={{ marginTop: 4, marginBottom: 0 }}>
-                  {currentDateValidation.conflictingDependencies.map((dep, index) => (
+                  {displayNodeDateValidation.conflictingDependencies.map((dep, index) => (
                     <li key={index}>
                       {t('messages.validation.dependencyConflict', { 
                         taskName: dep.name, 
@@ -776,7 +777,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         />
       )}
 
-      {isEditing && node.id !== 'grouped-others' ? (
+      {isEditing && displayNode.id !== 'grouped-others' ? (
         // Modo de Edição
         <div>
           {/* Alerta de validação durante edição */}
@@ -881,7 +882,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   {!editedDateValidation.isValid && (
                     <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
                   )}
-                  {node.children.length > 0 && (
+                  {displayNode.children.length > 0 && (
                     <Tag 
                       color="lime" 
                       style={{ marginLeft: 8, fontSize: '10px' }}
@@ -900,9 +901,9 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   }}
                   format="DD/MM/YYYY"
                   status={!editedDateValidation.isValid ? 'error' : undefined}
-                  placeholder={node.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
+                  placeholder={displayNode.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
                 />
-                {node.children.length > 0 && (
+                {displayNode.children.length > 0 && (
                   <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
                     💡 <em>{t('wbs.inheritanceHelpStart')}</em>
                   </div>
@@ -916,7 +917,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   {editedDateValidation.hasDateRangeError && (
                     <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
                   )}
-                  {node.children.length > 0 && (
+                  {displayNode.children.length > 0 && (
                     <Tag 
                       color="cyan" 
                       style={{ marginLeft: 8, fontSize: '10px' }}
@@ -935,7 +936,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   }}
                   format="DD/MM/YYYY"
                   status={editedDateValidation.hasDateRangeError ? 'error' : undefined}
-                  placeholder={node.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
+                  placeholder={displayNode.children.length > 0 ? t('wbs.leaveEmptyToInherit') : t('wbs.selectDate')}
                 />
                 {editedDateValidation.hasDateRangeError && editedDateValidation.suggestedEndDate && (
                   <div style={{ marginTop: 4 }}>
@@ -949,7 +950,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     </Button>
                   </div>
                 )}
-                {node.children.length > 0 && (
+                {displayNode.children.length > 0 && (
                   <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
                     💡 <em>{t('wbs.inheritanceHelpEnd')}</em>
                   </div>
@@ -977,26 +978,26 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
                   {t('wbs.dependencies')}:
                 </label>
-                <Select
-                  mode="multiple"
-                  value={editedDependencies}
-                  onChange={setEditedDependencies}
-                  style={{ width: '100%' }}
-                  placeholder={t('wbs.selectDependencies')}
-                  allowClear
-                >
-                  {getAllAvailableTasks.map(task => (
-                    <Option key={task.id} value={task.id}>
-                      <Tag color={getLevelColor(task.level)} style={{ marginRight: 4, fontSize: '11px' }}>
-                        N{task.level}
-                      </Tag>
-                      {task.name}
-                    </Option>
-                  ))}
-                </Select>
+                                  <Select
+                    mode="multiple"
+                    value={editedDependencies}
+                    onChange={setEditedDependencies}
+                    style={{ width: '100%' }}
+                    placeholder={t('wbs.selectDependencies')}
+                    allowClear
+                  >
+                    {getDisplayNodeAvailableTasks.map(task => (
+                      <Option key={task.id} value={task.id}>
+                        <Tag color={getLevelColor(task.level)} style={{ marginRight: 4, fontSize: '11px' }}>
+                          N{task.level}
+                        </Tag>
+                        {task.name}
+                      </Option>
+                    ))}
+                  </Select>
               </div>
             </Col>
-            {node.level === 2 && (
+            {displayNode.level === 2 && (
               <Col xs={24} sm={8}>
                 <div>
                   <label style={{ fontWeight: 'bold', marginBottom: 4, display: 'block' }}>
@@ -1060,35 +1061,35 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         </div>
       ) : (
         // Modo de Visualização
-        (!isEditing || node.id === 'grouped-others') && (
-          node.id === 'grouped-others' ? <></> : (
+        (!isEditing || displayNode.id === 'grouped-others') && (
+          displayNode.id === 'grouped-others' ? <></> : (
             <div>
               <Row gutter={[16, 16]}>
                 <Col xs={24} sm={8}>
                   <div>
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.ownCost')}: </span>
-                    <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost || 0)}</span>
+                    <span style={{ color: '#1890ff' }}>{formatCurrency(displayNode.cost || 0)}</span>
                   </div>
                 </Col>
                 <Col xs={24} sm={8}>
                   <div>
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.responsible')}: </span>
-                    <span>{node.responsible || t('wbs.notDefined')}</span>
+                    <span>{displayNode.responsible || t('wbs.notDefined')}</span>
                   </div>
                 </Col>
                 <Col xs={24} sm={8}>
                   <div>
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.status')}: </span>
-                    <Tag color={getStatusColor(node.status)}>
-                      {getStatusText(node.status)}
+                    <Tag color={getStatusColor(displayNode.status)}>
+                      {getStatusText(displayNode.status)}
                     </Tag>
                   </div>
                 </Col>
-                {node.level === 2 && (
+                {displayNode.level === 2 && (
                   <Col xs={24} sm={8}>
                     <div>
                       <span style={{ fontWeight: 'bold' }}>{t('wbs.trl')}: </span>
-                      <span>{node.trl ? `TRL-${node.trl}` : t('wbs.notDefined')}</span>
+                      <span>{displayNode.trl ? `TRL-${displayNode.trl}` : t('wbs.notDefined')}</span>
                     </div>
                   </Col>
                 )}
@@ -1100,13 +1101,13 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     <CalendarOutlined style={{ marginRight: 4, color: '#52c41a' }} />
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.startDate')}: </span>
                     <span style={{ 
-                      color: !currentDateValidation.isValid ? '#ff4d4f' : 'inherit',
-                      fontWeight: !currentDateValidation.isValid ? 'bold' : 'normal'
+                      color: !displayNodeDateValidation.isValid ? '#ff4d4f' : 'inherit',
+                      fontWeight: !displayNodeDateValidation.isValid ? 'bold' : 'normal'
                     }}>
-                      {formatDate(node.startDate)}
+                      {formatDate(displayNode.startDate)}
                     </span>
                     {(() => {
-                      const inheritanceInfo = getStartDateInheritanceInfo(node);
+                      const inheritanceInfo = getStartDateInheritanceInfo(displayNode);
                       if (inheritanceInfo.isInherited) {
                         return (
                           <Tag 
@@ -1127,16 +1128,16 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                     <CalendarOutlined style={{ marginRight: 4, color: '#ff4d4f' }} />
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.endDate')}: </span>
                     <span style={{ 
-                      color: currentDateValidation.hasDateRangeError ? '#ff4d4f' : 'inherit',
-                      fontWeight: currentDateValidation.hasDateRangeError ? 'bold' : 'normal'
+                      color: displayNodeDateValidation.hasDateRangeError ? '#ff4d4f' : 'inherit',
+                      fontWeight: displayNodeDateValidation.hasDateRangeError ? 'bold' : 'normal'
                     }}>
-                      {formatDate(node.endDate)}
+                      {formatDate(displayNode.endDate)}
                     </span>
-                    {currentDateValidation.hasDateRangeError && (
+                    {displayNodeDateValidation.hasDateRangeError && (
                       <WarningOutlined style={{ color: '#ff4d4f', marginLeft: 4 }} />
                     )}
                     {(() => {
-                      const inheritanceInfo = getEndDateInheritanceInfo(node);
+                      const inheritanceInfo = getEndDateInheritanceInfo(displayNode);
                       if (inheritanceInfo.isInherited) {
                         return (
                           <Tag 
@@ -1156,8 +1157,8 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                   <div>
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.duration')}: </span>
                     <span>
-                      {node.startDate && node.endDate 
-                        ? `${Math.ceil((new Date(node.endDate).getTime() - new Date(node.startDate).getTime()) / (1000 * 60 * 60 * 24))} ${t('wbs.days')}`
+                      {displayNode.startDate && displayNode.endDate 
+                        ? `${Math.ceil((new Date(displayNode.endDate).getTime() - new Date(displayNode.startDate).getTime()) / (1000 * 60 * 60 * 24))} ${t('wbs.days')}`
                         : t('wbs.notCalculated')
                       }
                     </span>
@@ -1166,14 +1167,14 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
               </Row>
 
               {/* Dependências */}
-              {Array.isArray(node.dependencies) && node.dependencies.length > 0 && (
+              {Array.isArray(displayNode.dependencies) && displayNode.dependencies.length > 0 && (
                 <Row style={{ marginTop: 8 }}>
                   <Col xs={24}>
                     <div>
                       <LinkOutlined style={{ marginRight: 4, color: '#fa8c16' }} />
                       <span style={{ fontWeight: 'bold' }}>{t('wbs.dependencies')}: </span>
                       <div style={{ marginTop: 4 }}>
-                        {getDependencyNames(node.dependencies).map((depName, index) => (
+                        {getDependencyNames(displayNode.dependencies).map((depName, index) => (
                           <Tag key={index} color="orange" style={{ marginBottom: 4 }}>
                             {depName}
                           </Tag>
@@ -1187,10 +1188,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 </Row>
               )}
 
-              {node.description && (
+              {displayNode.description && (
                 <div style={{ marginTop: 8 }}>
                   <span style={{ fontWeight: 'bold' }}>{t('wbs.description')}: </span>
-                  <span style={{ fontStyle: 'italic', color: '#666' }}>{node.description}</span>
+                  <span style={{ fontStyle: 'italic', color: '#666' }}>{displayNode.description}</span>
                 </div>
               )}
             </div>
@@ -1201,7 +1202,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       <Divider style={{ margin: '16px 0' }} />
 
       {/* Informação sobre agrupamento ativo */}
-      {node.level === 1 && groupingState.groupedPhaseIds.length > 0 && (
+      {displayNode.level === 1 && groupingState.groupedPhaseIds.length > 0 && (
         <div style={{ 
           marginBottom: 16, 
           padding: 12, 
@@ -1220,7 +1221,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         </div>
       )}
 
-      {node.level < maxLevel && node.id !== 'grouped-others' && (
+      {displayNode.level < maxLevel && displayNode.id !== 'grouped-others' && (
         <Button
           type="dashed"
           icon={<PlusOutlined />}
@@ -1231,14 +1232,14 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
         </Button>
       )}
 
-      {node.children.length > 0 && (
+      {displayNode.children.length > 0 && (
         <Collapse
           size="small"
-          defaultActiveKey={node.level === 1 ? ['children'] : []}
+          defaultActiveKey={displayNode.level === 1 ? ['children'] : []}
           items={[
             {
               key: 'children',
-              label: `${t('wbs.subitems')} (${node.children.length})`,
+              label: `${t('wbs.subitems')} (${displayNode.children.length})`,
               children: (
                 <div style={{ paddingLeft: 16 }}>
                   {processedNode.children.map(child => {

@@ -75,18 +75,30 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
   // Converte para formato da biblioteca gantt-task-react
   const tasks: Task[] = useMemo(() => {
-    return ganttTasks.map(task => ({
-      id: task.id,
-      name: task.name,
-      start: task.start,
-      end: task.end,
-      type: task.type as any,
-      progress: task.progress,
-      isDisabled: false,
-      project: task.project,
-      dependencies: task.dependencies,
-      styles: task.styles
-    }));
+    return ganttTasks.map(task => {
+      // Debug específico para Planning
+      if (task.name.includes('Planning')) {
+        console.log('=== FINAL TASK DEBUG ===');
+        console.log(`Task: ${task.name}`);
+        console.log(`Start: ${task.start.toDateString()}`);
+        console.log(`End: ${task.end.toDateString()}`);
+        console.log(`Start === End: ${task.start.getTime() === task.end.getTime()}`);
+        console.log('=======================');
+      }
+      
+      return {
+        id: task.id,
+        name: task.name,
+        start: task.start,
+        end: task.end,
+        type: task.type as any,
+        progress: task.progress,
+        isDisabled: false,
+        project: task.project,
+        dependencies: task.dependencies,
+        styles: task.styles
+      };
+    });
   }, [ganttTasks]);
 
   // Análise do projeto

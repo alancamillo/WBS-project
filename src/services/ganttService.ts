@@ -24,8 +24,8 @@ export class GanttService {
       const task: GanttTask = {
         id: node.id,
         name: node.name,
-        start: node.startDate || this.calculateStartDate(node, rootNode),
-        end: node.endDate || this.calculateEndDate(node, rootNode),
+        start: this.getNodeStartDate(node, rootNode),
+        end: this.getNodeEndDate(node, rootNode),
         progress: this.calculateProgress(node),
         type: this.getTaskType(node),
         project: parentId,
@@ -61,7 +61,85 @@ export class GanttService {
   }
 
   /**
-   * Calcula data de início baseada na hierarquia e dependências
+   * Obtém data de início do nó, priorizando herança para nós com filhos
+   */
+  private static getNodeStartDate(node: TreeNode, rootNode: TreeNode): Date {
+    // Para nós com filhos, sempre calcular herança primeiro
+    if (node.children.length > 0 && node.level >= 2) {
+      const inheritedStart = this.calculateInheritedStartDate(node, rootNode);
+      if (inheritedStart) {
+        return inheritedStart;
+      }
+    }
+    
+    return node.startDate || this.calculateStartDate(node, rootNode);
+  }
+
+  /**
+   * Obtém data de fim do nó, priorizando herança para nós com filhos
+   */
+  private static getNodeEndDate(node: TreeNode, rootNode: TreeNode): Date {
+    // Debug para Planning
+    if (node.name.includes('Planning')) {
+      console.log(`\n=== getNodeEndDate DEBUG: ${node.name} ===`);
+      console.log(`Has children: ${node.children.length > 0}`);
+      console.log(`Level: ${node.level}`);
+      console.log(`Original endDate: ${node.endDate?.toDateString() || 'undefined'}`);
+    }
+    
+    // Para nós com filhos, sempre calcular herança primeiro
+    if (node.children.length > 0 && node.level >= 2) {
+      const inheritedEnd = this.calculateInheritedEndDate(node, rootNode);
+      if (inheritedEnd) {
+        if (node.name.includes('Planning')) {
+          console.log(`Inherited end date: ${inheritedEnd.toDateString()}`);
+          console.log('=== END getNodeEndDate ===\n');
+        }
+        return inheritedEnd;
+      }
+    }
+    
+    const finalDate = node.endDate || this.calculateEndDate(node, rootNode);
+    if (node.name.includes('Planning')) {
+      console.log(`Final date: ${finalDate.toDateString()}`);
+      console.log('=== END getNodeEndDate ===\n');
+    }
+    
+    return finalDate;
+  }
+
+  /**
+   * Calcula data de início herdada dos filhos
+   */
+  private static calculateInheritedStartDate(node: TreeNode, rootNode: TreeNode): Date | null {
+    if (node.children.length === 0) return null;
+    
+    const childrenStartDates = node.children
+      .map(child => this.getNodeStartDate(child, rootNode))
+      .filter(date => date);
+    
+    if (childrenStartDates.length === 0) return null;
+    
+    return new Date(Math.min(...childrenStartDates.map(d => d.getTime())));
+  }
+
+  /**
+   * Calcula data de fim herdada dos filhos
+   */
+  private static calculateInheritedEndDate(node: TreeNode, rootNode: TreeNode): Date | null {
+    if (node.children.length === 0) return null;
+    
+    const childrenEndDates = node.children
+      .map(child => this.getNodeEndDate(child, rootNode))
+      .filter(date => date);
+    
+    if (childrenEndDates.length === 0) return null;
+    
+    return new Date(Math.max(...childrenEndDates.map(d => d.getTime())));
+  }
+
+  /**
+   * Calcula data de início padrão quando não há herança ou dados
    */
   private static calculateStartDate(node: TreeNode, rootNode: TreeNode): Date {
     if (node.startDate) return node.startDate;
@@ -81,7 +159,7 @@ export class GanttService {
   }
 
   /**
-   * Calcula data de fim baseada na duração estimada
+   * Calcula data de fim padrão baseada na duração estimada
    */
   private static calculateEndDate(node: TreeNode, rootNode: TreeNode): Date {
     if (node.endDate) return node.endDate;
@@ -166,32 +244,19 @@ export class GanttService {
     rootNode: TreeNode, 
     options: GanttViewOptions
   ): void {
-    // Adiciona dependências sequenciais entre irmãos do mesmo nível
-    const tasksByParent = new Map<string, GanttTask[]>();
+    // COMENTADO: Esta lógica estava forçando sequência automática e sobrescrevendo datas herdadas
+    // Apenas adiciona dependências explícitas do WBS, não força sequências automáticas
     
+    // Adiciona apenas dependências explicitamente definidas no WBS
     tasks.forEach(task => {
-      const parentId = task.project || 'root';
-      if (!tasksByParent.has(parentId)) {
-        tasksByParent.set(parentId, []);
-      }
-      tasksByParent.get(parentId)!.push(task);
-    });
-
-    // Para cada grupo de irmãos, adiciona dependências sequenciais
-    tasksByParent.forEach(siblings => {
-      siblings.sort((a, b) => a.start.getTime() - b.start.getTime());
-      
-      for (let i = 1; i < siblings.length; i++) {
-        const current = siblings[i];
-        const previous = siblings[i - 1];
-        
-        // Adiciona dependência finish-to-start se não existe
-        if (!current.dependencies?.includes(previous.id)) {
-          current.dependencies = current.dependencies || [];
-          current.dependencies.push(previous.id);
-        }
+      const sourceNode = this.findNodeById(rootNode, task.id);
+      if (sourceNode?.dependencies) {
+        task.dependencies = [...(sourceNode.dependencies || [])];
       }
     });
+    
+    // REMOVIDO: lógica que forçava dependências sequenciais entre irmãos
+    // pois estava sobrescrevendo as datas originais/herdadas calculadas
   }
 
   /**
