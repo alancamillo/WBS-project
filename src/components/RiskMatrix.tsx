@@ -8,9 +8,10 @@ const { Title } = Typography;
 
 interface RiskMatrixProps {
   risks: Risk[];
+  matrixRef?: React.RefObject<HTMLDivElement>;
 }
 
-const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
+const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks, matrixRef }) => {
   const { t } = useTranslation();
 
   // Função para obter cor baseada no score específico (1-12)
@@ -116,7 +117,7 @@ const RiskMatrix: React.FC<RiskMatrixProps> = ({ risks }) => {
   ];
 
   return (
-    <div className="risk-matrix-wrapper">
+    <div className="risk-matrix-wrapper" ref={matrixRef}>
       <div className="matrix-title-container">
         <Title level={4} style={{ textAlign: 'center', marginBottom: 24 }}>
           {t('riskMatrix.title')}

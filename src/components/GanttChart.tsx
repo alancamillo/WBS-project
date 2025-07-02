@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { 
   Card, 
   Select, 
@@ -12,7 +12,9 @@ import {
   Tag,
   Divider,
   Alert,
-  Tooltip
+  Tooltip,
+  Dropdown,
+  message
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
@@ -22,12 +24,16 @@ import {
   InfoCircleOutlined,
   CalendarOutlined,
   DollarCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  CameraOutlined,
+  FileImageOutlined
 } from '@ant-design/icons';
 import { Gantt, Task, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
 import { TreeNode, GanttViewOptions } from '../types';
 import { GanttService } from '../services/ganttService';
+
+
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -165,7 +171,48 @@ const GanttChart: React.FC<GanttChartProps> = ({
     }
   };
 
+  const ganttContainerRef = useRef<HTMLDivElement>(null);
 
+  const handleExportImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!ganttContainerRef.current) return;
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(ganttContainerRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `gantt-chart-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('gantt.imageExportSuccess') || 'Image exported successfully');
+    } catch (error) {
+      console.error('Error exporting image:', error);
+      message.error(t('gantt.imageExportError') || 'Error exporting image');
+    }
+  };
+
+  const imageExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportImage('jpeg')
+    }
+  ];
 
   return (
     <div style={{ padding: '24px' }}>
@@ -192,6 +239,14 @@ const GanttChart: React.FC<GanttChartProps> = ({
             >
               {t('gantt.exportCsv')}
             </Button>
+            <Dropdown
+              menu={{ items: imageExportItems }}
+              placement="bottomRight"
+            >
+              <Button icon={<FileImageOutlined />}>
+                {t('gantt.exportImage') || 'Export Image'} <DownloadOutlined />
+              </Button>
+            </Dropdown>
           </Space>
         </Col>
       </Row>
@@ -383,7 +438,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
       {/* Gráfico Gantt */}
       <Card>
-        <div style={{ height: getContainerHeight(viewOptions.ganttHeight), overflowX: 'auto' }}>
+        <div style={{ height: getContainerHeight(viewOptions.ganttHeight), overflowX: 'auto' }} ref={ganttContainerRef}>
           {tasks.length > 0 ? (
             <Gantt
               tasks={tasks}

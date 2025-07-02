@@ -312,6 +312,9 @@
     "title": "Diagrama de Gantt",
     "exportJson": "Exportar JSON",
     "exportCsv": "Exportar CSV",
+    "exportImage": "Exportar Imagen",
+    "imageExportSuccess": "¡Imagen exportada exitosamente!",
+    "imageExportError": "Error al exportar imagen",
     "totalTasks": "Total de Tareas",
     "completionRate": "Tasa de Finalización",
     "totalCost": "Costo Total",
@@ -516,6 +519,11 @@
     "clearAllConfirmDescription": "Esta acción eliminará permanentemente todos los riesgos. ¿Está seguro?",
     "clearAllConfirmOk": "Sí, limpiar",
     "clearAllConfirmCancel": "Cancelar",
+    "noRisksToExport": "No hay riesgos disponibles para exportar",
+    "exportMatrixImage": "Exportar Matriz",
+    "exportTableImage": "Exportar Tabla",
+    "tableExportSuccess": "¡Tabla de riesgos exportada exitosamente!",
+    "tableExportError": "Error al exportar tabla de riesgos",
     "localStorage": {
       "title": "💾 Almacenamiento Local",
       "description": "Los riesgos creados se guardan automáticamente en su navegador y permanecerán disponibles incluso después de navegar entre pantallas o recargar la página."
@@ -672,6 +680,8 @@
     "title": "Matriz de Riesgo - Cronograma del Proyecto",
     "probability": "Probabilidad",
     "impact": "Impacto",
+    "imageExportSuccess": "¡Imagen de la matriz de riesgo exportada exitosamente!",
+    "imageExportError": "Error al exportar imagen de la matriz de riesgo",
     "probabilityLabels": {
       "veryHigh": "Muy Alta (5)",
       "high": "Alta (4)",

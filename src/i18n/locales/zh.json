@@ -312,6 +312,9 @@
     "title": "甘特图",
     "exportJson": "导出 JSON",
     "exportCsv": "导出 CSV",
+    "exportImage": "导出图片",
+    "imageExportSuccess": "图片导出成功！",
+    "imageExportError": "图片导出错误",
     "totalTasks": "总任务数",
     "completionRate": "完成率",
     "totalCost": "总成本",
@@ -516,6 +519,11 @@
     "clearAllConfirmDescription": "此操作将永久删除所有风险。您确定吗？",
     "clearAllConfirmOk": "是的，清除",
     "clearAllConfirmCancel": "取消",
+    "noRisksToExport": "没有可导出的风险",
+    "exportMatrixImage": "导出矩阵",
+    "exportTableImage": "导出表格",
+    "tableExportSuccess": "风险表格导出成功！",
+    "tableExportError": "风险表格导出错误",
     "localStorage": {
       "title": "💾 本地存储",
       "description": "创建的风险会自动保存在您的浏览器中，即使在屏幕间导航或重新加载页面后也会保持可用。"
@@ -672,6 +680,8 @@
     "title": "风险矩阵 - 项目进度",
     "probability": "概率",
     "impact": "影响",
+    "imageExportSuccess": "风险矩阵图片导出成功！",
+    "imageExportError": "风险矩阵图片导出错误",
     "probabilityLabels": {
       "veryHigh": "极高 (5)",
       "high": "高 (4)",
