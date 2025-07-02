@@ -278,6 +278,7 @@
     "wbsLevel1": "第1级（项目）",
     "wbsLevel2": "第2级（阶段）",
     "wbsLevel3": "第3级（活动）",
+    "wbsLevel4": "第4级（子活动）",
     "periodDetail": "周期明细",
     "wbsStructure": "WBS结构",
     "total": "总计",
