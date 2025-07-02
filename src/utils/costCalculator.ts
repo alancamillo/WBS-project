@@ -6,17 +6,19 @@ export class CostCalculator {
    * Calcula o custo total de um nó e seus filhos
    */
   static calculateTotalCost(node: TreeNode): number {
-    // Se é nó folha (nível 3), retorna apenas o custo próprio
-    if (node.level === 3 || node.children.length === 0) {
-      return node.cost;
+    const ownCost = node.cost || 0;
+
+    // Se não tiver filhos, o custo total é apenas o seu próprio custo.
+    if (!node.children || node.children.length === 0) {
+      return ownCost;
     }
 
-    // Para nós intermediários, soma o custo próprio + custos dos filhos
+    // Se tiver filhos, o custo total é o seu próprio custo mais o custo total de cada filho.
     const childrenCost = node.children.reduce((total, child) => {
       return total + this.calculateTotalCost(child);
     }, 0);
 
-    return node.cost + childrenCost;
+    return ownCost + childrenCost;
   }
 
   /**
@@ -60,15 +62,16 @@ export class CostCalculator {
     let level3Cost = 0;
 
     const traverse = (currentNode: TreeNode) => {
+      const currentCost = currentNode.cost || 0;
       switch (currentNode.level) {
         case 1:
-          level1Cost += currentNode.cost;
+          level1Cost += currentCost;
           break;
         case 2:
-          level2Cost += currentNode.cost;
+          level2Cost += currentCost;
           break;
         case 3:
-          level3Cost += currentNode.cost;
+          level3Cost += currentCost;
           break;
       }
 
@@ -81,7 +84,7 @@ export class CostCalculator {
       level1: level1Cost,
       level2: level2Cost,
       level3: level3Cost,
-      total: level1Cost + level2Cost + level3Cost
+      total: node.totalCost || 0
     };
   }
 

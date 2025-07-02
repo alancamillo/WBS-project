@@ -17,7 +17,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, eachMonthOfInterval, eachQuarterOfInterval, eachYearOfInterval } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, eachMonthOfInterval, eachQuarterOfInterval, eachYearOfInterval, startOfDay, endOfDay } from 'date-fns';
 import { ptBR, enUS, es, zhCN } from 'date-fns/locale';
 import { TreeNode } from '../types';
 import { PieChartOutlined, FolderOutlined, FileOutlined } from '@ant-design/icons';
@@ -213,20 +213,21 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
       const calculateNodeCostInPeriod = (node: TreeNode): number => {
         if (!node.startDate || !node.endDate) return 0;
 
-        // Verifica se o nó tem interseção com o período
-        const nodeStart = node.startDate;
-        const nodeEnd = node.endDate;
+        // Normalize node dates to start and end of day for consistent calculation
+        const nodeStart = startOfDay(node.startDate);
+        const nodeEnd = endOfDay(node.endDate);
         
-        // Calcula interseção entre o período e o nó
+        // Calculate intersection between the period and the node's duration
         const intersectionStart = new Date(Math.max(intervalStart.getTime(), nodeStart.getTime()));
         const intersectionEnd = new Date(Math.min(intervalEnd.getTime(), nodeEnd.getTime()));
         
-        if (intersectionStart > intersectionEnd) return 0;
+        // If there's no valid intersection, return 0
+        if (intersectionStart.getTime() >= intersectionEnd.getTime()) return 0;
 
-        // Calcula proporção do custo baseado na interseção
+        // Calculate proportion of cost based on the intersection duration
         const nodeDuration = nodeEnd.getTime() - nodeStart.getTime();
         const intersectionDuration = intersectionEnd.getTime() - intersectionStart.getTime();
-        const proportion = intersectionDuration / nodeDuration;
+        const proportion = nodeDuration > 0 ? intersectionDuration / nodeDuration : 0;
         
         return node.cost * proportion;
       };
@@ -283,13 +284,13 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
       const calculateNodeCostInPeriod = (node: TreeNode): number => {
         if (!node.startDate || !node.endDate) return 0;
 
-        const nodeStart = node.startDate;
-        const nodeEnd = node.endDate;
+        const nodeStart = startOfDay(node.startDate);
+        const nodeEnd = endOfDay(node.endDate);
         
         const intersectionStart = new Date(Math.max(intervalStart.getTime(), nodeStart.getTime()));
         const intersectionEnd = new Date(Math.min(intervalEnd.getTime(), nodeEnd.getTime()));
         
-        if (intersectionStart > intersectionEnd) return 0;
+        if (intersectionStart.getTime() >= intersectionEnd.getTime()) return 0;
 
         const nodeDuration = nodeEnd.getTime() - nodeStart.getTime();
         const intersectionDuration = intersectionEnd.getTime() - intersectionStart.getTime();
@@ -437,20 +438,20 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
         return 0;
       }
 
-      const nodeStart = node.startDate;
-      const nodeEnd = node.endDate;
+      const nodeStart = startOfDay(node.startDate);
+      const nodeEnd = endOfDay(node.endDate);
       
       const intersectionStart = new Date(Math.max(intervalStart.getTime(), nodeStart.getTime()));
       const intersectionEnd = new Date(Math.min(intervalEnd.getTime(), nodeEnd.getTime()));
       
-      if (intersectionStart > intersectionEnd) return 0;
+      if (intersectionStart.getTime() >= intersectionEnd.getTime()) return 0;
 
       const nodeDuration = nodeEnd.getTime() - nodeStart.getTime();
       const intersectionDuration = intersectionEnd.getTime() - intersectionStart.getTime();
       const proportion = nodeDuration > 0 ? intersectionDuration / nodeDuration : 0;
       
       // Para nós folha, usar custo próprio; para nós pai, usar totalCost se não especificado diferente
-      const costToUse = useOwnCostOnly || node.children.length === 0 ? node.cost : node.totalCost;
+      const costToUse = (useOwnCostOnly || node.children.length === 0 ? node.cost : node.totalCost) || 0;
       const result = costToUse * proportion;
       
 
@@ -708,7 +709,7 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
             const periods = generatePeriods(projectStart, projectEnd, periodType);
             
             // Calcular totais de TODOS os nós (cada um representa apenas seu custo próprio)
-            const totalSum = data.reduce((sum, record) => sum + (record.total || 0), 0);
+            const totalSum = rootNode.totalCost;
             
 
             

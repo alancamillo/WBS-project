@@ -108,6 +108,7 @@ export class GanttService {
       case 1: return Math.min(365, baseDays * 3); // Projetos podem durar até 1 ano
       case 2: return Math.min(90, baseDays * 2);  // Fases até 3 meses
       case 3: return Math.min(30, baseDays);      // Atividades até 1 mês
+      case 4: return Math.min(15, baseDays);      // Sub-atividades até 2 semanas
       default: return baseDays;
     }
   }
@@ -140,10 +141,11 @@ export class GanttService {
     const levelColors = {
       1: { bg: '#1890ff', selected: '#096dd9', progress: '#40a9ff', progressSelected: '#1890ff' },
       2: { bg: '#52c41a', selected: '#389e0d', progress: '#73d13d', progressSelected: '#52c41a' },
-      3: { bg: '#faad14', selected: '#d48806', progress: '#ffc53d', progressSelected: '#faad14' }
+      3: { bg: '#faad14', selected: '#d48806', progress: '#ffc53d', progressSelected: '#faad14' },
+      4: { bg: '#f759ab', selected: '#c41d7f', progress: '#ff85c0', progressSelected: '#f759ab' }
     };
 
-    const colors = levelColors[level as keyof typeof levelColors] || levelColors[3];
+    const colors = levelColors[level as keyof typeof levelColors] || levelColors[4];
     
     // Ajusta opacidade baseado no status
     const opacity = status === 'completed' ? '0.7' : '1';
@@ -328,7 +330,8 @@ export class GanttService {
     const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
     const notStartedTasks = tasks.filter(t => t.status === 'not-started').length;
 
-    const totalCost = tasks.reduce((sum, task) => sum + task.cost, 0);
+    const projectTask = tasks.find(t => t.level === 1);
+    const totalCost = projectTask ? projectTask.totalCost : 0;
     const totalDuration = Math.max(
       ...tasks.map(task => task.end.getTime())
     ) - Math.min(
@@ -338,7 +341,8 @@ export class GanttService {
     const tasksByLevel = {
       level1: tasks.filter(t => t.level === 1).length,
       level2: tasks.filter(t => t.level === 2).length,
-      level3: tasks.filter(t => t.level === 3).length
+      level3: tasks.filter(t => t.level === 3).length,
+      level4: tasks.filter(t => t.level === 4).length
     };
 
     return {

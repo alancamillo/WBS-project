@@ -129,7 +129,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   const { formatCurrency, getCurrencySymbol } = useCurrencySettings();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(node.name);
-  const [editedCost, setEditedCost] = useState(node.cost);
+  const [editedCost, setEditedCost] = useState(node.cost || 0);
   const [editedDescription, setEditedDescription] = useState(node.description || '');
   const [editedResponsible, setEditedResponsible] = useState(node.responsible || '');
   const [editedStatus, setEditedStatus] = useState(node.status || 'not-started');
@@ -1067,7 +1067,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
                 <Col xs={24} sm={8}>
                   <div>
                     <span style={{ fontWeight: 'bold' }}>{t('wbs.ownCost')}: </span>
-                    <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost)}</span>
+                    <span style={{ color: '#1890ff' }}>{formatCurrency(node.cost || 0)}</span>
                   </div>
                 </Col>
                 <Col xs={24} sm={8}>

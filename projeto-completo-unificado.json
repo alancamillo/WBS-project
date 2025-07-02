@@ -1,0 +1,1050 @@
+{
+  "projectInfo": {
+    "id": "d9a03562-4d83-425b-9e9a-2efad44c2b80",
+    "name": "Food Waste Reduction Program",
+    "description": "Integrated platform to reduce food waste.",
+    "version": "2.0.0",
+    "exportDate": "2025-08-01T00:00:00Z"
+  },
+  "wbsStructure": {
+    "id": "d9a03562-4d83-425b-9e9a-2efad44c2b80",
+    "name": "Food Waste Reduction Program",
+    "level": 1,
+    "startDate": "2025-08-08T00:00:00Z",
+    "endDate": "2026-10-31T00:00:00Z",
+    "status": "not-started",
+    "responsible": "Project Manager",
+    "description": "Master WBS for the food-waste project",
+    "children": [
+      {
+        "id": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+        "name": "1. Planning & Requirements",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2025-08-08T00:00:00Z",
+        "endDate": "2025-08-22T00:00:00Z",
+        "status": "not-started",
+        "responsible": "Business Analyst Lead",
+        "description": "Scope, requirements, initial risks and approvals",
+        "trl": 2,
+        "children": [
+          {
+            "id": "fa7f9dd4-6ab4-4e06-b190-138c9ad5a3a5",
+            "name": "A. Stakeholder Analysis and Persona Definition",
+            "cost": 15000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "status": "not-started",
+            "responsible": "Business Analyst",
+            "startDate": "2025-08-08T00:00:00.000Z",
+            "endDate": "2025-08-10T00:00:00.000Z",
+            "children": [],
+            "description": "Identify and analyze all stakeholders and create user personas.",
+            "totalCost": 15000
+          },
+          {
+            "id": "41eb813f-ace3-4a51-81fa-a99313fc3386",
+            "name": "B. Existing Solutions Benchmarking",
+            "cost": 10000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "status": "not-started",
+            "responsible": "Market Analyst",
+            "startDate": "2025-08-08T00:00:00.000Z",
+            "endDate": "2025-08-12T00:00:00.000Z",
+            "children": [],
+            "description": "Analyze competitors and analogous solutions to identify opportunities.",
+            "totalCost": 10000
+          },
+          {
+            "id": "e0ece249-8c3c-42b3-932f-58e1a2260e11",
+            "name": "C. Requirement Gathering",
+            "cost": 40000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "startDate": "2025-08-08T00:00:00.000Z",
+            "endDate": "2025-08-15T00:00:00.000Z",
+            "durationDays": 7,
+            "status": "not-started",
+            "responsible": "BA Team",
+            "description": "Workshops with stakeholders to elicit requirements",
+            "children": [],
+            "totalCost": 40000
+          },
+          {
+            "id": "8c8e6641-4e06-4c49-9556-1edb3387e112",
+            "name": "D. Scope Definition",
+            "cost": 25000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "startDate": "2025-08-16T00:00:00.000Z",
+            "endDate": "2025-08-19T00:00:00.000Z",
+            "durationDays": 4,
+            "status": "not-started",
+            "responsible": "Product Owner",
+            "description": "MoSCoW priorities and high-level backlog",
+            "dependencies": [
+              "e0ece249-8c3c-42b3-932f-58e1a2260e11"
+            ],
+            "children": [],
+            "totalCost": 25000
+          },
+          {
+            "id": "99b85c3d-8a55-44d1-9989-79e2ad8e3313",
+            "name": "E. Preliminary Risk Register",
+            "cost": 15000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "startDate": "2025-08-16T00:00:00.000Z",
+            "endDate": "2025-08-20T00:00:00.000Z",
+            "durationDays": 5,
+            "status": "not-started",
+            "responsible": "Risk Manager",
+            "description": "Identify and rank initial project risks",
+            "dependencies": [
+              "e0ece249-8c3c-42b3-932f-58e1a2260e11"
+            ],
+            "children": [],
+            "totalCost": 15000
+          },
+          {
+            "id": "370918b8-1e31-49ee-85db-27fd38a98714",
+            "name": "F. Kick-off & Approvals",
+            "cost": 10000,
+            "level": 3,
+            "parentId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+            "startDate": "2025-08-21T00:00:00.000Z",
+            "endDate": "2025-08-22T00:00:00.000Z",
+            "durationDays": 2,
+            "status": "not-started",
+            "responsible": "Steering Committee",
+            "description": "Formal approval of charter, budget and schedule",
+            "dependencies": [
+              "99b85c3d-8a55-44d1-9989-79e2ad8e3313"
+            ],
+            "children": [],
+            "totalCost": 10000
+          }
+        ],
+        "totalCost": 115000,
+        "durationDays": 6,
+        "dependencies": []
+      },
+      {
+        "id": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+        "name": "2. Infrastructure Provisioning",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2025-08-23T00:00:00Z",
+        "endDate": "2025-10-03T00:00:00Z",
+        "status": "not-started",
+        "responsible": "Cloud Architect",
+        "description": "Cloud accounts, networking, security baseline, data lake & monitoring stack",
+        "trl": 3,
+        "dependencies": [
+          "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01"
+        ],
+        "children": [
+          {
+            "id": "b2d1c1e4-2e83-46b0-9e94-66031c9e5015",
+            "name": "A. Cloud Environment Setup",
+            "cost": 75000,
+            "level": 3,
+            "parentId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+            "startDate": "2025-08-23T00:00:00.000Z",
+            "endDate": "2025-09-03T00:00:00.000Z",
+            "durationDays": 9,
+            "status": "not-started",
+            "responsible": "DevOps Team",
+            "description": "Subscription creation, IAM, VPC/VNet",
+            "totalCost": 75000
+          },
+          {
+            "id": "b4fe4a81-30bb-4acd-acf3-71e91e1c8a67",
+            "name": "B. Dev/Staging Environment Configuration",
+            "cost": 40000,
+            "level": 3,
+            "parentId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+            "status": "not-started",
+            "responsible": "DevOps Team",
+            "startDate": "2025-09-04T00:00:00.000Z",
+            "endDate": "2025-09-08T00:00:00.000Z",
+            "durationDays": 5,
+            "children": [],
+            "description": "Create and configure isolated environments for development, testing and staging.",
+            "totalCost": 40000
+          },
+          {
+            "id": "59de9e05-18a2-4ed1-b6e3-50e804ffac16",
+            "name": "C. Networking & Security Baseline",
+            "cost": 75000,
+            "level": 3,
+            "parentId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+            "startDate": "2025-09-04T00:00:00.000Z",
+            "endDate": "2025-09-15T00:00:00.000Z",
+            "durationDays": 10,
+            "status": "not-started",
+            "responsible": "Security Engineer",
+            "dependencies": [
+              "b2d1c1e4-2e83-46b0-9e94-66031c9e5015"
+            ],
+            "description": "Firewall, WAF, logging, secrets management",
+            "totalCost": 75000
+          },
+          {
+            "id": "2d489957-f4ef-477c-b9ae-6d9eadb6af17",
+            "name": "D. Data Lake Provisioning",
+            "cost": 90000,
+            "level": 3,
+            "parentId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+            "startDate": "2025-09-16T00:00:00.000Z",
+            "endDate": "2025-09-26T00:00:00.000Z",
+            "durationDays": 11,
+            "status": "not-started",
+            "responsible": "Data Engineering Lead",
+            "dependencies": [
+              "59de9e05-18a2-4ed1-b6e3-50e804ffac16"
+            ],
+            "description": "Object storage, catalog, raw/curated zones",
+            "totalCost": 90000
+          },
+          {
+            "id": "9c778db6-0e3b-445e-bf9c-935d2bba5818",
+            "name": "E. Monitoring & Observability",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+            "startDate": "2025-09-27T00:00:00.000Z",
+            "endDate": "2025-10-03T00:00:00.000Z",
+            "durationDays": 7,
+            "status": "not-started",
+            "responsible": "SRE Lead",
+            "dependencies": [
+              "2d489957-f4ef-477c-b9ae-6d9eadb6af17"
+            ],
+            "description": "Prometheus/Grafana, alerts, cost dashboards",
+            "totalCost": 60000
+          }
+        ],
+        "totalCost": 340000,
+        "durationDays": 44
+      },
+      {
+        "id": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+        "name": "3. Core Backend Development",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2025-09-09T00:00:00Z",
+        "endDate": "2025-12-19T00:00:00Z",
+        "status": "not-started",
+        "responsible": "Backend Tech Lead",
+        "description": "APIs, ingestion pipelines, inventory tracking algorithms, CI/CD",
+        "trl": 4,
+        "dependencies": [
+          "96bf9f15-2753-44a4-9262-e1bc623acb02"
+        ],
+        "children": [
+          {
+            "id": "795f0f09-84cf-4ed7-b010-3b38430a4625",
+            "name": "A. Microservices Architecture Design",
+            "cost": 70000,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "status": "not-started",
+            "responsible": "Solution Architect",
+            "startDate": "2025-09-09T00:00:00.000Z",
+            "endDate": "2025-09-22T00:00:00.000Z",
+            "durationDays": 14,
+            "children": [],
+            "description": "Define main architecture, boundaries and communication between services.",
+            "totalCost": 70000
+          },
+          {
+            "id": "0dbb0653-0762-4534-ae22-02a1a581aca3",
+            "name": "B. Database and Schema Modeling",
+            "cost": 50000,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "status": "not-started",
+            "responsible": "Data Architect",
+            "startDate": "2025-09-09T00:00:00.000Z",
+            "endDate": "2025-09-19T00:00:00.000Z",
+            "durationDays": 11,
+            "children": [],
+            "description": "Design database schema to support application features.",
+            "totalCost": 50000
+          },
+          {
+            "id": "5cb84e8d-1ca5-4ed2-bbcd-6b2175410719",
+            "name": "C. Data Ingestion Pipelines",
+            "cost": 100000,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "startDate": "2025-09-23T00:00:00.000Z",
+            "endDate": "2025-10-17T00:00:00.000Z",
+            "durationDays": 25,
+            "status": "not-started",
+            "responsible": "Data Engineering Team",
+            "totalCost": 100000
+          },
+          {
+            "id": "fd028d5a-d148-4108-b063-bd8aec24671a",
+            "name": "D. Core API Development",
+            "cost": 120000,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "startDate": "2025-10-18T00:00:00.000Z",
+            "endDate": "2025-11-21T00:00:00.000Z",
+            "durationDays": 35,
+            "status": "not-started",
+            "responsible": "API Squad",
+            "dependencies": [
+              "5cb84e8d-1ca5-4ed2-bbcd-6b2175410719"
+            ],
+            "totalCost": 120000
+          },
+          {
+            "id": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+            "name": "E. ML/AI Algorithms Development",
+            "cost": 0,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "startDate": "2025-11-22T00:00:00.000Z",
+            "endDate": "2025-12-12T00:00:00.000Z",
+            "durationDays": 21,
+            "status": "not-started",
+            "responsible": "Data Science Team",
+            "dependencies": [
+              "fd028d5a-d148-4108-b063-bd8aec24671a"
+            ],
+            "children": [
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-1",
+                "name": "E.1. Inventory Tracking Algorithm",
+                "cost": 60000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-11-22T00:00:00.000Z",
+                "endDate": "2025-11-29T00:00:00.000Z",
+                "durationDays": 8,
+                "status": "not-started",
+                "responsible": "ML Engineer",
+                "description": "Real-time inventory tracking and monitoring system",
+                "totalCost": 60000
+              },
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-2",
+                "name": "E.2. Stock-out Detection Algorithm",
+                "cost": 45000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-11-22T00:00:00.000Z",
+                "endDate": "2025-11-28T00:00:00.000Z",
+                "durationDays": 7,
+                "status": "not-started",
+                "responsible": "ML Engineer",
+                "description": "Predictive stock-out detection with early warning alerts",
+                "totalCost": 45000
+              },
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-3",
+                "name": "E.3. Demand Prediction Algorithm",
+                "cost": 70000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-11-30T00:00:00.000Z",
+                "endDate": "2025-12-08T00:00:00.000Z",
+                "durationDays": 9,
+                "status": "not-started",
+                "responsible": "Data Scientist",
+                "dependencies": [
+                  "828e2628-8e92-4115-a68a-1c9f046bb81b-1"
+                ],
+                "description": "ML-based demand forecasting using historical and external data",
+                "totalCost": 70000
+              },
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-4",
+                "name": "E.4. Shelf-life Monitoring Algorithm",
+                "cost": 50000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-11-30T00:00:00.000Z",
+                "endDate": "2025-12-06T00:00:00.000Z",
+                "durationDays": 7,
+                "status": "not-started",
+                "responsible": "ML Engineer",
+                "dependencies": [
+                  "828e2628-8e92-4115-a68a-1c9f046bb81b-2"
+                ],
+                "description": "Dynamic shelf-life tracking with expiration prediction",
+                "totalCost": 50000
+              },
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-5",
+                "name": "E.5. Replenishment Planning Algorithm",
+                "cost": 65000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-12-09T00:00:00.000Z",
+                "endDate": "2025-12-12T00:00:00.000Z",
+                "durationDays": 4,
+                "status": "not-started",
+                "responsible": "Optimization Engineer",
+                "dependencies": [
+                  "828e2628-8e92-4115-a68a-1c9f046bb81b-3",
+                  "828e2628-8e92-4115-a68a-1c9f046bb81b-4"
+                ],
+                "description": "Automated replenishment optimization based on demand and shelf-life",
+                "totalCost": 65000
+              },
+              {
+                "id": "828e2628-8e92-4115-a68a-1c9f046bb81b-6",
+                "name": "E.6. Impact Tracking Algorithm",
+                "cost": 40000,
+                "level": 4,
+                "parentId": "828e2628-8e92-4115-a68a-1c9f046bb81b",
+                "startDate": "2025-12-07T00:00:00.000Z",
+                "endDate": "2025-12-11T00:00:00.000Z",
+                "durationDays": 5,
+                "status": "not-started",
+                "responsible": "Data Analyst",
+                "dependencies": [
+                  "828e2628-8e92-4115-a68a-1c9f046bb81b-4"
+                ],
+                "description": "Waste reduction impact measurement and ROI calculation",
+                "totalCost": 40000
+              }
+            ],
+            "totalCost": 330000
+          },
+          {
+            "id": "15a0120e-49ee-470d-9f1d-6fb20937f61c",
+            "name": "F. CI/CD & DevSecOps Pipeline",
+            "cost": 80000,
+            "level": 3,
+            "parentId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+            "startDate": "2025-12-13T00:00:00.000Z",
+            "endDate": "2025-12-19T00:00:00.000Z",
+            "durationDays": 7,
+            "status": "not-started",
+            "responsible": "DevOps Team",
+            "dependencies": [
+              "828e2628-8e92-4115-a68a-1c9f046bb81b"
+            ],
+            "totalCost": 80000
+          }
+        ],
+        "totalCost": 750000,
+        "durationDays": 91
+      },
+      {
+        "id": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+        "name": "4. Front-end Development",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2025-11-24T00:00:00Z",
+        "endDate": "2026-02-14T00:00:00Z",
+        "status": "not-started",
+        "responsible": "UI/UX Lead",
+        "description": "Consumer mobile app, admin web/desktop portal, UX/UI & accessibility",
+        "trl": 5,
+        "dependencies": [
+          "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03"
+        ],
+        "children": [
+          {
+            "id": "54d81d58-50d7-4a3e-a0e8-9cec9940c51d",
+            "name": "A. UX/UI Design System",
+            "cost": 75000,
+            "level": 3,
+            "parentId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+            "startDate": "2025-11-24T00:00:00.000Z",
+            "endDate": "2025-12-05T00:00:00.000Z",
+            "durationDays": 12,
+            "status": "not-started",
+            "responsible": "Design Team",
+            "totalCost": 75000
+          },
+          {
+            "id": "c191f193-f61a-4995-bd1a-a2fb9dbdad1e",
+            "name": "B. Consumer Mobile App (iOS/Android)",
+            "cost": 180000,
+            "level": 3,
+            "parentId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+            "startDate": "2025-12-06T00:00:00.000Z",
+            "endDate": "2026-01-31T00:00:00.000Z",
+            "durationDays": 57,
+            "status": "not-started",
+            "responsible": "Mobile Squad",
+            "dependencies": [
+              "54d81d58-50d7-4a3e-a0e8-9cec9940c51d"
+            ],
+            "totalCost": 180000
+          },
+          {
+            "id": "a11363fe-2d3d-4681-9dd8-3fbe3db9291f",
+            "name": "C. Admin Web/Desktop Portal",
+            "cost": 90000,
+            "level": 3,
+            "parentId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+            "startDate": "2025-12-06T00:00:00.000Z",
+            "endDate": "2026-01-17T00:00:00.000Z",
+            "durationDays": 43,
+            "status": "not-started",
+            "responsible": "Front-end Squad",
+            "dependencies": [
+              "54d81d58-50d7-4a3e-a0e8-9cec9940c51d"
+            ],
+            "totalCost": 90000
+          },
+          {
+            "id": "5259e7a2-03f4-4dbc-8668-47797c17a120",
+            "name": "D. Usability and Accessibility Testing (WCAG)",
+            "cost": 25000,
+            "level": 3,
+            "parentId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+            "startDate": "2026-02-01T00:00:00.000Z",
+            "endDate": "2026-02-14T00:00:00.000Z",
+            "durationDays": 14,
+            "status": "not-started",
+            "responsible": "QA Lead",
+            "dependencies": [
+              "c191f193-f61a-4995-bd1a-a2fb9dbdad1e",
+              "a11363fe-2d3d-4681-9dd8-3fbe3db9291f"
+            ],
+            "totalCost": 25000,
+            "description": "Focus on user experience and recognized accessibility standards."
+          },
+          {
+            "id": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04-E",
+            "name": "E. Insights Visualization Engine",
+            "cost": 80000,
+            "level": 3,
+            "parentId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+            "startDate": "2025-12-20T00:00:00.000Z",
+            "endDate": "2026-01-10T00:00:00.000Z",
+            "durationDays": 22,
+            "status": "not-started",
+            "responsible": "Data Visualization Team",
+            "dependencies": [
+              "54d81d58-50d7-4a3e-a0e8-9cec9940c51d"
+            ],
+            "description": "Advanced analytics dashboard with real-time insights, waste metrics, and impact visualization",
+            "totalCost": 80000
+          }
+        ],
+        "totalCost": 450000,
+        "durationDays": 74
+      },
+      {
+        "id": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+        "name": "5. Integration & Testing",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2026-02-15T00:00:00Z",
+        "endDate": "2026-04-11T00:00:00Z",
+        "status": "not-started",
+        "responsible": "QA Manager",
+        "description": "End-to-end, load, security and UAT testing",
+        "trl": 6,
+        "dependencies": [
+          "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04"
+        ],
+        "children": [
+          {
+            "id": "bbb27c7c-85f9-41fa-b9df-356e3310cd21",
+            "name": "A. Integration Testing",
+            "cost": 50000,
+            "level": 3,
+            "parentId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+            "startDate": "2026-02-15T00:00:00.000Z",
+            "endDate": "2026-03-05T00:00:00.000Z",
+            "durationDays": 19,
+            "status": "not-started",
+            "responsible": "QA Team",
+            "totalCost": 50000
+          },
+          {
+            "id": "8d5fe911-90c6-4e75-bdbc-c214f90c0ea6",
+            "name": "B. User and Technical Documentation Development",
+            "cost": 45000,
+            "level": 3,
+            "parentId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+            "status": "not-started",
+            "responsible": "Technical Writer",
+            "startDate": "2026-02-15T00:00:00.000Z",
+            "endDate": "2026-03-01T00:00:00.000Z",
+            "durationDays": 15,
+            "children": [],
+            "description": "Create manuals for end users, administrators and API documentation.",
+            "totalCost": 45000
+          },
+          {
+            "id": "33879869-258f-45c7-b36d-46e98127a922",
+            "name": "C. Load & Stress Testing",
+            "cost": 50000,
+            "level": 3,
+            "parentId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+            "startDate": "2026-03-06T00:00:00.000Z",
+            "endDate": "2026-03-24T00:00:00.000Z",
+            "durationDays": 19,
+            "status": "not-started",
+            "responsible": "Performance Engineering",
+            "dependencies": [
+              "bbb27c7c-85f9-41fa-b9df-356e3310cd21"
+            ],
+            "totalCost": 50000
+          },
+          {
+            "id": "b29b8df5-4cd0-46f8-b4cf-3dc39b252223",
+            "name": "D. Security & Pen-test",
+            "cost": 50000,
+            "level": 3,
+            "parentId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+            "startDate": "2026-03-25T00:00:00.000Z",
+            "endDate": "2026-04-02T00:00:00.000Z",
+            "durationDays": 9,
+            "status": "not-started",
+            "responsible": "Sec-Ops Team",
+            "dependencies": [
+              "33879869-258f-45c7-b36d-46e98127a922"
+            ],
+            "totalCost": 50000
+          },
+          {
+            "id": "19d0a6a7-264c-4e5f-9f25-589f8c30ea24",
+            "name": "E. UAT & Bug-fixing Sprint",
+            "cost": 50000,
+            "level": 3,
+            "parentId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+            "startDate": "2026-04-03T00:00:00.000Z",
+            "endDate": "2026-04-11T00:00:00.000Z",
+            "durationDays": 10,
+            "status": "not-started",
+            "responsible": "Dev & QA",
+            "dependencies": [
+              "b29b8df5-4cd0-46f8-b4cf-3dc39b252223"
+            ],
+            "totalCost": 50000
+          }
+        ],
+        "totalCost": 245000,
+        "durationDays": 60
+      },
+      {
+        "id": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+        "name": "6. Pilot Deployment",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2026-04-12T00:00:00Z",
+        "endDate": "2026-05-30T00:00:00Z",
+        "status": "not-started",
+        "responsible": "Deployment Lead",
+        "description": "Limited-market rollout, partner training, KPI monitoring",
+        "trl": 7,
+        "dependencies": [
+          "bc9b10fc-009b-4db7-a711-9035ba225f05"
+        ],
+        "children": [
+          {
+            "id": "2193ce21-2b2e-4cbe-97d7-e62e020a4d45",
+            "name": "A. Pilot Environment Provisioning",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+            "startDate": "2026-06-01T00:00:00.000Z",
+            "endDate": "2026-06-15T00:00:00.000Z",
+            "durationDays": 14,
+            "status": "not-started",
+            "responsible": "SRE",
+            "totalCost": 60000
+          },
+          {
+            "id": "d1e2bd2e-6612-4a7e-9c77-8f3bd1957b26",
+            "name": "B. Pilot User Training and Onboarding",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+            "startDate": "2026-06-16T00:00:00.000Z",
+            "endDate": "2026-06-30T00:00:00.000Z",
+            "durationDays": 14,
+            "status": "not-started",
+            "responsible": "Training Team",
+            "dependencies": [
+              "2193ce21-2b2e-4cbe-97d7-e62e020a4d45"
+            ],
+            "totalCost": 60000,
+            "description": "Generalizes the activity to include all pilot users."
+          },
+          {
+            "id": "f634cd7d-d898-433e-9560-0774f5d7e0d2",
+            "name": "C. Support Channels and Feedback Collection Setup",
+            "cost": 15000,
+            "level": 3,
+            "parentId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+            "status": "not-started",
+            "responsible": "Support Lead",
+            "startDate": "2026-06-01T00:00:00.000Z",
+            "endDate": "2026-06-10T00:00:00.000Z",
+            "durationDays": 10,
+            "children": [],
+            "description": "Establish how pilot users will report issues and provide suggestions.",
+            "totalCost": 15000
+          },
+          {
+            "id": "10c0b86d-c619-4407-9b3e-26cf36d36a27",
+            "name": "D. KPI Monitoring & Feedback",
+            "cost": 70000,
+            "level": 3,
+            "parentId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+            "startDate": "2026-07-01T00:00:00.000Z",
+            "endDate": "2026-07-20T00:00:00.000Z",
+            "durationDays": 19,
+            "status": "not-started",
+            "responsible": "Analytics Team",
+            "dependencies": [
+              "d1e2bd2e-6612-4a7e-9c77-8f3bd1957b26"
+            ],
+            "totalCost": 70000
+          },
+          {
+            "id": "d0b31077-3504-4e8f-8fea-1503af27bea8",
+            "name": "E. Pilot Adjustments",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+            "startDate": "2026-07-21T00:00:00.000Z",
+            "endDate": "2026-07-31T00:00:00.000Z",
+            "durationDays": 10,
+            "status": "not-started",
+            "responsible": "Dev Teams",
+            "dependencies": [
+              "10c0b86d-c619-4407-9b3e-26cf36d36a27"
+            ],
+            "totalCost": 60000
+          }
+        ],
+        "totalCost": 265000,
+        "durationDays": 60
+      },
+      {
+        "id": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+        "name": "7. Full-scale Deployment",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2026-08-01T00:00:00Z",
+        "endDate": "2026-09-30T00:00:00Z",
+        "status": "not-started",
+        "responsible": "Operations Manager",
+        "description": "Production rollout, marketing, support setup, continuous improvement backlog",
+        "trl": 8,
+        "dependencies": [
+          "cf41bb87-4a72-4609-b7e5-eae8a111e406"
+        ],
+        "children": [
+          {
+            "id": "bae6953e-d50b-49d6-bf21-2cf2e4fa1138",
+            "name": "A. Go-Live Planning and Deployment Window",
+            "cost": 20000,
+            "level": 3,
+            "parentId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+            "status": "not-started",
+            "responsible": "Release Manager",
+            "startDate": "2026-08-01T00:00:00.000Z",
+            "endDate": "2026-08-06T00:00:00.000Z",
+            "durationDays": 5,
+            "children": [],
+            "description": "Define launch strategy, communication plan and timeline.",
+            "totalCost": 20000
+          },
+          {
+            "id": "0704c66b-53a4-4241-8e7f-07ec269c48d9",
+            "name": "B. Go-Live Execution and Monitoring (Hypercare)",
+            "cost": 120000,
+            "level": 3,
+            "parentId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+            "status": "not-started",
+            "responsible": "Ops Team",
+            "startDate": "2026-08-07T00:00:00.000Z",
+            "endDate": "2026-08-21T00:00:00.000Z",
+            "durationDays": 14,
+            "children": [],
+            "description": "Production deployment followed by intensive support period.",
+            "dependencies": [
+              "bae6953e-d50b-49d6-bf21-2cf2e4fa1138"
+            ],
+            "totalCost": 120000
+          },
+          {
+            "id": "45b0790e-8b24-46db-9cf9-2f3354903ffc",
+            "name": "C. Marketing Campaign",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+            "startDate": "2026-08-22T00:00:00.000Z",
+            "endDate": "2026-09-21T00:00:00.000Z",
+            "durationDays": 31,
+            "status": "not-started",
+            "responsible": "Marketing Team",
+            "dependencies": [
+              "0704c66b-53a4-4241-8e7f-07ec269c48d9"
+            ],
+            "totalCost": 60000
+          },
+          {
+            "id": "fa31b04a-0198-4f3c-8c7a-ba9a49c4d6cf",
+            "name": "D. Support & Maintenance Setup",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+            "startDate": "2026-08-22T00:00:00.000Z",
+            "endDate": "2026-09-21T00:00:00.000Z",
+            "durationDays": 31,
+            "status": "not-started",
+            "responsible": "Support Lead",
+            "dependencies": [
+              "0704c66b-53a4-4241-8e7f-07ec269c48d9"
+            ],
+            "totalCost": 60000
+          },
+          {
+            "id": "ad2963d8-2c8e-49a7-9697-e9d69c36e1c0",
+            "name": "E. Continuous Improvement Backlog",
+            "cost": 60000,
+            "level": 3,
+            "parentId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+            "startDate": "2026-09-22T00:00:00.000Z",
+            "endDate": "2026-09-30T00:00:00.000Z",
+            "durationDays": 9,
+            "status": "not-started",
+            "responsible": "Product Owner",
+            "dependencies": [
+              "fa31b04a-0198-4f3c-8c7a-ba9a49c4d6cf",
+              "45b0790e-8b24-46db-9cf9-2f3354903ffc"
+            ],
+            "totalCost": 60000
+          }
+        ],
+        "totalCost": 320000,
+        "durationDays": 60
+      },
+      {
+        "id": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+        "name": "8. Closure & Evaluation",
+        "cost": 0,
+        "level": 2,
+        "parentId": "e699b1b0-6d29-45e0-a5a3-2f9c75cd4001",
+        "startDate": "2026-10-01T00:00:00Z",
+        "endDate": "2026-10-31T00:00:00Z",
+        "status": "not-started",
+        "responsible": "PMO",
+        "description": "Final documentation, performance evaluation, lessons learned",
+        "trl": 9,
+        "dependencies": [
+          "aaeaeb08-2adb-45bd-83c8-f04bb79b6207"
+        ],
+        "children": [
+          {
+            "id": "235e9b52-667d-4875-97b3-67a705086721",
+            "name": "A. Final Documentation",
+            "cost": 15000,
+            "level": 3,
+            "parentId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+            "startDate": "2026-10-01T00:00:00.000Z",
+            "endDate": "2026-10-10T00:00:00.000Z",
+            "durationDays": 9,
+            "status": "not-started",
+            "responsible": "Technical Writer",
+            "totalCost": 15000
+          },
+          {
+            "id": "07c14f55-3742-46db-91df-5cb41f3a41ba",
+            "name": "B. Performance Evaluation",
+            "cost": 15000,
+            "level": 3,
+            "parentId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+            "startDate": "2026-10-11T00:00:00.000Z",
+            "endDate": "2026-10-20T00:00:00.000Z",
+            "durationDays": 9,
+            "status": "not-started",
+            "responsible": "Analytics Lead",
+            "dependencies": [
+              "235e9b52-667d-4875-97b3-67a705086721"
+            ],
+            "totalCost": 15000
+          },
+          {
+            "id": "cc2c68ed-b3b3-4f21-8ac2-2415cf889d1c",
+            "name": "C. Lessons Learned Workshop",
+            "cost": 10000,
+            "level": 3,
+            "parentId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+            "startDate": "2026-10-21T00:00:00.000Z",
+            "endDate": "2026-10-31T00:00:00.000Z",
+            "durationDays": 10,
+            "status": "not-started",
+            "responsible": "PMO",
+            "dependencies": [
+              "07c14f55-3742-46db-91df-5cb41f3a41ba"
+            ],
+            "totalCost": 10000
+          },
+          {
+            "id": "59c51412-2bb0-45a5-86e1-51508c202eec",
+            "name": "D. Formal Transition to Operations Team",
+            "cost": 5000,
+            "level": 3,
+            "parentId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+            "status": "not-started",
+            "responsible": "PMO",
+            "startDate": "2026-10-21T00:00:00.000Z",
+            "endDate": "2026-10-31T00:00:00.000Z",
+            "durationDays": 10,
+            "children": [],
+            "description": "Ensure knowledge transfer and responsibility handover to maintenance team.",
+            "totalCost": 5000
+          }
+        ],
+        "totalCost": 45000,
+        "durationDays": 30
+      }
+    ],
+    "totalCost": 2530000,
+    "durationDays": 449
+  },
+  "risks": [
+    {
+      "id": "86d3f7fb-5b63-4e5e-8f03-e2adb0efc901",
+      "title": "Cloud Cost Overrun",
+      "description": "Unexpected usage spikes during infrastructure provisioning may exceed budget.",
+      "category": "financial",
+      "probability": "medium",
+      "impact": "high",
+      "riskScore": 6,
+      "status": "identified",
+      "owner": "Cloud Architect",
+      "createdAt": "2025-07-01T20:15:00.000Z",
+      "dueDate": "2025-10-15T00:00:00.000Z",
+      "mitigationPlan": "Enable budget alerts, use reserved instances, review architecture for cost efficiency.",
+      "contingencyPlan": "De-scope non-critical resources or request contingency funds.",
+      "estimatedCost": 100000,
+      "phaseLink": "2. Infrastructure Provisioning"
+    },
+    {
+      "id": "4af3d54e-3b0b-4cbb-9df1-4ae1ea210902",
+      "title": "Data Quality Delays",
+      "description": "Source systems deliver inconsistent data, blocking ingestion pipelines.",
+      "category": "technical",
+      "probability": "high",
+      "impact": "medium",
+      "riskScore": 6,
+      "status": "identified",
+      "owner": "Data Engineering Lead",
+      "createdAt": "2025-07-01T20:15:00.000Z",
+      "dueDate": "2025-11-15T00:00:00.000Z",
+      "mitigationPlan": "Define data contracts, run early data profiling, automate cleansing.",
+      "contingencyPlan": "Implement temporary manual cleansing or postpone downstream tasks.",
+      "estimatedCost": 80000,
+      "phaseLink": "3. Core Backend Development"
+    },
+    {
+      "id": "897d4a9e-f72c-474f-b9ba-0ced20531803",
+      "title": "Low User Adoption (Mobile)",
+      "description": "Mobile app fails to reach target adoption during pilot.",
+      "category": "strategic",
+      "probability": "medium",
+      "impact": "high",
+      "riskScore": 6,
+      "status": "identified",
+      "owner": "Product Marketing Manager",
+      "createdAt": "2025-07-01T20:15:00.000Z",
+      "dueDate": "2026-07-31T00:00:00.000Z",
+      "mitigationPlan": "Early marketing campaigns, incentives, usability testing.",
+      "contingencyPlan": "Enhance app features based on feedback, extend pilot window.",
+      "estimatedCost": 120000,
+      "phaseLink": "6. Pilot Deployment"
+    },
+    {
+      "id": "9beeb0e2-3f6a-4d52-a797-830fe5b13304",
+      "title": "Integration Bugs Cause Schedule Slip",
+      "description": "Critical defects found late in end-to-end testing.",
+      "category": "technical",
+      "probability": "high",
+      "impact": "high",
+      "riskScore": 9,
+      "status": "identified",
+      "owner": "QA Manager",
+      "createdAt": "2025-07-01T20:15:00.000Z",
+      "dueDate": "2026-05-31T00:00:00.000Z",
+      "mitigationPlan": "Shift-left testing, continuous integration, automated regression suite.",
+      "contingencyPlan": "Allocate additional dev capacity; negotiate go-live scope.",
+      "estimatedCost": 150000,
+      "phaseLink": "5. Integration & Testing"
+    },
+    {
+      "id": "bbf818f9-9020-4c90-9ff4-fc7e4a187305",
+      "title": "Regulatory Change on Food Donations",
+      "description": "New regulations may impact donation workflows and data requirements.",
+      "category": "external",
+      "probability": "low",
+      "impact": "very-high",
+      "riskScore": 4,
+      "status": "identified",
+      "owner": "Compliance Officer",
+      "createdAt": "2025-07-01T20:15:00.000Z",
+      "dueDate": "2026-09-30T00:00:00.000Z",
+      "mitigationPlan": "Monitor legislation, engage legal counsel, design flexible data model.",
+      "contingencyPlan": "Fast-track compliance updates, temporary process work-arounds.",
+      "estimatedCost": 50000,
+      "phaseLink": "7. Full-scale Deployment"
+    }
+  ],
+  "meritFigures": [],
+  "groupingState": {
+    "groupedPhaseIds": [],
+    "groupedExpanded": false,
+    "lastUpdated": "2025-07-01T20:15:00.000Z"
+  },
+  "projectSettings": {
+    "currency": "BRL",
+    "language": "pt-BR",
+    "timezone": "America/Sao_Paulo"
+  },
+  "statistics": {},
+  "exportMetadata": {
+    "exportOptions": {
+      "format": "json",
+      "includeWbs": true,
+      "includeRisks": true,
+      "includeMeritFigures": true,
+      "includeGroupingState": true,
+      "includeStatistics": false,
+      "includeSettings": true,
+      "includeMetadata": true,
+      "includeCostBreakdown": false,
+      "includeGanttData": false,
+      "compressOutput": false
+    },
+    "exportedSections": [
+      "projectInfo",
+      "wbsStructure",
+      "risks",
+      "meritFigures",
+      "groupingState",
+      "projectSettings"
+    ],
+    "dataIntegrity": {
+      "wbsNodes": 41,
+      "risksCount": 5,
+      "meritFiguresCount": 0
+    }
+  }
+}
