@@ -175,6 +175,15 @@ const ImportWBS: React.FC<ImportWBSProps> = ({ open, onClose, onImport }) => {
     if (!importResult?.success || !importResult.data) return null;
 
     const { data: rootNode, summary, warnings } = importResult;
+    
+    // Debug: Log dos dados importados
+    console.log('🔍 [ImportWBS Preview] Dados importados:', {
+      rootNode: rootNode,
+      summary: summary,
+      rootNodeTotalCost: rootNode?.totalCost,
+      rootNodeCost: rootNode?.cost,
+      childrenCount: rootNode?.children?.length
+    });
 
     // Flattened data for table
     const tableData: any[] = [];

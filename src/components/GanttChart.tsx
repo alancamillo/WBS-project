@@ -70,20 +70,22 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
   // Converte para tarefas Gantt
   const ganttTasks = useMemo(() => {
-    return GanttService.convertTreeToGanttTasks(rootNode, viewOptions);
+    const convertedTasks = GanttService.convertTreeToGanttTasks(rootNode, viewOptions);
+    console.log('GanttChart: Converted ganttTasks from service:', convertedTasks.map(t => ({ id: t.id, name: t.name, start: t.start?.toISOString(), end: t.end?.toISOString() })));
+    return convertedTasks;
   }, [rootNode, viewOptions]);
 
   // Converte para formato da biblioteca gantt-task-react
   const tasks: Task[] = useMemo(() => {
-    return ganttTasks.map(task => {
+    const finalTasks = ganttTasks.map(task => {
       // Debug específico para Planning
       if (task.name.includes('Planning')) {
-        console.log('=== FINAL TASK DEBUG ===');
-        console.log(`Task: ${task.name}`);
-        console.log(`Start: ${task.start.toDateString()}`);
-        console.log(`End: ${task.end.toDateString()}`);
-        console.log(`Start === End: ${task.start.getTime() === task.end.getTime()}`);
-        console.log('=======================');
+        console.log('GanttChart: === FINAL TASK DEBUG (Planning) ===');
+        console.log(`GanttChart: Task: ${task.name}`);
+        console.log(`GanttChart: Start: ${task.start.toDateString()}`);
+        console.log(`GanttChart: End: ${task.end.toDateString()}`);
+        console.log(`GanttChart: Start === End: ${task.start.getTime() === task.end.getTime()}`);
+        console.log('GanttChart: =======================');
       }
       
       return {
@@ -99,6 +101,8 @@ const GanttChart: React.FC<GanttChartProps> = ({
         styles: task.styles
       };
     });
+    console.log('GanttChart: Final tasks passed to Gantt component:', finalTasks.map(t => ({ id: t.id, name: t.name, start: t.start?.toISOString(), end: t.end?.toISOString() })));
+    return finalTasks;
   }, [ganttTasks]);
 
   // Análise do projeto

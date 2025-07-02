@@ -64,7 +64,12 @@ export class GanttService {
    * Obtém data de início do nó, priorizando herança para nós com filhos
    */
   private static getNodeStartDate(node: TreeNode, rootNode: TreeNode): Date {
-    // Para nós com filhos, sempre calcular herança primeiro
+    // Prioritize the node's own startDate if it exists
+    if (node.startDate) {
+      return node.startDate;
+    }
+
+    // If node has children and no explicit startDate, calculate inherited start from children
     if (node.children.length > 0 && node.level >= 2) {
       const inheritedStart = this.calculateInheritedStartDate(node, rootNode);
       if (inheritedStart) {
@@ -72,40 +77,29 @@ export class GanttService {
       }
     }
     
-    return node.startDate || this.calculateStartDate(node, rootNode);
+    // Fallback: calculate a default start date
+    return this.calculateStartDate(node, rootNode);
   }
 
   /**
    * Obtém data de fim do nó, priorizando herança para nós com filhos
    */
   private static getNodeEndDate(node: TreeNode, rootNode: TreeNode): Date {
-    // Debug para Planning
-    if (node.name.includes('Planning')) {
-      console.log(`\n=== getNodeEndDate DEBUG: ${node.name} ===`);
-      console.log(`Has children: ${node.children.length > 0}`);
-      console.log(`Level: ${node.level}`);
-      console.log(`Original endDate: ${node.endDate?.toDateString() || 'undefined'}`);
+    // Prioritize the node's own endDate if it exists
+    if (node.endDate) {
+      return node.endDate;
     }
-    
-    // Para nós com filhos, sempre calcular herança primeiro
+
+    // If node has children and no explicit endDate, calculate inherited end from children
     if (node.children.length > 0 && node.level >= 2) {
       const inheritedEnd = this.calculateInheritedEndDate(node, rootNode);
       if (inheritedEnd) {
-        if (node.name.includes('Planning')) {
-          console.log(`Inherited end date: ${inheritedEnd.toDateString()}`);
-          console.log('=== END getNodeEndDate ===\n');
-        }
         return inheritedEnd;
       }
     }
     
-    const finalDate = node.endDate || this.calculateEndDate(node, rootNode);
-    if (node.name.includes('Planning')) {
-      console.log(`Final date: ${finalDate.toDateString()}`);
-      console.log('=== END getNodeEndDate ===\n');
-    }
-    
-    return finalDate;
+    // Fallback: calculate a default end date
+    return this.calculateEndDate(node, rootNode);
   }
 
   /**
@@ -208,8 +202,9 @@ export class GanttService {
    */
   private static getTaskType(node: TreeNode): 'task' | 'milestone' | 'project' {
     if (node.level === 1) return 'project';
-    if (node.children.length === 0) return 'task';
-    return 'milestone';
+    // All other nodes are considered 'task' type to allow duration,
+    // even if they have children (which will inherit dates from children)
+    return 'task';
   }
 
   /**
@@ -266,17 +261,8 @@ export class GanttService {
     // Implementação simplificada do algoritmo CPM
     const taskMap = new Map(tasks.map(t => [t.id, t]));
     
-    // Calcula early start e early finish
-    tasks.forEach(task => {
-      const earlyStart = this.calculateEarlyStart(task, taskMap);
-      const duration = task.end.getTime() - task.start.getTime();
-      
-      // Atualiza datas se necessário
-      if (earlyStart > task.start.getTime()) {
-        task.start = new Date(earlyStart);
-        task.end = new Date(earlyStart + duration);
-      }
-    });
+    // Calcula early start e early finish (para análise, não para modificar datas)
+    // As datas de início e fim das tarefas já devem ter sido definidas pela herança ou valores explícitos.
 
     // Marca tarefas críticas (implementação simplificada)
     tasks.forEach(task => {
