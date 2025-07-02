@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.css": "/WBS-project/static/css/main.2aff6eb9.css",
-    "main.js": "/WBS-project/static/js/main.6112df59.js",
+    "main.css": "/WBS-project/static/css/main.27de01d7.css",
+    "main.js": "/WBS-project/static/js/main.a8ac0d83.js",
+    "static/js/239.2892e6ed.chunk.js": "/WBS-project/static/js/239.2892e6ed.chunk.js",
     "index.html": "/WBS-project/index.html",
-    "main.2aff6eb9.css.map": "/WBS-project/static/css/main.2aff6eb9.css.map",
-    "main.6112df59.js.map": "/WBS-project/static/js/main.6112df59.js.map"
+    "main.27de01d7.css.map": "/WBS-project/static/css/main.27de01d7.css.map",
+    "main.a8ac0d83.js.map": "/WBS-project/static/js/main.a8ac0d83.js.map",
+    "239.2892e6ed.chunk.js.map": "/WBS-project/static/js/239.2892e6ed.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2aff6eb9.css",
-    "static/js/main.6112df59.js"
+    "static/css/main.27de01d7.css",
+    "static/js/main.a8ac0d83.js"
   ]
 }
