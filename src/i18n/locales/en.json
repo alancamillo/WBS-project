@@ -314,7 +314,13 @@
     "cumulativeBudget": "Cumulative Budget",
     "periodLabel": "Period:",
     "accumulated": "Accumulated",
-    "level": "Level"
+    "level": "Level",
+    "exportTable": "Export Table",
+    "exportChart": "Export Chart",
+    "tableExportSuccess": "Budget allocation table exported successfully!",
+    "areaChartExportSuccess": "Area chart exported successfully!",
+    "lineChartExportSuccess": "Cumulative chart exported successfully!",
+    "exportError": "Export error"
   },
   "flowTree": {
     "project": "Project",
@@ -330,6 +336,9 @@
     "title": "Gantt Chart",
     "exportJson": "Export JSON",
     "exportCsv": "Export CSV",
+    "exportImage": "Export Image",
+    "imageExportSuccess": "Image exported successfully!",
+    "imageExportError": "Error exporting image",
     "totalTasks": "Total Tasks",
     "completionRate": "Completion Rate",
     "totalCost": "Total Cost",
@@ -534,6 +543,11 @@
     "clearAllConfirmDescription": "This action will permanently remove all risks. Are you sure?",
     "clearAllConfirmOk": "Yes, clear",
     "clearAllConfirmCancel": "Cancel",
+    "noRisksToExport": "No risks available to export",
+    "exportMatrixImage": "Export Matrix",
+    "exportTableImage": "Export Table",
+    "tableExportSuccess": "Risk table exported successfully!",
+    "tableExportError": "Error exporting risk table",
     "localStorage": {
       "title": "💾 Local Storage",
       "description": "Created risks are automatically saved in your browser and will remain available even after navigating between screens or reloading the page."
@@ -690,6 +704,8 @@
     "title": "Risk Matrix - Project Schedule",
     "probability": "Probability",
     "impact": "Impact",
+    "imageExportSuccess": "Risk Matrix image exported successfully!",
+    "imageExportError": "Error exporting Risk Matrix image",
     "probabilityLabels": {
       "veryHigh": "Very High (5)",
       "high": "High (4)",
@@ -748,6 +764,9 @@
       "expandAll": "Expand All",
       "collapsePhases": "Collapse Phases"
     },
+    "exportTable": "Export Table",
+    "tableExportSuccess": "WBS table exported successfully!",
+    "exportError": "Export error",
     "tooltips": {
       "items": "items",
       "workingDays": "{days} working days",
@@ -898,7 +917,10 @@
       "name": "Cost Efficiency",
       "description": "Measures the relationship between project costs and delivered value",
       "unit": "%"
-    }
+    },
+    "exportChart": "Export Chart",
+    "chartExportSuccess": "Merit figures chart exported successfully!",
+    "exportError": "Export error"
   },
   "wbsAutoSave": "Your WBS structure is automatically saved in the browser. All modifications, including adding/editing phases and activities, will remain available even after navigating between screens or reloading the page.",
   "unifiedImport": {

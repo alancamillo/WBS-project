@@ -1005,9 +1005,192 @@
       "contingencyPlan": "Fast-track compliance updates, temporary process work-arounds.",
       "estimatedCost": 50000,
       "phaseLink": "7. Full-scale Deployment"
+    },
+    {
+      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "title": "Inaccurate ML Model Predictions",
+      "description": "The machine learning models for demand prediction, stock-out detection, or shelf-life monitoring may not perform as expected in a real-world environment, leading to incorrect business decisions and eroding user trust in the platform.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "high",
+      "riskScore": 6,
+      "status": "identified",
+      "owner": "Data Science Team Lead",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "dueDate": "2025-12-31T00:00:00.000Z",
+      "mitigationPlan": "Implement robust model validation, A/B testing, continuous monitoring, and fallback mechanisms.",
+      "contingencyPlan": "Revert to manual processes temporarily while retraining models with additional data.",
+      "estimatedCost": 95000,
+      "phaseLink": "3. Core Backend Development"
+    },
+    {
+      "id": "b2c3d4e5-f6g7-8901-2345-67890abcdef1",
+      "title": "Uncontrolled Scope Creep",
+      "description": "Continuous addition of new features from stakeholders after the initial scope has been defined, leading to budget overruns and schedule delays without a formal change control process.",
+      "category": "strategic",
+      "probability": "high",
+      "impact": "high",
+      "riskScore": 9,
+      "status": "identified",
+      "owner": "Product Owner",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "dueDate": "2025-08-31T00:00:00.000Z",
+      "mitigationPlan": "Establish formal change control board, document all change requests, require business case justification.",
+      "contingencyPlan": "Implement feature freeze periods and defer non-critical requests to future releases.",
+      "estimatedCost": 75000,
+      "phaseLink": "1. Planning & Requirements"
+    },
+    {
+      "id": "c3d4e5f6-g7h8-9012-3456-7890abcdef12",
+      "title": "Poor User Experience (UX)",
+      "description": "The user interfaces for the mobile and web applications may be confusing, slow, or unappealing, leading to user frustration and low adoption rates, regardless of the backend functionality's quality.",
+      "category": "strategic",
+      "probability": "medium",
+      "impact": "high",
+      "riskScore": 6,
+      "status": "identified",
+      "owner": "UI/UX Lead",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "dueDate": "2026-02-28T00:00:00.000Z",
+      "mitigationPlan": "Conduct extensive user research, iterative prototyping, usability testing throughout development.",
+      "contingencyPlan": "Implement rapid UX improvements based on user feedback, consider redesign of critical user flows.",
+      "estimatedCost": 85000,
+      "phaseLink": "4. Front-end Development"
+    },
+    {
+      "id": "d4e5f6g7-h8i9-0123-4567-890abcdef123",
+      "title": "Third-Party API Dependency Failure",
+      "description": "The platform may rely on external data sources (e.g., market prices, supplier data) via third-party APIs. These APIs could become unreliable, change their terms, or be deprecated, disrupting critical features.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "medium",
+      "riskScore": 4,
+      "status": "identified",
+      "owner": "Backend Tech Lead",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "dueDate": "2025-11-30T00:00:00.000Z",
+      "mitigationPlan": "Identify multiple data providers, implement circuit breakers, cache critical data locally.",
+      "contingencyPlan": "Activate backup data sources or implement manual data entry processes temporarily.",
+      "estimatedCost": 40000,
+      "phaseLink": "3. Core Backend Development"
+    },
+    {
+      "id": "e5f6g7h8-i9j0-1234-5678-90abcdef1234",
+      "title": "Inadequate Post-Launch Support",
+      "description": "The support team may not be adequately trained or staffed to handle the volume or complexity of user inquiries and technical issues after the full-scale deployment, leading to poor customer satisfaction.",
+      "category": "operational",
+      "probability": "medium",
+      "impact": "medium",
+      "riskScore": 4,
+      "status": "identified",
+      "owner": "Support Lead",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "dueDate": "2026-09-30T00:00:00.000Z",
+      "mitigationPlan": "Develop comprehensive training programs, create detailed support documentation, establish escalation procedures.",
+      "contingencyPlan": "Temporarily assign development team members to support, engage external support services.",
+      "estimatedCost": 65000,
+      "phaseLink": "7. Full-scale Deployment"
     }
   ],
-  "meritFigures": [],
+  "meritFigures": [
+    {
+      "id": "mf-001-food-distributed",
+      "name": "Amount of food distributed",
+      "description": "Tons of food reused through the platform (1 ton = 2,000 meals)",
+      "unit": "tons",
+      "category": "impact",
+      "targetValue": 1250,
+      "currentValue": 0,
+      "status": "not-started",
+      "owner": "Product Manager",
+      "createdAt": "2025-08-01T00:00:00.000Z",
+      "lastUpdated": "2025-08-01T00:00:00.000Z",
+      "phases": [
+        {
+          "phaseId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+          "phaseName": "1. Planning & Requirements",
+          "contribution": 0,
+          "justification": "Structural phase - no direct contribution to food distribution"
+        },
+        {
+          "phaseId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+          "phaseName": "2. Infrastructure Provisioning",
+          "contribution": 0,
+          "justification": "Structural phase - establishes technological foundation without direct impact on distribution"
+        },
+        {
+          "phaseId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+          "phaseName": "3. Core Backend Development",
+          "contribution": 450,
+          "justification": "Development of ML algorithms for inventory optimization, demand prediction, and shelf-life monitoring - direct impact on distribution efficiency"
+        },
+        {
+          "phaseId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+          "phaseName": "4. Front-end Development",
+          "contribution": 150,
+          "justification": "Interfaces that facilitate platform usage by end users, improving adoption and operational efficiency"
+        },
+        {
+          "phaseId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+          "phaseName": "5. Integration & Testing",
+          "contribution": 0,
+          "justification": "Monitoring and validation phase - no direct contribution to food distribution"
+        },
+        {
+          "phaseId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+          "phaseName": "6. Pilot Deployment",
+          "contribution": 100,
+          "justification": "Beginning of operations with limited user group - first distribution results"
+        },
+        {
+          "phaseId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+          "phaseName": "7. Full-scale Deployment",
+          "contribution": 550,
+          "justification": "Full-scale operation with all active users - maximum impact on food distribution"
+        },
+        {
+          "phaseId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+          "phaseName": "8. Closure & Evaluation",
+          "contribution": 0,
+          "justification": "Monitoring and evaluation phase - no additional contribution to distribution"
+        }
+      ],
+      "cumulativeProgress": [
+        {
+          "phaseId": "37a3b527-6b57-4b55-b5cd-27e4b2cd6a01",
+          "cumulativeValue": 0
+        },
+        {
+          "phaseId": "96bf9f15-2753-44a4-9262-e1bc623acb02",
+          "cumulativeValue": 0
+        },
+        {
+          "phaseId": "e7f472d0-5039-46e1-b8c6-56a6bdaf6b03",
+          "cumulativeValue": 450
+        },
+        {
+          "phaseId": "b3b6cfa8-8e2c-4b3d-846a-6f8959ad2c04",
+          "cumulativeValue": 600
+        },
+        {
+          "phaseId": "bc9b10fc-009b-4db7-a711-9035ba225f05",
+          "cumulativeValue": 600
+        },
+        {
+          "phaseId": "cf41bb87-4a72-4609-b7e5-eae8a111e406",
+          "cumulativeValue": 700
+        },
+        {
+          "phaseId": "aaeaeb08-2adb-45bd-83c8-f04bb79b6207",
+          "cumulativeValue": 1250
+        },
+        {
+          "phaseId": "fef62b8b-f9bd-4ef6-a6c9-197798f89b08",
+          "cumulativeValue": 1250
+        }
+      ]
+    }
+  ],
   "groupingState": {
     "groupedPhaseIds": [],
     "groupedExpanded": false,
@@ -1043,8 +1226,8 @@
     ],
     "dataIntegrity": {
       "wbsNodes": 41,
-      "risksCount": 5,
-      "meritFiguresCount": 0
+      "risksCount": 10,
+      "meritFiguresCount": 1
     }
   }
 }

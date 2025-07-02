@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Table,
   Button,
@@ -21,7 +21,8 @@ import {
   Empty,
   message,
   Alert,
-  Popconfirm
+  Popconfirm,
+  Dropdown
 } from 'antd';
 import {
   PlusOutlined,
@@ -35,7 +36,10 @@ import {
   BarChartOutlined,
   TableOutlined,
   BulbOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  FileImageOutlined,
+  CameraOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCurrencySettings } from '../hooks/useCurrencySettings';
@@ -107,6 +111,115 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
+  const [activeTab, setActiveTab] = useState('table');
+  
+  // Refs para captura da Risk Matrix e Risk Table
+  const riskMatrixRef = useRef<HTMLDivElement>(null);
+  const riskTableRef = useRef<HTMLDivElement>(null);
+
+  // Função para exportar Risk Matrix como imagem
+  const handleExportMatrixImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!riskMatrixRef.current) {
+      message.error(t('riskMatrix.imageExportError') || 'Error: Risk Matrix not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(riskMatrixRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `risk-matrix-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('riskMatrix.imageExportSuccess') || 'Risk Matrix image exported successfully');
+    } catch (error) {
+      console.error('Error exporting Risk Matrix image:', error);
+      message.error(t('riskMatrix.imageExportError') || 'Error exporting Risk Matrix image');
+    }
+  };
+
+  // Função para exportar Risk Table como imagem
+  const handleExportTableImage = async (format: 'png' | 'jpeg' = 'png') => {
+    if (!riskTableRef.current) {
+      message.error(t('riskManagement.tableExportError') || 'Error: Risk Table not found');
+      return;
+    }
+
+    try {
+      // Dynamic import to avoid TypeScript issues
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const canvas = await html2canvas(riskTableRef.current, {
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const dataUrl = canvas.toDataURL(`image/${format}`, 0.9);
+      
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `risk-table-${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+
+      message.success(t('riskManagement.tableExportSuccess') || 'Risk Table image exported successfully');
+    } catch (error) {
+      console.error('Error exporting Risk Table image:', error);
+      message.error(t('riskManagement.tableExportError') || 'Error exporting Risk Table image');
+    }
+  };
+
+  // Items do dropdown para exportação de imagem da matriz
+  const matrixImageExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportMatrixImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportMatrixImage('jpeg')
+    }
+  ];
+
+  // Items do dropdown para exportação de imagem da tabela
+  const tableImageExportItems = [
+    {
+      key: 'png',
+      label: 'PNG',
+      icon: <FileImageOutlined />,
+      onClick: () => handleExportTableImage('png')
+    },
+    {
+      key: 'jpeg',
+      label: 'JPEG',
+      icon: <CameraOutlined />,
+      onClick: () => handleExportTableImage('jpeg')
+    }
+  ];
+
+  // Items do dropdown baseado na aba ativa
+  const getExportItems = () => {
+    return activeTab === 'matrix' ? matrixImageExportItems : tableImageExportItems;
+  };
+
+  // Função para obter o label do botão baseado na aba ativa
+  const getExportButtonLabel = () => {
+    return activeTab === 'matrix' 
+      ? t('riskManagement.exportMatrixImage')
+      : t('riskManagement.exportTableImage');
+  };
 
   // Opções de probabilidade e impacto traduzidas
   const probabilityOptions = [
@@ -717,6 +830,19 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
             >
               {t('riskManagement.loadExamples')}
             </Button>
+            <Dropdown
+              menu={{ items: getExportItems() }}
+              placement="bottomRight"
+              disabled={filteredRisks.length === 0}
+            >
+              <Button 
+                icon={<FileImageOutlined />}
+                disabled={filteredRisks.length === 0}
+                title={filteredRisks.length === 0 ? t('riskManagement.noRisksToExport') : undefined}
+              >
+                {getExportButtonLabel()} <DownloadOutlined />
+              </Button>
+            </Dropdown>
             <Popconfirm
               title={t('riskManagement.clearAllConfirmTitle')}
               description={t('riskManagement.clearAllConfirmDescription')}
@@ -839,6 +965,7 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
         {/* Abas para Tabela e Matriz */}
         <Tabs 
           defaultActiveKey="table"
+          onChange={setActiveTab}
           items={[
             {
               key: 'table',
@@ -849,42 +976,44 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
                 </span>
               ),
               children: (
-                <Table
-                  columns={columns}
-                  dataSource={filteredRisks}
-                  rowKey="id"
-                  scroll={{ x: 1200 }}
-                  pagination={{
-                    current: currentPage,
-                    pageSize: pageSize,
-                    total: filteredRisks.length,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    pageSizeOptions: ['5', '10', '20', '50'],
-                    showTotal: (total, range) => 
-                      `${range[0]}-${range[1]} ${t('riskManagement.table.pagination')} ${total} ${t('riskManagement.table.risks')}`,
-                    onChange: (page, size) => {
-                      setCurrentPage(page);
-                      if (size !== pageSize) {
+                <div ref={riskTableRef}>
+                  <Table
+                    columns={columns}
+                    dataSource={filteredRisks}
+                    rowKey="id"
+                    scroll={{ x: 1200 }}
+                    pagination={{
+                      current: currentPage,
+                      pageSize: pageSize,
+                      total: filteredRisks.length,
+                      showSizeChanger: true,
+                      showQuickJumper: true,
+                      pageSizeOptions: ['5', '10', '20', '50'],
+                      showTotal: (total, range) => 
+                        `${range[0]}-${range[1]} ${t('riskManagement.table.pagination')} ${total} ${t('riskManagement.table.risks')}`,
+                      onChange: (page, size) => {
+                        setCurrentPage(page);
+                        if (size !== pageSize) {
+                          setPageSize(size);
+                          setCurrentPage(1); // Reset to first page when changing page size
+                        }
+                      },
+                      onShowSizeChange: (current, size) => {
                         setPageSize(size);
                         setCurrentPage(1); // Reset to first page when changing page size
-                      }
-                    },
-                    onShowSizeChange: (current, size) => {
-                      setPageSize(size);
-                      setCurrentPage(1); // Reset to first page when changing page size
-                    },
-                  }}
-                  locale={{
-                    emptyText: (
-                      <Empty
-                        description={t('riskManagement.table.noRisksFound')}
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      />
-                    ),
-                  }}
-                  size="middle"
-                />
+                      },
+                    }}
+                    locale={{
+                      emptyText: (
+                        <Empty
+                          description={t('riskManagement.table.noRisksFound')}
+                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        />
+                      ),
+                    }}
+                    size="middle"
+                  />
+                </div>
               )
             },
             {
@@ -895,7 +1024,7 @@ const RiskManagement: React.FC<RiskManagementProps> = ({ rootNode }) => {
                   {t('riskManagement.tabs.riskMatrix')}
                 </span>
               ),
-              children: <RiskMatrix risks={filteredRisks} />
+              children: <RiskMatrix risks={filteredRisks} matrixRef={riskMatrixRef} />
             }
           ]}
         />

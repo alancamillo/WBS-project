@@ -296,7 +296,13 @@
     "cumulativeBudget": "Presupuesto Acumulativo",
     "periodLabel": "Período:",
     "accumulated": "Acumulado",
-    "level": "Nivel"
+    "level": "Nivel",
+    "exportTable": "Exportar Tabla",
+    "exportChart": "Exportar Gráfico",
+    "tableExportSuccess": "¡Tabla de asignación exportada con éxito!",
+    "areaChartExportSuccess": "¡Gráfico de áreas exportado con éxito!",
+    "lineChartExportSuccess": "¡Gráfico acumulativo exportado con éxito!",
+    "exportError": "Error al exportar"
   },
   "flowTree": {
     "project": "Proyecto",
@@ -312,6 +318,9 @@
     "title": "Diagrama de Gantt",
     "exportJson": "Exportar JSON",
     "exportCsv": "Exportar CSV",
+    "exportImage": "Exportar Imagen",
+    "imageExportSuccess": "¡Imagen exportada exitosamente!",
+    "imageExportError": "Error al exportar imagen",
     "totalTasks": "Total de Tareas",
     "completionRate": "Tasa de Finalización",
     "totalCost": "Costo Total",
@@ -516,6 +525,11 @@
     "clearAllConfirmDescription": "Esta acción eliminará permanentemente todos los riesgos. ¿Está seguro?",
     "clearAllConfirmOk": "Sí, limpiar",
     "clearAllConfirmCancel": "Cancelar",
+    "noRisksToExport": "No hay riesgos disponibles para exportar",
+    "exportMatrixImage": "Exportar Matriz",
+    "exportTableImage": "Exportar Tabla",
+    "tableExportSuccess": "¡Tabla de riesgos exportada exitosamente!",
+    "tableExportError": "Error al exportar tabla de riesgos",
     "localStorage": {
       "title": "💾 Almacenamiento Local",
       "description": "Los riesgos creados se guardan automáticamente en su navegador y permanecerán disponibles incluso después de navegar entre pantallas o recargar la página."
@@ -672,6 +686,8 @@
     "title": "Matriz de Riesgo - Cronograma del Proyecto",
     "probability": "Probabilidad",
     "impact": "Impacto",
+    "imageExportSuccess": "¡Imagen de la matriz de riesgo exportada exitosamente!",
+    "imageExportError": "Error al exportar imagen de la matriz de riesgo",
     "probabilityLabels": {
       "veryHigh": "Muy Alta (5)",
       "high": "Alta (4)",
@@ -730,6 +746,9 @@
       "expandAll": "Expandir Todas",
       "collapsePhases": "Colapsar Fases"
     },
+    "exportTable": "Exportar Tabla",
+    "tableExportSuccess": "¡Tabla WBS exportada con éxito!",
+    "exportError": "Error al exportar",
     "tooltips": {
       "items": "elementos",
       "workingDays": "{days} días laborables",
@@ -899,7 +918,10 @@
       "name": "Eficiencia de Costos",
       "description": "Mide la relación entre costos del proyecto y valor entregado",
       "unit": "%"
-    }
+    },
+    "exportChart": "Exportar Gráfico",
+    "chartExportSuccess": "¡Gráfico de figuras de mérito exportado con éxito!",
+    "exportError": "Error al exportar"
   },
   "unifiedImport": {
     "nodesImported": "nodos importados",
