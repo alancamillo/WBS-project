@@ -11,6 +11,7 @@ import {
   MeritFigure
 } from '../types';
 import { CostCalculator } from '../utils/costCalculator';
+import { DateCalculator } from '../utils/dateCalculator';
 import { v4 as uuidv4 } from 'uuid';
 
 // Versões suportadas do formato de dados
@@ -227,6 +228,10 @@ export class ImportService {
       groupedExpanded: false
     };
 
+    // Aplicar herança de datas igual ao App.tsx
+    const processedWbsStructure = wbsResult?.data || this.createEmptyProject();
+    const wbsWithDateInheritance = DateCalculator.applyDateInheritanceRecursively(processedWbsStructure);
+
     // Montar dados unificados
     const unifiedData: UnifiedProjectData = {
       projectInfo: {
@@ -235,7 +240,7 @@ export class ImportService {
         projectStartDate: data.projectInfo.projectStartDate ? new Date(data.projectInfo.projectStartDate) : undefined,
         projectEndDate: data.projectInfo.projectEndDate ? new Date(data.projectInfo.projectEndDate) : undefined,
       },
-      wbsStructure: wbsResult?.data || this.createEmptyProject(),
+      wbsStructure: wbsWithDateInheritance,
       risks,
       meritFigures,
       groupingState,
@@ -284,24 +289,25 @@ export class ImportService {
     const processedRisks = this.processRisksData(risks, errors, warnings);
     const processedMeritFigures = this.processMeritFiguresData(meritFigures, errors, warnings);
 
-    // Criar dados unificados com informações padrão
+    // Aplicar herança de datas igual ao App.tsx
     const rootNode = wbsResult.data || this.createEmptyProject();
-    const projectDates = this.calculateProjectDates(rootNode);
+    const rootNodeWithDateInheritance = DateCalculator.applyDateInheritanceRecursively(rootNode);
+    const projectDates = this.calculateProjectDates(rootNodeWithDateInheritance);
 
     const unifiedData: UnifiedProjectData = {
       projectInfo: {
-        id: rootNode.id,
-        name: rootNode.name,
-        description: rootNode.description,
+        id: rootNodeWithDateInheritance.id,
+        name: rootNodeWithDateInheritance.name,
+        description: rootNodeWithDateInheritance.description,
         version: CURRENT_VERSION,
         exportDate: new Date(),
-        totalNodes: this.countNodes(rootNode),
-        totalCost: rootNode.totalCost,
+        totalNodes: this.countNodes(rootNodeWithDateInheritance),
+        totalCost: rootNodeWithDateInheritance.totalCost,
         projectDuration: projectDates.duration,
         projectStartDate: projectDates.startDate,
         projectEndDate: projectDates.endDate,
       },
-      wbsStructure: rootNode,
+      wbsStructure: rootNodeWithDateInheritance,
       risks: processedRisks,
       meritFigures: processedMeritFigures,
       groupingState: {
@@ -513,6 +519,21 @@ export class ImportService {
   static async importFromJSON(file: File): Promise<ImportResult> {
     const unifiedResult = await this.importUnifiedFromJSON(file);
     
+    // Criar summary específico para o preview com formato esperado pelo ImportWBS.tsx
+    let previewSummary = null;
+    if (unifiedResult.data?.wbsStructure && unifiedResult.summary) {
+      const wbsData = unifiedResult.data.wbsStructure;
+      const originalSummary = unifiedResult.summary;
+      
+      previewSummary = {
+        totalNodes: originalSummary.wbs.totalNodes,
+        level1Nodes: originalSummary.wbs.nodesByLevel[1] || 0,
+        level2Nodes: originalSummary.wbs.nodesByLevel[2] || 0,
+        level3Nodes: originalSummary.wbs.nodesByLevel[3] || 0,
+        totalCost: wbsData.totalCost || 0
+      };
+    }
+    
     return {
       success: unifiedResult.success,
       data: unifiedResult.data?.wbsStructure,
@@ -520,7 +541,7 @@ export class ImportService {
       meritFigures: unifiedResult.data?.meritFigures,
       errors: unifiedResult.errors,
       warnings: unifiedResult.warnings,
-      summary: unifiedResult.summary
+      summary: previewSummary
     };
   }
 
@@ -559,8 +580,8 @@ export class ImportService {
         });
       }
 
-      // Recalcular custos totais
-      const processedData = CostCalculator.updateAllTotalCosts(convertedData);
+      // Aplicar processamento completo (custos + datas) igual ao App.tsx
+      const processedData = CostCalculator.processCompleteNode(convertedData);
 
       return {
         success: errors.length === 0,

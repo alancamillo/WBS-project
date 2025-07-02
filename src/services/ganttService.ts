@@ -24,8 +24,8 @@ export class GanttService {
       const task: GanttTask = {
         id: node.id,
         name: node.name,
-        start: node.startDate || this.calculateStartDate(node, rootNode),
-        end: node.endDate || this.calculateEndDate(node, rootNode),
+        start: this.getNodeStartDate(node, rootNode),
+        end: this.getNodeEndDate(node, rootNode),
         progress: this.calculateProgress(node),
         type: this.getTaskType(node),
         project: parentId,
@@ -61,7 +61,79 @@ export class GanttService {
   }
 
   /**
-   * Calcula data de início baseada na hierarquia e dependências
+   * Obtém data de início do nó, priorizando herança para nós com filhos
+   */
+  private static getNodeStartDate(node: TreeNode, rootNode: TreeNode): Date {
+    // Prioritize the node's own startDate if it exists
+    if (node.startDate) {
+      return node.startDate;
+    }
+
+    // If node has children and no explicit startDate, calculate inherited start from children
+    if (node.children.length > 0 && node.level >= 2) {
+      const inheritedStart = this.calculateInheritedStartDate(node, rootNode);
+      if (inheritedStart) {
+        return inheritedStart;
+      }
+    }
+    
+    // Fallback: calculate a default start date
+    return this.calculateStartDate(node, rootNode);
+  }
+
+  /**
+   * Obtém data de fim do nó, priorizando herança para nós com filhos
+   */
+  private static getNodeEndDate(node: TreeNode, rootNode: TreeNode): Date {
+    // Prioritize the node's own endDate if it exists
+    if (node.endDate) {
+      return node.endDate;
+    }
+
+    // If node has children and no explicit endDate, calculate inherited end from children
+    if (node.children.length > 0 && node.level >= 2) {
+      const inheritedEnd = this.calculateInheritedEndDate(node, rootNode);
+      if (inheritedEnd) {
+        return inheritedEnd;
+      }
+    }
+    
+    // Fallback: calculate a default end date
+    return this.calculateEndDate(node, rootNode);
+  }
+
+  /**
+   * Calcula data de início herdada dos filhos
+   */
+  private static calculateInheritedStartDate(node: TreeNode, rootNode: TreeNode): Date | null {
+    if (node.children.length === 0) return null;
+    
+    const childrenStartDates = node.children
+      .map(child => this.getNodeStartDate(child, rootNode))
+      .filter(date => date);
+    
+    if (childrenStartDates.length === 0) return null;
+    
+    return new Date(Math.min(...childrenStartDates.map(d => d.getTime())));
+  }
+
+  /**
+   * Calcula data de fim herdada dos filhos
+   */
+  private static calculateInheritedEndDate(node: TreeNode, rootNode: TreeNode): Date | null {
+    if (node.children.length === 0) return null;
+    
+    const childrenEndDates = node.children
+      .map(child => this.getNodeEndDate(child, rootNode))
+      .filter(date => date);
+    
+    if (childrenEndDates.length === 0) return null;
+    
+    return new Date(Math.max(...childrenEndDates.map(d => d.getTime())));
+  }
+
+  /**
+   * Calcula data de início padrão quando não há herança ou dados
    */
   private static calculateStartDate(node: TreeNode, rootNode: TreeNode): Date {
     if (node.startDate) return node.startDate;
@@ -81,7 +153,7 @@ export class GanttService {
   }
 
   /**
-   * Calcula data de fim baseada na duração estimada
+   * Calcula data de fim padrão baseada na duração estimada
    */
   private static calculateEndDate(node: TreeNode, rootNode: TreeNode): Date {
     if (node.endDate) return node.endDate;
@@ -108,6 +180,7 @@ export class GanttService {
       case 1: return Math.min(365, baseDays * 3); // Projetos podem durar até 1 ano
       case 2: return Math.min(90, baseDays * 2);  // Fases até 3 meses
       case 3: return Math.min(30, baseDays);      // Atividades até 1 mês
+      case 4: return Math.min(15, baseDays);      // Sub-atividades até 2 semanas
       default: return baseDays;
     }
   }
@@ -129,8 +202,9 @@ export class GanttService {
    */
   private static getTaskType(node: TreeNode): 'task' | 'milestone' | 'project' {
     if (node.level === 1) return 'project';
-    if (node.children.length === 0) return 'task';
-    return 'milestone';
+    // All other nodes are considered 'task' type to allow duration,
+    // even if they have children (which will inherit dates from children)
+    return 'task';
   }
 
   /**
@@ -140,10 +214,11 @@ export class GanttService {
     const levelColors = {
       1: { bg: '#1890ff', selected: '#096dd9', progress: '#40a9ff', progressSelected: '#1890ff' },
       2: { bg: '#52c41a', selected: '#389e0d', progress: '#73d13d', progressSelected: '#52c41a' },
-      3: { bg: '#faad14', selected: '#d48806', progress: '#ffc53d', progressSelected: '#faad14' }
+      3: { bg: '#faad14', selected: '#d48806', progress: '#ffc53d', progressSelected: '#faad14' },
+      4: { bg: '#f759ab', selected: '#c41d7f', progress: '#ff85c0', progressSelected: '#f759ab' }
     };
 
-    const colors = levelColors[level as keyof typeof levelColors] || levelColors[3];
+    const colors = levelColors[level as keyof typeof levelColors] || levelColors[4];
     
     // Ajusta opacidade baseado no status
     const opacity = status === 'completed' ? '0.7' : '1';
@@ -164,32 +239,19 @@ export class GanttService {
     rootNode: TreeNode, 
     options: GanttViewOptions
   ): void {
-    // Adiciona dependências sequenciais entre irmãos do mesmo nível
-    const tasksByParent = new Map<string, GanttTask[]>();
+    // COMENTADO: Esta lógica estava forçando sequência automática e sobrescrevendo datas herdadas
+    // Apenas adiciona dependências explícitas do WBS, não força sequências automáticas
     
+    // Adiciona apenas dependências explicitamente definidas no WBS
     tasks.forEach(task => {
-      const parentId = task.project || 'root';
-      if (!tasksByParent.has(parentId)) {
-        tasksByParent.set(parentId, []);
-      }
-      tasksByParent.get(parentId)!.push(task);
-    });
-
-    // Para cada grupo de irmãos, adiciona dependências sequenciais
-    tasksByParent.forEach(siblings => {
-      siblings.sort((a, b) => a.start.getTime() - b.start.getTime());
-      
-      for (let i = 1; i < siblings.length; i++) {
-        const current = siblings[i];
-        const previous = siblings[i - 1];
-        
-        // Adiciona dependência finish-to-start se não existe
-        if (!current.dependencies?.includes(previous.id)) {
-          current.dependencies = current.dependencies || [];
-          current.dependencies.push(previous.id);
-        }
+      const sourceNode = this.findNodeById(rootNode, task.id);
+      if (sourceNode?.dependencies) {
+        task.dependencies = [...(sourceNode.dependencies || [])];
       }
     });
+    
+    // REMOVIDO: lógica que forçava dependências sequenciais entre irmãos
+    // pois estava sobrescrevendo as datas originais/herdadas calculadas
   }
 
   /**
@@ -199,17 +261,8 @@ export class GanttService {
     // Implementação simplificada do algoritmo CPM
     const taskMap = new Map(tasks.map(t => [t.id, t]));
     
-    // Calcula early start e early finish
-    tasks.forEach(task => {
-      const earlyStart = this.calculateEarlyStart(task, taskMap);
-      const duration = task.end.getTime() - task.start.getTime();
-      
-      // Atualiza datas se necessário
-      if (earlyStart > task.start.getTime()) {
-        task.start = new Date(earlyStart);
-        task.end = new Date(earlyStart + duration);
-      }
-    });
+    // Calcula early start e early finish (para análise, não para modificar datas)
+    // As datas de início e fim das tarefas já devem ter sido definidas pela herança ou valores explícitos.
 
     // Marca tarefas críticas (implementação simplificada)
     tasks.forEach(task => {
@@ -328,7 +381,8 @@ export class GanttService {
     const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
     const notStartedTasks = tasks.filter(t => t.status === 'not-started').length;
 
-    const totalCost = tasks.reduce((sum, task) => sum + task.cost, 0);
+    const projectTask = tasks.find(t => t.level === 1);
+    const totalCost = projectTask ? projectTask.totalCost : 0;
     const totalDuration = Math.max(
       ...tasks.map(task => task.end.getTime())
     ) - Math.min(
@@ -338,7 +392,8 @@ export class GanttService {
     const tasksByLevel = {
       level1: tasks.filter(t => t.level === 1).length,
       level2: tasks.filter(t => t.level === 2).length,
-      level3: tasks.filter(t => t.level === 3).length
+      level3: tasks.filter(t => t.level === 3).length,
+      level4: tasks.filter(t => t.level === 4).length
     };
 
     return {

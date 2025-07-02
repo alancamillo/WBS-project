@@ -269,4 +269,108 @@ export class DateCalculator {
         return value;
     }
   }
+
+  /**
+   * Aplica herança automática de datas recursivamente em toda a árvore
+   * Níveis 2, 3 e 4 que tenham filhos herdam automaticamente as datas
+   */
+  static applyDateInheritanceRecursively(nodeToProcess: TreeNode): TreeNode {
+    // Primeiro, processa todos os filhos recursivamente
+    const processedChildren = nodeToProcess.children.map(child => 
+      DateCalculator.applyDateInheritanceRecursively(child)
+    );
+
+    // Se não tem filhos, retorna o nó como está
+    if (processedChildren.length === 0) {
+      return {
+        ...nodeToProcess,
+        children: processedChildren
+      };
+    }
+
+    // Cria nó temporário com filhos processados para calcular herança
+    const tempNode = {
+      ...nodeToProcess,
+      children: processedChildren
+    };
+
+    // Calcula datas herdadas dos filhos
+    const inheritedStartDate = DateCalculator.calculateInheritedStartDate(tempNode);
+    const inheritedEndDate = DateCalculator.calculateInheritedEndDate(tempNode);
+
+    // Aplica herança se necessário
+    let finalStartDate = nodeToProcess.startDate;
+    let finalEndDate = nodeToProcess.endDate;
+
+    // Para níveis 2, 3 e 4 que tenham filhos, aplicar herança automática
+    if (nodeToProcess.level >= 2 && processedChildren.length > 0) {
+      // Herda data de início mais cedo se não definida ou se a herdada for anterior
+      if (inheritedStartDate) {
+        if (!nodeToProcess.startDate || inheritedStartDate < nodeToProcess.startDate) {
+          finalStartDate = inheritedStartDate;
+        }
+      }
+
+      // Herda data de fim mais distante se não definida ou se a herdada for posterior
+      if (inheritedEndDate) {
+        if (!nodeToProcess.endDate || inheritedEndDate > nodeToProcess.endDate) {
+          finalEndDate = inheritedEndDate;
+        }
+      }
+    }
+
+    return {
+      ...tempNode,
+      startDate: finalStartDate,
+      endDate: finalEndDate
+    };
+  }
+
+  /**
+   * Calcula a data de fim mais distante dos filhos
+   */
+  private static calculateInheritedEndDate(nodeToCheck: TreeNode): Date | undefined {
+    if (nodeToCheck.children.length === 0) {
+      // Nó folha: retorna sua própria data de fim
+      return nodeToCheck.endDate;
+    }
+
+    // Nó pai: encontra a data de fim mais distante dos filhos
+    let latestEndDate: Date | undefined;
+    
+    for (const child of nodeToCheck.children) {
+      const childEndDate = DateCalculator.calculateInheritedEndDate(child);
+      if (childEndDate) {
+        if (!latestEndDate || childEndDate > latestEndDate) {
+          latestEndDate = childEndDate;
+        }
+      }
+    }
+
+    return latestEndDate;
+  }
+
+  /**
+   * Calcula a data de início mais cedo dos filhos
+   */
+  private static calculateInheritedStartDate(nodeToCheck: TreeNode): Date | undefined {
+    if (nodeToCheck.children.length === 0) {
+      // Nó folha: retorna sua própria data de início
+      return nodeToCheck.startDate;
+    }
+
+    // Nó pai: encontra a data de início mais cedo dos filhos
+    let earliestStartDate: Date | undefined;
+    
+    for (const child of nodeToCheck.children) {
+      const childStartDate = DateCalculator.calculateInheritedStartDate(child);
+      if (childStartDate) {
+        if (!earliestStartDate || childStartDate < earliestStartDate) {
+          earliestStartDate = childStartDate;
+        }
+      }
+    }
+
+    return earliestStartDate;
+  }
 } 

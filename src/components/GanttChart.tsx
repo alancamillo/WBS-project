@@ -57,41 +57,74 @@ const GanttChart: React.FC<GanttChartProps> = ({
   };
 
   const [viewOptions, setViewOptions] = useState<GanttViewOptions>({
-    showLevels: [1, 2, 3],
+    showLevels: [1, 2, 3, 4],
     showCriticalPath: true,
     groupByLevel: false,
     showCosts: true,
     showProgress: true,
-    viewMode: 'Day'
+    viewMode: 'Day',
+    ganttHeight: 'standard'
   });
 
   const [selectedView, setSelectedView] = useState<ViewMode>(ViewMode.Day);
 
   // Converte para tarefas Gantt
   const ganttTasks = useMemo(() => {
-    return GanttService.convertTreeToGanttTasks(rootNode, viewOptions);
+    const convertedTasks = GanttService.convertTreeToGanttTasks(rootNode, viewOptions);
+    console.log('GanttChart: Converted ganttTasks from service:', convertedTasks.map(t => ({ id: t.id, name: t.name, start: t.start?.toISOString(), end: t.end?.toISOString() })));
+    return convertedTasks;
   }, [rootNode, viewOptions]);
 
   // Converte para formato da biblioteca gantt-task-react
   const tasks: Task[] = useMemo(() => {
-    return ganttTasks.map(task => ({
-      id: task.id,
-      name: task.name,
-      start: task.start,
-      end: task.end,
-      type: task.type as any,
-      progress: task.progress,
-      isDisabled: false,
-      project: task.project,
-      dependencies: task.dependencies,
-      styles: task.styles
-    }));
+    const finalTasks = ganttTasks.map(task => {
+      // Debug específico para Planning
+      if (task.name.includes('Planning')) {
+        console.log('GanttChart: === FINAL TASK DEBUG (Planning) ===');
+        console.log(`GanttChart: Task: ${task.name}`);
+        console.log(`GanttChart: Start: ${task.start.toDateString()}`);
+        console.log(`GanttChart: End: ${task.end.toDateString()}`);
+        console.log(`GanttChart: Start === End: ${task.start.getTime() === task.end.getTime()}`);
+        console.log('GanttChart: =======================');
+      }
+      
+      return {
+        id: task.id,
+        name: task.name,
+        start: task.start,
+        end: task.end,
+        type: task.type as any,
+        progress: task.progress,
+        isDisabled: false,
+        project: task.project,
+        dependencies: task.dependencies,
+        styles: task.styles
+      };
+    });
+    console.log('GanttChart: Final tasks passed to Gantt component:', finalTasks.map(t => ({ id: t.id, name: t.name, start: t.start?.toISOString(), end: t.end?.toISOString() })));
+    return finalTasks;
   }, [ganttTasks]);
 
   // Análise do projeto
   const projectAnalysis = useMemo(() => {
     return GanttService.generateProjectAnalysis(ganttTasks, t);
   }, [ganttTasks, t]);
+
+  // Converte a opção de altura para pixels
+  const getGanttHeight = (heightOption: string): number => {
+    switch (heightOption) {
+      case 'compact': return 300;
+      case 'standard': return 400;
+      case 'expanded': return 600;
+      case 'full': return 800;
+      default: return 400;
+    }
+  };
+
+  // Calcula altura do container baseado na altura do Gantt
+  const getContainerHeight = (heightOption: string): number => {
+    return getGanttHeight(heightOption) + 200; // +200px para acomodar headers e controles
+  };
 
   const handleViewOptionsChange = (key: keyof GanttViewOptions, value: any) => {
     setViewOptions(prev => ({
@@ -101,7 +134,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
   };
 
   const handleLevelChange = (levels: number[]) => {
-    handleViewOptionsChange('showLevels', levels as (1 | 2 | 3)[]);
+    handleViewOptionsChange('showLevels', levels as (1 | 2 | 3 | 4)[]);
   };
 
   const handleExportGantt = (format: 'json' | 'csv') => {
@@ -127,6 +160,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
       case 1: return 'blue';
       case 2: return 'green';
       case 3: return 'orange';
+      case 4: return 'magenta';
       default: return 'default';
     }
   };
@@ -209,7 +243,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
       <Card style={{ marginBottom: '24px' }}>
         <Title level={4}>{t('gantt.viewSettings')}</Title>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={6}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <Text strong>{t('gantt.levelsToShow')}</Text>
               <Select
@@ -228,11 +262,14 @@ const GanttChart: React.FC<GanttChartProps> = ({
                 <Option value={3}>
                   <Tag color={getLevelColor(3)}>{t('gantt.level3Activity')}</Tag>
                 </Option>
+                <Option value={4}>
+                  <Tag color={getLevelColor(4)}>{t('gantt.level4SubActivity')}</Tag>
+                </Option>
               </Select>
             </Space>
           </Col>
           
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={6}>
             <Space direction="vertical" style={{ width: '100%' }}>
               <Text strong>{t('gantt.viewMode')}</Text>
               <Select
@@ -252,7 +289,23 @@ const GanttChart: React.FC<GanttChartProps> = ({
             </Space>
           </Col>
 
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={6}>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Text strong>{t('gantt.chartHeight')}</Text>
+              <Select
+                style={{ width: '100%' }}
+                value={viewOptions.ganttHeight}
+                onChange={(value) => handleViewOptionsChange('ganttHeight', value)}
+              >
+                <Option value="compact">{t('gantt.heightCompact')}</Option>
+                <Option value="standard">{t('gantt.heightStandard')}</Option>
+                <Option value="expanded">{t('gantt.heightExpanded')}</Option>
+                <Option value="full">{t('gantt.heightFull')}</Option>
+              </Select>
+            </Space>
+          </Col>
+
+          <Col xs={24} sm={12} md={6}>
             <Space direction="vertical">
               <Text strong>{t('gantt.advancedOptions')}</Text>
               <Space direction="vertical">
@@ -330,7 +383,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
 
       {/* Gráfico Gantt */}
       <Card>
-        <div style={{ height: '600px', overflowX: 'auto' }}>
+        <div style={{ height: getContainerHeight(viewOptions.ganttHeight), overflowX: 'auto' }}>
           {tasks.length > 0 ? (
             <Gantt
               tasks={tasks}
@@ -350,7 +403,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
               rtl={false}
               headerHeight={50}
               rowHeight={50}
-              ganttHeight={400}
+              ganttHeight={getGanttHeight(viewOptions.ganttHeight)}
               preStepsCount={1}
               todayColor="rgba(252, 58, 48, 0.5)"
               TooltipContent={({ task, fontSize, fontFamily }) => (
@@ -382,7 +435,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
             />
           ) : (
             <div style={{ 
-              height: '400px', 
+              height: getContainerHeight(viewOptions.ganttHeight), 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',

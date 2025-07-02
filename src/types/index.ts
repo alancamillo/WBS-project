@@ -2,7 +2,7 @@ export interface TreeNode {
   id: string;
   name: string;
   cost: number;
-  level: 1 | 2 | 3;
+  level: 1 | 2 | 3 | 4;
   parentId?: string;
   children: TreeNode[];
   // Agregação automática de custos
@@ -45,7 +45,7 @@ export interface GanttTask {
   type: 'task' | 'milestone' | 'project';
   project?: string;
   dependencies?: string[];
-  level: 1 | 2 | 3;
+  level: 1 | 2 | 3 | 4;
   cost: number;
   totalCost: number;
   responsible?: string;
@@ -59,12 +59,13 @@ export interface GanttTask {
 }
 
 export interface GanttViewOptions {
-  showLevels: (1 | 2 | 3)[];
+  showLevels: (1 | 2 | 3 | 4)[];
   showCriticalPath: boolean;
   groupByLevel: boolean;
   showCosts: boolean;
   showProgress: boolean;
   viewMode: 'Quarter Day' | 'Half Day' | 'Day' | 'Week' | 'Month';
+  ganttHeight: 'compact' | 'standard' | 'expanded' | 'full';
 }
 
 export interface GanttDependency {
@@ -314,7 +315,7 @@ export interface UnifiedExportOptions {
   compressOutput: boolean;
   
   // Filtros
-  levelsToExport?: (1 | 2 | 3)[];
+  levelsToExport?: (1 | 2 | 3 | 4)[];
   riskStatusFilter?: Risk['status'][];
   meritFigureCategoryFilter?: MeritFigure['category'][];
   

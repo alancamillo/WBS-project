@@ -16,6 +16,7 @@ import SettingsModal from './components/SettingsModal';
 import { TreeNode, ExportOptions, UnifiedExportOptions } from './types/index';
 import { ImportResult, ImportService } from './services/importService';
 import { CostCalculator } from './utils/costCalculator';
+import { DateCalculator } from './utils/dateCalculator';
 import { ExportService } from './services/exportService';
 import { createSampleProject } from './data/sampleData';
 import { useCurrencySettings } from './hooks/useCurrencySettings';
@@ -50,21 +51,24 @@ function App() {
           };
         };
         
-        return convertDates(parsedWBS);
+        const convertedWBS = convertDates(parsedWBS);
+        // Aplica herança e cálculo de custos imediatamente ao carregar
+        const processedRoot = CostCalculator.processCompleteNode(convertedWBS);
+        return DateCalculator.applyDateInheritanceRecursively(processedRoot);
       }
     } catch (error) {
-              console.error(t('messages.error.loadFailed'), error);
-      }
-      
-      // Retorna estrutura padrão se não houver dados salvos
-      return {
-        id: uuidv4(),
-        name: t('wbs.project'),
-        cost: 0,
-        level: 1,
-        children: [],
-        totalCost: 0
-      };
+      console.error(t('messages.error.loadFailed'), error);
+    }
+    
+    // Retorna estrutura padrão se não houver dados salvos
+    return {
+      id: uuidv4(),
+      name: t('wbs.project'),
+      cost: 0,
+      level: 1,
+      children: [],
+      totalCost: 0
+    };
   };
 
   // Função para carregar estado de agrupamento do localStorage
@@ -89,7 +93,10 @@ function App() {
   // Função para salvar estrutura WBS no localStorage
   const saveWBSToStorage = (wbs: TreeNode) => {
     try {
-      localStorage.setItem(WBS_STORAGE_KEY, JSON.stringify(wbs));
+      // Sempre aplicar herança e cálculo de custos antes de persistir
+      const processedRoot = CostCalculator.processCompleteNode(wbs);
+      const processedWithInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+      localStorage.setItem(WBS_STORAGE_KEY, JSON.stringify(processedWithInheritance));
     } catch (error) {
       console.error(t('messages.error.saveFailed'), error);
       
@@ -127,14 +134,7 @@ function App() {
     }
   }, [groupingState]);
 
-  // Recalcula custos, datas e durações automaticamente quando a estrutura muda
-  useEffect(() => {
-    const processedRoot = CostCalculator.processCompleteNode(rootNode);
-    if (processedRoot.totalCost !== rootNode.totalCost || 
-        JSON.stringify(processedRoot) !== JSON.stringify(rootNode)) {
-      setRootNode(processedRoot);
-    }
-  }, [rootNode]);
+  // REMOVIDO: useEffect que reprocessava dados após mudanças - agora é feito na atualização
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -147,7 +147,10 @@ function App() {
 
         if (result.success && result.data) {
           ImportService.applyUnifiedData(result.data);
-          setRootNode(result.data.wbsStructure);
+          // Aplica processamento completo nos dados da URL
+          const processedRoot = CostCalculator.processCompleteNode(result.data.wbsStructure);
+          const wbsWithInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+          setRootNode(wbsWithInheritance);
           if (result.data.groupingState) {
             setGroupingState(result.data.groupingState);
           }
@@ -162,7 +165,10 @@ function App() {
   }, [t]);
 
   const handleRootUpdate = (updatedNode: TreeNode) => {
-    setRootNode(updatedNode);
+    // Aplica processamento completo (custos + herança) antes de atualizar o estado
+    const processedRoot = CostCalculator.processCompleteNode(updatedNode);
+    const nodeWithDateInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+    setRootNode(nodeWithDateInheritance);
     // A persistência acontece automaticamente via useEffect
   };
 
@@ -234,12 +240,16 @@ function App() {
         okText: t('modals.loadSampleData.replaceButton'),
         cancelText: t('buttons.cancel'),
         onOk: () => {
-          setRootNode(sampleProject);
+          const processedRoot = CostCalculator.processCompleteNode(sampleProject);
+          const sampleWithInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+          setRootNode(sampleWithInheritance);
           message.success(t('messages.success.sampleDataLoaded'));
         },
       });
     } else {
-      setRootNode(sampleProject);
+      const processedRoot = CostCalculator.processCompleteNode(sampleProject);
+      const sampleWithInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+      setRootNode(sampleWithInheritance);
       message.success(t('messages.success.sampleDataLoaded'));
     }
   };
@@ -271,7 +281,10 @@ function App() {
 
   const handleImportWBS = (result: ImportResult) => {
     if (result.data) {
-      setRootNode(result.data);
+      // Aplica processamento completo nos dados importados
+      const processedRoot = CostCalculator.processCompleteNode(result.data);
+      const dataWithInheritance = DateCalculator.applyDateInheritanceRecursively(processedRoot);
+      setRootNode(dataWithInheritance);
     }
 
     if (result.risks) {
@@ -299,8 +312,9 @@ function App() {
         // Aplicar dados usando o novo método
         ImportService.applyUnifiedData(unifiedResult.data);
         
-        // Atualizar estado local com WBS
-        setRootNode(unifiedResult.data.wbsStructure);
+        // Atualizar estado local com WBS com herança de datas aplicada
+        const wbsWithInheritance = DateCalculator.applyDateInheritanceRecursively(unifiedResult.data.wbsStructure);
+        setRootNode(wbsWithInheritance);
         
         // Atualizar estado de agrupamento se presente
         if (unifiedResult.data.groupingState) {
