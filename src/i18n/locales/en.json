@@ -296,6 +296,7 @@
     "wbsLevel1": "Level 1 (Project)",
     "wbsLevel2": "Level 2 (Phase)",
     "wbsLevel3": "Level 3 (Activity)",
+    "wbsLevel4": "Level 4 (Sub-activity)",
     "periodDetail": "Period Detail",
     "wbsStructure": "WBS Structure",
     "total": "Total",

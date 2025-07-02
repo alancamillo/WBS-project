@@ -450,8 +450,8 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
         // Incluir custo da própria fase
         phaseCost += calculateNodeCostInPeriod(phase);
 
-        // Incluir custos dos filhos (atividades) se nível 3 estiver selecionado
-        if (selectedLevels.includes(3)) {
+        // Incluir custos dos filhos (atividades) se níveis 3 ou 4 estiverem selecionados
+        if (selectedLevels.includes(3) || selectedLevels.includes(4)) {
           const calculateChildrenCost = (node: TreeNode): number => {
             let childrenCost = 0;
             node.children.forEach(child => {
@@ -667,14 +667,16 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 <FileOutlined style={{ color: getLevelColor(1) }} />
               ) : record.level === 2 ? (
                 <FolderOutlined style={{ color: getLevelColor(2) }} />
-              ) : (
+              ) : record.level === 3 ? (
                 <FileOutlined style={{ color: getLevelColor(3) }} />
+              ) : (
+                <FileOutlined style={{ color: getLevelColor(4) }} />
               )}
               <Text 
                 strong={record.level <= 2} 
                 style={{ 
-                  fontSize: record.level === 1 ? '14px' : record.level === 2 ? '13px' : '12px',
-                  color: record.level === 1 ? '#1890ff' : record.level === 2 ? '#333' : '#666',
+                  fontSize: record.level === 1 ? '14px' : record.level === 2 ? '13px' : record.level === 3 ? '12px' : '11px',
+                  color: record.level === 1 ? '#1890ff' : record.level === 2 ? '#333' : record.level === 3 ? '#666' : '#999',
                   fontWeight: record.isLeaf ? 'normal' : 'bold'
                 }}
               >
@@ -788,7 +790,8 @@ const BudgetAllocationView: React.FC<BudgetAllocationViewProps> = ({ rootNode })
                 options={[
                   { value: 1, label: t('budgetAllocation.wbsLevel1') },
                   { value: 2, label: t('budgetAllocation.wbsLevel2') },
-                  { value: 3, label: t('budgetAllocation.wbsLevel3') }
+                  { value: 3, label: t('budgetAllocation.wbsLevel3') },
+                  { value: 4, label: t('budgetAllocation.wbsLevel4') }
                 ]}
               />
             </Space>
