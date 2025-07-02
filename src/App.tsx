@@ -716,6 +716,66 @@ function App() {
           open={importModalVisible}
           onClose={() => setImportModalVisible(false)}
           onImport={handleImportWBS}
+          onImportUnified={(result) => {
+            if (result.success && result.data) {
+              // Aplicar dados usando o novo método
+              ImportService.applyUnifiedData(result.data);
+              
+              // Atualizar estado local com WBS e aplicar herança de datas
+              const wbsWithInheritance = DateCalculator.applyDateInheritanceRecursively(result.data.wbsStructure);
+              setRootNode(wbsWithInheritance);
+              
+              // Atualizar estado de agrupamento se presente
+              if (result.data.groupingState) {
+                setGroupingState(result.data.groupingState);
+              }
+
+              // Atualizar figuras de mérito se presente
+              if (result.data.meritFigures) {
+                setProjectMeritFigures(result.data.meritFigures);
+              }
+              
+              setImportModalVisible(false);
+              
+              // Mostrar resumo da importação
+              const summary = result.summary;
+              if (summary) {
+                message.success({
+                  content: (
+                    <div>
+                      <div><strong>{t('messages.success.wbsImported')}</strong></div>
+                      <div>WBS: {summary.wbs.totalNodes} {t('unifiedImport.nodesImported')}</div>
+                      <div>{t('navigation.risks')}: {summary.risks.totalRisks} {t('unifiedImport.risksImported')}</div>
+                      <div>{t('navigation.meritFigures')}: {summary.meritFigures.totalFigures} {t('unifiedImport.meritFiguresImported')}</div>
+                      {summary.compatibility.migrationRequired && (
+                        <div style={{ color: '#faad14' }}>{t('unifiedImport.migrationPerformed')}</div>
+                      )}
+                    </div>
+                  ),
+                  duration: 6
+                });
+              } else {
+                message.success(t('messages.success.wbsImported'));
+              }
+              
+              // Forçar recarga para garantir sincronização
+              setTimeout(() => window.location.reload(), 1000);
+            } else {
+              // Mostrar erros
+              const errorMessages = result.errors
+                .filter(e => e.severity === 'error')
+                .map(e => e.message)
+                .join('; ');
+              
+              message.error(`${t('unifiedImport.importError')} ${errorMessages}`);
+              
+              // Mostrar warnings se houver
+              const warnings = result.warnings;
+              if (warnings.length > 0) {
+                message.warning(`${t('unifiedImport.warnings')} ${warnings.map(w => w.message).join('; ')}`);
+              }
+            }
+          }}
         />
 
         <SettingsModal
